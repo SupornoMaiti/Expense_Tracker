@@ -1,3 +1,4 @@
+import React, { useState } from 'react'
 import { deleteTransaction } from '../lib/db'
 import type { Transaction } from '../lib/db'
 import CategoryBadge from './CategoryBadge'
@@ -26,6 +27,7 @@ function formatDate(iso: string) {
 }
 
 export default function TransactionList({ transactions, onDelete, limit }: Props) {
+  const [expandedId, setExpandedId] = useState<string | null>(null)
   const displayed = limit ? transactions.slice(0, limit) : transactions
 
   if (displayed.length === 0) {
@@ -47,63 +49,76 @@ export default function TransactionList({ transactions, onDelete, limit }: Props
   }
 
   return (
-    <table className="ledger-table">
-      <thead>
-        <tr>
-          <th style={{ width: 60 }}>DATE</th>
-          <th>DESCRIPTION</th>
-          <th>CATEGORY</th>
-          <th style={{ textAlign: 'right' }}>AMOUNT</th>
-          <th style={{ width: 40 }}></th>
-        </tr>
-      </thead>
-      <tbody>
-        {displayed.map(tx => {
-          const { day, month, time } = formatDate(tx.created_at)
-          return (
-            <tr key={tx.id}>
-              <td>
-                <div style={{ lineHeight: 1.2 }}>
-                  <div style={{ fontSize: 'var(--font-size-md)', fontWeight: 600, color: 'var(--color-text)' }}>
-                    {day} {month}
-                  </div>
-                  <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>
-                    {time}
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div style={{ fontWeight: 500, color: 'var(--color-text)' }}>
-                  {tx.description || '—'}
-                </div>
-                {tx.synced_at === null && (
-                  <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-warn)' }}>
-                    ◌ pending
-                  </span>
-                )}
-              </td>
-              <td>
-                <CategoryBadge category={tx.category} />
-              </td>
-              <td style={{ textAlign: 'right' }}>
-                <span className={tx.type === 'income' ? 'amount-income' : 'amount-expense'}>
-                  {formatAmount(tx.amount)}
-                </span>
-              </td>
-              <td>
-                <button
-                  className="btn btn-ghost btn-sm btn-icon"
-                  onClick={() => handleDelete(tx.id)}
-                  title="Delete transaction"
-                  style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-size-xs)' }}
+    <div className="ledger-table-wrap">
+      <table className="ledger-table" style={{ borderCollapse: 'collapse' }}>
+        <thead>
+          <tr>
+            <th style={{ width: 70 }}>DATE</th>
+            <th style={{ width: 120 }}>CATEGORY</th>
+            <th style={{ width: 100, textAlign: 'right' }}>AMOUNT</th>
+            <th></th> {/* spacer */}
+            <th style={{ width: 40 }}></th>
+          </tr>
+        </thead>
+        <tbody>
+          {displayed.map(tx => {
+            const { day, month, time } = formatDate(tx.created_at)
+            const isExpanded = expandedId === tx.id
+            
+            return (
+              <React.Fragment key={tx.id}>
+                <tr 
+                  onClick={() => setExpandedId(isExpanded ? null : tx.id)}
+                  style={{ cursor: 'pointer', borderBottom: isExpanded ? 'none' : '1px solid var(--color-border)' }}
                 >
-                  ✕
-                </button>
-              </td>
-            </tr>
-          )
-        })}
-      </tbody>
-    </table>
+                  <td>
+                    <div style={{ lineHeight: 1.2 }}>
+                      <div style={{ fontSize: 'var(--font-size-md)', fontWeight: 600, color: 'var(--color-text)' }}>
+                        {day} {month}
+                      </div>
+                      <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>
+                        {time}
+                      </div>
+                      {tx.synced_at === null && (
+                        <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-warn)', marginTop: 2 }}>
+                          ◌ pending
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                  <td>
+                    <CategoryBadge category={tx.category} />
+                  </td>
+                  <td style={{ textAlign: 'right' }}>
+                    <span className={tx.type === 'income' ? 'amount-income' : 'amount-expense'}>
+                      {formatAmount(tx.amount)}
+                    </span>
+                  </td>
+                  <td></td> {/* spacer */}
+                  <td>
+                    <button
+                      className="btn btn-ghost btn-sm btn-icon"
+                      onClick={(e) => { e.stopPropagation(); handleDelete(tx.id) }}
+                      title="Delete transaction"
+                      style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-size-xs)' }}
+                    >
+                      ✕
+                    </button>
+                  </td>
+                </tr>
+                {isExpanded && (
+                  <tr style={{ background: 'var(--color-surface-2)', borderBottom: '1px solid var(--color-border)' }}>
+                    <td colSpan={5} style={{ padding: 'var(--space-3) var(--space-4)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-dim)' }}>
+                      <strong>Description: </strong>
+                      {tx.description ? tx.description : <span style={{ fontStyle: 'italic', opacity: 0.6 }}>No description provided.</span>}
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            )
+          })}
+        </tbody>
+      </table>
+    </div>
   )
 }

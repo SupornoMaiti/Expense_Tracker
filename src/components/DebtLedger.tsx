@@ -172,6 +172,7 @@ export default function DebtLedger({ people, onRefresh }: Props) {
             <div className="empty-state-text">No outstanding debts. You're all square!</div>
           </div>
         ) : (
+          <div className="ledger-table-wrap">
           <table className="ledger-table">
             <thead>
               <tr>
@@ -237,6 +238,7 @@ export default function DebtLedger({ people, onRefresh }: Props) {
               })}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>

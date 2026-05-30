@@ -120,7 +120,21 @@ export default function PersonDetail() {
             </div>
             {person.phone && (
               <a
-                href={`https://wa.me/${person.phone.replace(/\D/g, '')}?text=Hey+${encodeURIComponent(person.name)}!+Our+net+balance+is+${isCredit ? `you+owe+me+₹${Math.abs(netBalance).toFixed(2)}` : `I+owe+you+₹${Math.abs(netBalance).toFixed(2)}`}.`}
+                href={`https://wa.me/${person.phone.replace(/\D/g, '')}?text=${(() => {
+                  const activeDebts = debts.filter(d => !d.settled)
+                  if (activeDebts.length === 0) return encodeURIComponent(`Hey ${person.name}, we are all settled up! 🎉`)
+                  
+                  let msg = `Hey ${person.name}!\n\nHere is our current balance breakdown:\n`
+                  activeDebts.forEach(d => {
+                    const amt = Math.abs(d.amount).toFixed(2)
+                    const action = d.amount > 0 ? 'You owe me' : 'I owe you'
+                    const note = d.note ? ` for ${d.note}` : ''
+                    msg += `• ${action} ₹${amt}${note}\n`
+                  })
+                  
+                  msg += `\nNet Balance: *${isCredit ? 'You owe me' : 'I owe you'} ₹${Math.abs(netBalance).toFixed(2)}*\n\nLet's settle up soon!`
+                  return encodeURIComponent(msg)
+                })()}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-ghost btn-sm"
@@ -185,6 +199,7 @@ export default function PersonDetail() {
             <div className="empty-state-text">No entries yet.</div>
           </div>
         ) : (
+          <div className="ledger-table-wrap">
           <table className="ledger-table">
             <thead>
               <tr>
@@ -237,6 +252,7 @@ export default function PersonDetail() {
               })}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>

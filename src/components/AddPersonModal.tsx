@@ -35,7 +35,30 @@ export default function AddPersonModal({ onClose, onSuccess }: Props) {
     <div className="modal-backdrop" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
       <div className="modal">
         <div className="modal-header">
-          <span className="modal-title">+ Add Contact</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+            <span className="modal-title">+ Add Contact</span>
+            {'contacts' in navigator && 'ContactsManager' in window && (
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                style={{ fontSize: 'var(--font-size-xs)', padding: '2px 8px', color: 'var(--color-info)' }}
+                onClick={async () => {
+                  try {
+                    // @ts-ignore - Contacts API is not in standard lib dom yet
+                    const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: false })
+                    if (contacts && contacts.length > 0) {
+                      setName(contacts[0].name?.[0] || '')
+                      setPhone(contacts[0].tel?.[0] || '')
+                    }
+                  } catch (err) {
+                    console.log('Contacts API failed:', err)
+                  }
+                }}
+              >
+                📥 IMPORT
+              </button>
+            )}
+          </div>
           <button className="modal-close" onClick={onClose}>✕</button>
         </div>
 

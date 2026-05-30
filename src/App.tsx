@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, NavLink, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 import SyncStatusBar from './components/SyncStatusBar'
 import Dashboard   from './pages/Dashboard'
 import Transactions from './pages/Transactions'
@@ -6,10 +7,23 @@ import Debts       from './pages/Debts'
 import PersonDetail from './pages/PersonDetail'
 
 const NAV_ITEMS = [
-  { to: '/',             label: 'DASHBOARD',     icon: '⬛' },
-  { to: '/transactions', label: 'TRANSACTIONS',  icon: '≡' },
-  { to: '/debts',        label: 'DEBTS',         icon: '⇄' },
+  { to: '/',             label: 'DASHBOARD',    icon: '◈' },
+  { to: '/transactions', label: 'LEDGER',       icon: '≋' },
+  { to: '/debts',        label: 'DEBTS',        icon: '⇌' },
 ] as const
+
+// ── Scroll-to-top on every route change ──────────────────────────────────────
+function ScrollToTop() {
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    // Scroll the main-content element, not window (which doesn't scroll here)
+    const el = document.querySelector('.main-content') as HTMLElement | null
+    if (el) el.scrollTop = 0
+  }, [pathname])
+
+  return null
+}
 
 export default function App() {
   return (
@@ -26,7 +40,7 @@ export default function App() {
           </div>
         </header>
 
-        {/* ── Sidebar navigation ──────────────────────── */}
+        {/* ── Sidebar / bottom-nav ─────────────────────── */}
         <nav className="sidebar">
           {NAV_ITEMS.map(item => (
             <NavLink
@@ -38,19 +52,12 @@ export default function App() {
               }
             >
               <span className="nav-icon">{item.icon}</span>
-              {item.label}
+              <span className="nav-label">{item.label}</span>
             </NavLink>
           ))}
 
-          <div style={{ flex: 1 }} />
-
-          {/* Version / info footer */}
-          <div style={{
-            padding: 'var(--space-3) var(--space-5)',
-            fontSize: 'var(--font-size-xs)',
-            color: 'var(--color-text-muted)',
-            borderTop: '1px solid var(--color-border)',
-          }}>
+          {/* Version — desktop sidebar only, hidden on mobile */}
+          <div className="sidebar__footer">
             <div>FINTRACK v1.0</div>
             <div>offline-first PWA</div>
           </div>
@@ -58,6 +65,7 @@ export default function App() {
 
         {/* ── Main content ────────────────────────────── */}
         <main className="main-content">
+          <ScrollToTop />
           <Routes>
             <Route path="/"              element={<Dashboard />} />
             <Route path="/transactions"  element={<Transactions />} />
