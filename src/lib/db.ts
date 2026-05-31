@@ -1,4 +1,5 @@
 import { openDB } from 'idb'
+import { getCurrentUserId } from './user-id'
 import type { DBSchema, IDBPDatabase } from 'idb'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -139,6 +140,16 @@ export function getDB(): Promise<IDBPDatabase<FinTrackDB>> {
   return dbPromise
 }
 
+// Close the connection — must be called before indexedDB.deleteDatabase()
+// otherwise the deletion is blocked by the open handle.
+export async function closeDB(): Promise<void> {
+  if (dbPromise) {
+    const db = await dbPromise
+    db.close()
+    dbPromise = null
+  }
+}
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function uuid(): string {
@@ -158,14 +169,15 @@ const DEVICE_ID = (() => {
   return id
 })()
 
-const USER_ID = 'local-user' // replaced by Supabase auth in Phase 1c
+// user_id is resolved dynamically via auth.tsx getCurrentUserId()
 
 // ─── Transactions CRUD ───────────────────────────────────────────────────────
 
 export async function getAllTransactions(): Promise<Transaction[]> {
-  const db = await getDB()
+  const db  = await getDB()
+  const uid = getCurrentUserId()
   const all = await db.getAllFromIndex('transactions', 'by-created')
-  return all.reverse()
+  return all.filter(tx => tx.user_id === uid).reverse()
 }
 
 export async function addTransaction(
@@ -175,7 +187,7 @@ export async function addTransaction(
   const tx: Transaction = {
     ...data,
     id: uuid(),
-    user_id: USER_ID,
+    user_id: getCurrentUserId(),
     created_at: now(),
     synced_at: null,
     device_id: DEVICE_ID,
@@ -196,15 +208,19 @@ export async function deleteTransaction(id: string): Promise<void> {
 }
 
 export async function getTransactionsByType(type: TransactionType): Promise<Transaction[]> {
-  const db = await getDB()
-  return db.getAllFromIndex('transactions', 'by-type', type)
+  const db  = await getDB()
+  const uid = getCurrentUserId()
+  const all = await db.getAllFromIndex('transactions', 'by-type', type)
+  return all.filter(tx => tx.user_id === uid)
 }
 
 // ─── People CRUD ─────────────────────────────────────────────────────────────
 
 export async function getAllPeople(): Promise<Person[]> {
-  const db = await getDB()
-  return db.getAllFromIndex('people', 'by-name')
+  const db  = await getDB()
+  const uid = getCurrentUserId()
+  const all = await db.getAllFromIndex('people', 'by-name')
+  return all.filter(p => p.user_id === uid)
 }
 
 export async function addPerson(data: Omit<Person, 'id' | 'user_id' | 'created_at'>): Promise<Person> {
@@ -212,7 +228,7 @@ export async function addPerson(data: Omit<Person, 'id' | 'user_id' | 'created_a
   const person: Person = {
     ...data,
     id: uuid(),
-    user_id: USER_ID,
+    user_id: getCurrentUserId(),
     created_at: now(),
   }
   await db.put('people', person)
@@ -241,8 +257,10 @@ export async function getPerson(id: string): Promise<Person | undefined> {
 // ─── Categories CRUD ─────────────────────────────────────────────────────────
 
 export async function getAllCategories(): Promise<Category[]> {
-  const db = await getDB()
-  return db.getAllFromIndex('categories', 'by-name')
+  const db  = await getDB()
+  const uid = getCurrentUserId()
+  const all = await db.getAllFromIndex('categories', 'by-name')
+  return all.filter(c => c.user_id === uid)
 }
 
 export async function addCategory(
@@ -252,7 +270,7 @@ export async function addCategory(
   const cat: Category = {
     ...data,
     id: uuid(),
-    user_id: USER_ID,
+    user_id: getCurrentUserId(),
     created_at: now(),
   }
   await db.put('categories', cat)
@@ -271,13 +289,17 @@ export async function deleteCategory(id: string): Promise<void> {
 // ─── Debts CRUD ──────────────────────────────────────────────────────────────
 
 export async function getAllDebts(): Promise<Debt[]> {
-  const db = await getDB()
-  return db.getAll('debts')
+  const db  = await getDB()
+  const uid = getCurrentUserId()
+  const all = await db.getAll('debts')
+  return all.filter(d => d.user_id === uid)
 }
 
 export async function getDebtsByPerson(personId: string): Promise<Debt[]> {
-  const db = await getDB()
-  return db.getAllFromIndex('debts', 'by-person', personId)
+  const db  = await getDB()
+  const uid = getCurrentUserId()
+  const all = await db.getAllFromIndex('debts', 'by-person', personId)
+  return all.filter(d => d.user_id === uid)
 }
 
 export async function addDebt(
@@ -287,7 +309,7 @@ export async function addDebt(
   const debt: Debt = {
     ...data,
     id: uuid(),
-    user_id: USER_ID,
+    user_id: getCurrentUserId(),
     created_at: now(),
   }
   await db.put('debts', debt)
@@ -315,7 +337,7 @@ export async function settleDebt(id: string): Promise<void> {
 
   const tx: Transaction = {
     id:          uuid(),
-    user_id:     USER_ID,
+    user_id:     getCurrentUserId(),
     type:        debt.amount > 0 ? 'refund' : 'expense',
     amount:      Math.abs(debt.amount),
     category:    debt.category || 'other',

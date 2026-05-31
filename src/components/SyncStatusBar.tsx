@@ -22,10 +22,15 @@ export default function SyncStatusBar() {
   useEffect(() => {
     if (isOnline && pending > 0) {
       setSyncing(true)
-      pushOutbox().then(({ pushed }) => {
-        if (pushed > 0) refreshCount()
-        setSyncing(false)
-      })
+      pushOutbox()
+        .then(({ pushed }) => {
+          if (pushed > 0) refreshCount()
+          setSyncing(false)
+        })
+        .catch((err) => {
+          console.warn('[SyncStatusBar] pushOutbox rejected:', err)
+          setSyncing(false)
+        })
     }
   }, [isOnline, pending])
 

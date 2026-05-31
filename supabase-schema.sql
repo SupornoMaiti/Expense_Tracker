@@ -10,7 +10,7 @@ create table if not exists public.transactions (
   id            uuid primary key default gen_random_uuid(),
   user_id       uuid not null references auth.users(id) on delete cascade,
   amount        numeric(10,2) not null check (amount > 0),
-  type          text not null check (type in ('expense')),
+  type          text not null check (type in ('income', 'expense', 'refund')),
   category      text not null,
   description   text not null default '',
   created_at    timestamptz not null default now(),
@@ -56,7 +56,9 @@ create table if not exists public.debts (
   category       text not null default 'other',
   note           text not null default '',
   settled        boolean not null default false,
-  created_at     timestamptz not null default now()
+  created_at     timestamptz not null default now(),
+  due_date       date,                              -- when they should repay
+  remind_at      timestamptz                        -- last notification fired
 );
 
 alter table public.debts enable row level security;
@@ -89,8 +91,43 @@ create policy "Users can manage own categories"
   with check (auth.uid() = user_id);
 
 -- ─── Realtime subscriptions ────────────────────────────────────────────────
+-- ─── Realtime: replica identity ───────────────────────────────────────────
+-- Required for Supabase Realtime to work with RLS-enabled tables.
+-- Without FULL, Supabase cannot check old row values against RLS policies
+-- and silently drops change events — realtime will appear broken.
+alter table public.transactions replica identity full;
+alter table public.people       replica identity full;
+alter table public.debts        replica identity full;
+alter table public.categories   replica identity full;
+
 -- Enable realtime for cross-device sync
 alter publication supabase_realtime add table public.transactions;
 alter publication supabase_realtime add table public.people;
 alter publication supabase_realtime add table public.debts;
 alter publication supabase_realtime add table public.categories;
+
+
+-- ─── Table-level grants ────────────────────────────────────────────────────
+-- RLS policies filter rows, but PostgreSQL also requires these GRANT statements
+-- for the authenticated role to be allowed to touch the tables at all.
+-- 403 "permission denied" errors mean these are missing — run them now.
+grant select, insert, update, delete on public.transactions to authenticated;
+grant select, insert, update, delete on public.people       to authenticated;
+grant select, insert, update, delete on public.debts        to authenticated;
+grant select, insert, update, delete on public.categories   to authenticated;
+
+
+-- ─── Migration patches (run on existing DB only) ──────────────────────────
+-- Skip these if you are applying the schema for the first time.
+
+-- Fix transaction type constraint
+alter table public.transactions
+  drop constraint if exists transactions_type_check;
+alter table public.transactions
+  add constraint transactions_type_check check (type in ('income', 'expense', 'refund'));
+
+-- Add missing debt columns
+alter table public.debts
+  add column if not exists due_date   date;
+alter table public.debts
+  add column if not exists remind_at  timestamptz;

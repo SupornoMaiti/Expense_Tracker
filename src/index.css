@@ -942,3 +942,82 @@ input[type="date"] {
     padding-bottom: calc(var(--space-5) + 64px + 72px);
   }
 }
+
+/* ─── User Avatar & Sign-out Dropdown ───────────────────────────────────────── */
+
+.user-avatar-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-3);
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0;
+  transition: all var(--transition-fast);
+  box-shadow: 0 0 8px var(--color-accent-glow);
+  flex-shrink: 0;
+}
+
+.user-avatar-btn:hover {
+  background: var(--color-accent-glow);
+  box-shadow: 0 0 14px rgba(0, 255, 136, 0.3);
+}
+
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-bright);
+  border-radius: var(--radius-lg);
+  min-width: 220px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.7), 0 0 0 1px var(--color-accent-glow);
+  z-index: 300;
+  overflow: hidden;
+  animation: slideUp 150ms ease;
+}
+
+.user-dropdown__email {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.04em;
+}
+
+.user-dropdown__divider {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 0;
+}
+
+.user-dropdown__signout {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background: transparent;
+  border: none;
+  color: var(--color-expense);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  transition: background var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.user-dropdown__signout:hover {
+  background: rgba(255, 71, 87, 0.08);
+}

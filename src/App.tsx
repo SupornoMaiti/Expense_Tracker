@@ -1,7 +1,9 @@
 import { BrowserRouter, Routes, Route, NavLink, useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { AuthProvider, useAuth } from './lib/auth'
 import SyncStatusBar from './components/SyncStatusBar'
 import AddTransactionModal from './components/AddTransactionModal'
+import Login from './pages/Login'
 import Spend       from './pages/Spend'
 import Debts       from './pages/Debts'
 import Contacts    from './pages/Contacts'
@@ -24,6 +26,74 @@ function ScrollToTop() {
   return null
 }
 
+// ── User menu (avatar + dropdown in topbar) ───────────────────────────────────
+function UserMenu() {
+  const { user, signOut } = useAuth()
+  const [open, setOpen]   = useState(false)
+
+  if (!user) return null
+
+  // Derive initials from email
+  const initials = (user.email ?? 'U').slice(0, 1).toUpperCase()
+
+  return (
+    <div className="user-menu" style={{ position: 'relative' }}>
+      <button
+        id="user-menu-trigger"
+        className="user-avatar-btn"
+        onClick={() => setOpen(o => !o)}
+        title={user.email ?? 'User menu'}
+        aria-expanded={open}
+        aria-haspopup="true"
+      >
+        {initials}
+      </button>
+
+      {open && (
+        <>
+          {/* Click-outside overlay */}
+          <div
+            style={{ position: 'fixed', inset: 0, zIndex: 299 }}
+            onClick={() => setOpen(false)}
+          />
+          <div className="user-dropdown" role="menu">
+            <div className="user-dropdown__email">{user.email}</div>
+            <hr className="user-dropdown__divider" />
+            <button
+              id="sign-out-btn"
+              className="user-dropdown__signout"
+              role="menuitem"
+              onClick={async () => {
+                setOpen(false)
+                await signOut()
+              }}
+            >
+              ⏻ Sign Out
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
+// ── Boot screen — shown while session is being resolved ──────────────────────
+function BootScreen() {
+  return (
+    <div style={{
+      position: 'fixed', inset: 0,
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center',
+      background: 'var(--color-bg)', gap: '16px',
+    }}>
+      <span style={{ fontSize: '2rem', color: 'var(--color-accent)', filter: 'drop-shadow(0 0 12px var(--color-accent))' }}>₹</span>
+      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--color-text-muted)', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
+        initialising<span className="blink">_</span>
+      </span>
+    </div>
+  )
+}
+
 // ── Global FAB wrapper (needs router context) ─────────────────────────────────
 function AppShell() {
   const [showAdd, setShowAdd] = useState(false)
@@ -38,6 +108,7 @@ function AppShell() {
         </div>
         <div className="topbar__right">
           <SyncStatusBar />
+          <UserMenu />
         </div>
       </header>
 
@@ -102,10 +173,24 @@ function AppShell() {
   )
 }
 
-export default function App() {
+// ── Auth-gated root ───────────────────────────────────────────────────────────
+function AuthGate() {
+  const { user, loading } = useAuth()
+
+  if (loading) return <BootScreen />
+  if (!user)   return <Login />
+
   return (
     <BrowserRouter>
       <AppShell />
     </BrowserRouter>
+  )
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AuthGate />
+    </AuthProvider>
   )
 }
