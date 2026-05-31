@@ -44,6 +44,15 @@ async function wipeLocalData(): Promise<void> {
       req.onerror   = () => reject(req.error)
       req.onblocked = () => resolve() // fallback
     })
+    // Also wipe Supabase auth tokens manually. If signOut() timed out due to 
+    // network issues, it leaves the token in localStorage. The next page load 
+    // will hang trying to refresh it. This guarantees a clean local state.
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('sb-') && key.endsWith('-auth-token')) {
+        localStorage.removeItem(key)
+      }
+    })
+    
     localStorage.removeItem('fintrack-device-id')
     localStorage.removeItem('fintrack-last-user')
   } catch (err) {
@@ -70,12 +79,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const LAST_USER_KEY = 'fintrack-last-user'
 
     // ── Restore existing session ─────────────────────────────────────────────
-    // Timeout guard: if Supabase doesn't respond in 8 s, unblock the app.
+    // Timeout guard: if Supabase doesn't respond quickly, unblock the app.
+    // 2.5s is enough for a local token check. If it takes longer, network is dead.
     const timeoutId = setTimeout(() => {
       console.warn('[auth] getSession timed out — running unauthenticated')
       setCurrentUserId('local-user')
       setLoading(false)
-    }, 8000)
+    }, 2500)
 
     if (!supabase) {
       clearTimeout(timeoutId)
