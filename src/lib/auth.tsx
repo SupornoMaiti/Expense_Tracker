@@ -80,12 +80,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // ── Restore existing session ─────────────────────────────────────────────
     // Timeout guard: if Supabase doesn't respond quickly, unblock the app.
-    // 2.5s is enough for a local token check. If it takes longer, network is dead.
+    // 2.5s is enough for a local token check. But if this is an OAuth redirect,
+    // Supabase needs to verify the token with the server, so give it 10s.
+    const isOAuthRedirect = window.location.hash.includes('access_token=')
     const timeoutId = setTimeout(() => {
       console.warn('[auth] getSession timed out — running unauthenticated')
       setCurrentUserId('local-user')
       setLoading(false)
-    }, 2500)
+    }, isOAuthRedirect ? 10000 : 2500)
 
     if (!supabase) {
       clearTimeout(timeoutId)
@@ -131,6 +133,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // ── Listen for future auth events ────────────────────────────────────────
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        // Prevent race conditions: if onAuthStateChange fires before getSession
+        // during an OAuth login, it must enforce the wipe-and-reload guard.
+        if (event === 'SIGNED_IN' && session) {
+          const incomingId = session.user.id
+          const lastId     = localStorage.getItem(LAST_USER_KEY) ?? 'local-user'
+          if (incomingId !== lastId) {
+            console.info('[auth] user changed (OAuth) — wiping local cache')
+            await wipeLocalData()
+            localStorage.setItem(LAST_USER_KEY, incomingId)
+            window.location.reload()
+            return
+          }
+        }
+
         setSession(session)
         setUser(session?.user ?? null)
         setCurrentUserId(session?.user?.id ?? 'local-user')
