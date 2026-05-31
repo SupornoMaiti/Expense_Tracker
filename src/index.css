@@ -232,6 +232,7 @@ a:hover { color: var(--color-accent-dim); }
   overflow-y: auto;
   height: 100%;
   min-height: 0;
+  padding-bottom: calc(var(--space-8) + 72px); /* FAB clearance */
 }
 
 /* --- Buttons ---------------------------------------------- */
@@ -879,3 +880,65 @@ input[type="date"] {
   .ledger-table      { min-width: 480px; }
 }
 
+/* ─── Floating Action Button ────────────────────────────────────────────── */
+.fab {
+  position: fixed;
+  /* On desktop: bottom-right corner */
+  bottom: var(--space-8);
+  right: var(--space-8);
+  z-index: 200;
+
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+
+  background: var(--color-accent);
+  color: #0a0a0a;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 1.5rem;
+  line-height: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow:
+    0 0 0 1px rgba(0,255,136,0.4),
+    0 0 20px rgba(0,255,136,0.35),
+    0 4px 16px rgba(0,0,0,0.5);
+
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.fab:hover {
+  transform: scale(1.08);
+  box-shadow:
+    0 0 0 2px rgba(0,255,136,0.6),
+    0 0 32px rgba(0,255,136,0.5),
+    0 6px 20px rgba(0,0,0,0.6);
+}
+
+.fab:active {
+  transform: scale(0.95);
+}
+
+/* Mobile: center above bottom nav */
+@media (max-width: 768px) {
+  .fab {
+    bottom: calc(64px + env(safe-area-inset-bottom) + 12px);
+    right: 50%;
+    transform: translateX(50%);
+  }
+  .fab:hover {
+    transform: translateX(50%) scale(1.08);
+  }
+  .fab:active {
+    transform: translateX(50%) scale(0.95);
+  }
+  .main-content {
+    padding-bottom: calc(var(--space-5) + 64px + 72px);
+  }
+}

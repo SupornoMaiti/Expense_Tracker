@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { getPerson, getDebtsByPerson, settleDebt, deleteDebt, addDebt } from '../lib/db'
+import { getPerson, getDebtsByPerson, settleDebt, deleteDebt, addDebt, settleAllDebts } from '../lib/db'
 import type { Person, Debt } from '../lib/db'
 
 function formatINR(amount: number) {
@@ -31,7 +31,7 @@ export default function PersonDetail() {
   const [note, setNote]       = useState('')
   const [dueDate, setDueDate] = useState('')
   const [adding, setAdding]   = useState(false)
-
+  const [settling, setSettling] = useState(false)
   const refresh = useCallback(async () => {
     if (!id) return
     setLoading(true)
@@ -65,6 +65,19 @@ export default function PersonDetail() {
     setNote('')
     setDueDate('')
     setAdding(false)
+    refresh()
+  }
+
+  async function handleSettleAll() {
+    if (!id || unsettled.length === 0) return
+    const isCredit = netBalance > 0
+    const label = isCredit
+      ? `Mark all ${unsettled.length} debt(s) from ${person?.name} as settled?\nThis will record refunds on the Spend page.`
+      : `Settle all ${unsettled.length} debt(s) you owe ${person?.name}?\nThis will record expenses on the Spend page.`
+    if (!confirm(label)) return
+    setSettling(true)
+    await settleAllDebts(id)
+    setSettling(false)
     refresh()
   }
 
@@ -118,31 +131,47 @@ export default function PersonDetail() {
             <div className="text-xs text-muted">
               {isCredit ? 'owes you' : isDebit ? 'you owe' : 'all clear'}
             </div>
-            {person.phone && (
-              <a
-                href={`https://wa.me/${person.phone.replace(/\D/g, '')}?text=${(() => {
-                  const activeDebts = debts.filter(d => !d.settled)
-                  if (activeDebts.length === 0) return encodeURIComponent(`Hey ${person.name}, we are all settled up! 🎉`)
-                  
-                  let msg = `Hey ${person.name}!\n\nHere is our current balance breakdown:\n`
-                  activeDebts.forEach(d => {
-                    const amt = Math.abs(d.amount).toFixed(2)
-                    const action = d.amount > 0 ? 'You owe me' : 'I owe you'
-                    const note = d.note ? ` for ${d.note}` : ''
-                    msg += `• ${action} ₹${amt}${note}\n`
-                  })
-                  
-                  msg += `\nNet Balance: *${isCredit ? 'You owe me' : 'I owe you'} ₹${Math.abs(netBalance).toFixed(2)}*\n\nLet's settle up soon!`
-                  return encodeURIComponent(msg)
-                })()}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-ghost btn-sm"
-                style={{ marginTop: 'var(--space-2)', color: '#25D366', display: 'inline-flex' }}
-              >
-                📲 WhatsApp
-              </a>
-            )}
+            <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-2)', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+              {unsettled.length > 0 && (
+                <button
+                  className="btn btn-sm"
+                  style={{
+                    background: isCredit ? 'rgba(0,255,136,0.12)' : 'rgba(255,165,2,0.12)',
+                    color:       isCredit ? 'var(--color-income)'  : 'var(--color-warn)',
+                    border:      `1px solid ${isCredit ? 'rgba(0,255,136,0.3)' : 'rgba(255,165,2,0.3)'}`,
+                  }}
+                  onClick={handleSettleAll}
+                  disabled={settling}
+                >
+                  {settling ? '⏳' : '✓'} SETTLE ALL
+                </button>
+              )}
+              {person.phone && (
+                <a
+                  href={`https://wa.me/${person.phone.replace(/\D/g, '')}?text=${(() => {
+                    const activeDebts = debts.filter(d => !d.settled)
+                    if (activeDebts.length === 0) return encodeURIComponent(`Hey ${person.name}, we are all settled up! 🎉`)
+                    
+                    let msg = `Hey ${person.name}!\n\nHere is our current balance breakdown:\n`
+                    activeDebts.forEach(d => {
+                      const amt = Math.abs(d.amount).toFixed(2)
+                      const action = d.amount > 0 ? 'You owe me' : 'I owe you'
+                      const note = d.note ? ` for ${d.note}` : ''
+                      msg += `• ${action} ₹${amt}${note}\n`
+                    })
+                    
+                    msg += `\nNet Balance: *${isCredit ? 'You owe me' : 'I owe you'} ₹${Math.abs(netBalance).toFixed(2)}*\n\nLet's settle up soon!`
+                    return encodeURIComponent(msg)
+                  })()}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-ghost btn-sm"
+                  style={{ color: '#25D366' }}
+                >
+                  📲 WhatsApp
+                </a>
+              )}
+            </div>
           </div>
         </div>
       </div>

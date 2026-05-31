@@ -10,7 +10,7 @@ create table if not exists public.transactions (
   id            uuid primary key default gen_random_uuid(),
   user_id       uuid not null references auth.users(id) on delete cascade,
   amount        numeric(10,2) not null check (amount > 0),
-  type          text not null check (type in ('income','expense')),
+  type          text not null check (type in ('expense')),
   category      text not null,
   description   text not null default '',
   created_at    timestamptz not null default now(),

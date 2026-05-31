@@ -1,6 +1,7 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { PersonWithBalance } from '../hooks/useDebts'
-import { deletePerson } from '../lib/db'
+import { deletePerson, settleAllDebts } from '../lib/db'
 
 interface Props {
   person: PersonWithBalance
@@ -29,11 +30,24 @@ export default function PersonCard({ person, onDelete }: Props) {
   const isCredit  = netBalance > 0  // they owe me
   const isDebit   = netBalance < 0  // I owe them
   const isSettled = netBalance === 0
+  const [settling, setSettling] = useState(false)
 
   async function handleDelete() {
     if (!confirm(`Delete ${person.name} and all their debts?`)) return
     await deletePerson(person.id)
     onDelete()
+  }
+
+  async function handleSettleAll() {
+    if (activeDebts.length === 0) return
+    const label = isCredit
+      ? `Mark all ${activeDebts.length} debt(s) from ${person.name} as settled?\nThis will record refunds on the Spend page.`
+      : `Settle all ${activeDebts.length} debt(s) you owe ${person.name}?\nThis will record expenses on the Spend page.`
+    if (!confirm(label)) return
+    setSettling(true)
+    await settleAllDebts(person.id)
+    setSettling(false)
+    onDelete() // refresh parent list
   }
 
   return (
@@ -97,9 +111,24 @@ export default function PersonCard({ person, onDelete }: Props) {
       </div>
 
       {/* Actions */}
-      <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-4)', justifyContent: 'flex-end' }}>
+      <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-4)', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+        {/* SETTLE ALL — only shown when there are active debts */}
+        {activeDebts.length > 0 && (
+          <button
+            className="btn btn-sm"
+            style={{
+              background: isCredit ? 'rgba(0,255,136,0.12)' : 'rgba(255,165,2,0.12)',
+              color:       isCredit ? 'var(--color-income)'  : 'var(--color-warn)',
+              border:      `1px solid ${isCredit ? 'rgba(0,255,136,0.3)' : 'rgba(255,165,2,0.3)'}`,
+            }}
+            onClick={handleSettleAll}
+            disabled={settling}
+          >
+            {settling ? '⏳' : '✓'} SETTLE ALL
+          </button>
+        )}
         <Link
-          to={`/debts/${person.id}`}
+          to={`/contacts/${person.id}`}
           className="btn btn-ghost btn-sm"
         >
           VIEW →

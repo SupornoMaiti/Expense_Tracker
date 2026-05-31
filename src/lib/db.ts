@@ -3,7 +3,7 @@ import type { DBSchema, IDBPDatabase } from 'idb'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type TransactionType = 'income' | 'expense'
+export type TransactionType = 'income' | 'expense' | 'refund'
 
 export interface Transaction {
   id: string
@@ -238,28 +238,45 @@ export async function settleDebt(id: string): Promise<void> {
   const db = await getDB()
   const debt = await db.get('debts', id)
   if (!debt || debt.settled) return
-  
+
+  // Mark the debt settled
   const updated = { ...debt, settled: true }
   await db.put('debts', updated)
   await enqueueOutbox('debts', 'UPDATE', updated)
 
-  // Auto-record offsetting transaction to fix net balance/expenses
+  // ── Accounting side-effect ───────────────────────────────────────────────
+  // debt.amount > 0  → they owed me, they paid back  → create a REFUND
+  //                    (money returned, so net expense goes DOWN)
+  // debt.amount < 0  → I owed them, I paid them back → create an EXPENSE
+  //                    (cash left my pocket, so expense goes UP)
   const person = await db.get('people', debt.person_id)
-  const pName = person ? person.name : 'friend'
+  const pName  = person ? person.name : 'friend'
 
   const tx: Transaction = {
-    id: uuid(),
-    user_id: USER_ID,
-    type: debt.amount > 0 ? 'income' : 'expense', // if they owed me (+), I get income
-    amount: Math.abs(debt.amount),
-    category: 'other',
-    description: `Settled debt with ${pName}`,
-    created_at: now(),
-    synced_at: null,
-    device_id: DEVICE_ID,
+    id:          uuid(),
+    user_id:     USER_ID,
+    type:        debt.amount > 0 ? 'refund' : 'expense',
+    amount:      Math.abs(debt.amount),
+    category:    'other',
+    description: debt.amount > 0
+      ? `Refund from ${pName} – ${debt.note || 'settled'}` 
+      : `Paid to ${pName} – ${debt.note || 'settled'}`,
+    created_at:  now(),
+    synced_at:   null,
+    device_id:   DEVICE_ID,
   }
   await db.put('transactions', tx)
   await enqueueOutbox('transactions', 'INSERT', tx)
+}
+
+// Settle every unsettled debt for a given person at once
+export async function settleAllDebts(personId: string): Promise<void> {
+  const db    = await getDB()
+  const debts = await db.getAllFromIndex('debts', 'by-person', personId)
+  const unsettled = debts.filter(d => !d.settled)
+  for (const d of unsettled) {
+    await settleDebt(d.id)
+  }
 }
 
 export async function deleteDebt(id: string): Promise<void> {
