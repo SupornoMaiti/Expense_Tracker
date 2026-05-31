@@ -237,10 +237,29 @@ export async function addDebt(
 export async function settleDebt(id: string): Promise<void> {
   const db = await getDB()
   const debt = await db.get('debts', id)
-  if (!debt) return
+  if (!debt || debt.settled) return
+  
   const updated = { ...debt, settled: true }
   await db.put('debts', updated)
   await enqueueOutbox('debts', 'UPDATE', updated)
+
+  // Auto-record offsetting transaction to fix net balance/expenses
+  const person = await db.get('people', debt.person_id)
+  const pName = person ? person.name : 'friend'
+
+  const tx: Transaction = {
+    id: uuid(),
+    user_id: USER_ID,
+    type: debt.amount > 0 ? 'income' : 'expense', // if they owed me (+), I get income
+    amount: Math.abs(debt.amount),
+    category: 'other',
+    description: `Settled debt with ${pName}`,
+    created_at: now(),
+    synced_at: null,
+    device_id: DEVICE_ID,
+  }
+  await db.put('transactions', tx)
+  await enqueueOutbox('transactions', 'INSERT', tx)
 }
 
 export async function deleteDebt(id: string): Promise<void> {

@@ -44,14 +44,23 @@ export default function AddPersonModal({ onClose, onSuccess }: Props) {
                 style={{ fontSize: 'var(--font-size-xs)', padding: '2px 8px', color: 'var(--color-info)' }}
                 onClick={async () => {
                   try {
+                    setSaving(true)
                     // @ts-ignore - Contacts API is not in standard lib dom yet
-                    const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: false })
+                    const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: true })
                     if (contacts && contacts.length > 0) {
-                      setName(contacts[0].name?.[0] || '')
-                      setPhone(contacts[0].tel?.[0] || '')
+                      for (const c of contacts) {
+                        const cName = c.name?.[0] || 'Unknown'
+                        const cPhone = c.tel?.[0] || ''
+                        await addPerson({ name: cName, phone: cPhone })
+                      }
+                      onSuccess()
+                      onClose()
+                    } else {
+                      setSaving(false)
                     }
                   } catch (err) {
                     console.log('Contacts API failed:', err)
+                    setSaving(false)
                   }
                 }}
               >
