@@ -77,6 +77,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false)
     }, 8000)
 
+    if (!supabase) {
+      clearTimeout(timeoutId)
+      setCurrentUserId('local-user')
+      setLoading(false)
+      return
+    }
+
     supabase.auth.getSession()
       .then(async ({ data: { session } }) => {
         clearTimeout(timeoutId)
