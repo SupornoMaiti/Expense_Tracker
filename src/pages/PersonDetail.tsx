@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { getPerson, getDebtsByPerson, settleDebt, deleteDebt, addDebt, settleAllDebts } from '../lib/db'
 import type { Person, Debt } from '../lib/db'
+import { useCategories } from '../hooks/useCategories'
 
 function formatINR(amount: number) {
   return new Intl.NumberFormat('en-IN', {
@@ -32,6 +33,8 @@ export default function PersonDetail() {
   const [dueDate, setDueDate] = useState('')
   const [adding, setAdding]   = useState(false)
   const [settling, setSettling] = useState(false)
+  const [category, setCategory] = useState('other')
+  const { categories } = useCategories()
   const refresh = useCallback(async () => {
     if (!id) return
     setLoading(true)
@@ -57,6 +60,7 @@ export default function PersonDetail() {
       person_id: id,
       transaction_id: null,
       amount: direction === 'credit' ? num : -num,
+      category,
       note: note.trim(),
       settled: false,
       due_date: dueDate || undefined,
@@ -208,6 +212,18 @@ export default function PersonDetail() {
               <input type="date" className="form-input" value={dueDate} onChange={e => setDueDate(e.target.value)} min={new Date().toISOString().slice(0, 10)} />
             </div>
           )}
+          <div className="form-group" style={{ flex: '1 1 140px' }}>
+            <label className="form-label">Category</label>
+            <select
+              className="form-select"
+              value={category}
+              onChange={e => setCategory(e.target.value)}
+            >
+              {categories.map(c => (
+                <option key={c.name} value={c.name}>{c.icon} {c.name.charAt(0).toUpperCase() + c.name.slice(1)}</option>
+              ))}
+            </select>
+          </div>
           <div className="form-group" style={{ flex: '0 0 auto' }}>
             <label className="form-label" style={{ visibility: 'hidden' }}>x</label>
             <button type="submit" className="btn btn-primary" disabled={adding}>{adding ? '…' : '[ ADD ]'}</button>
@@ -233,6 +249,7 @@ export default function PersonDetail() {
             <thead>
               <tr>
                 <th>DATE</th>
+                <th>CATEGORY</th>
                 <th>NOTE</th>
                 <th>DUE</th>
                 <th style={{ textAlign: 'right' }}>AMOUNT</th>
@@ -246,6 +263,9 @@ export default function PersonDetail() {
                 return (
                   <tr key={debt.id} style={{ opacity: debt.settled ? 0.4 : 1 }}>
                     <td className="text-xs text-muted">{formatDate(debt.created_at)}</td>
+                    <td className="text-xs" style={{ textTransform: 'capitalize' }}>
+                      {categories.find(c => c.name === debt.category)?.icon} {debt.category || 'other'}
+                    </td>
                     <td>{debt.note || '—'}</td>
                     <td>
                       {debt.due_date && !debt.settled ? (() => {

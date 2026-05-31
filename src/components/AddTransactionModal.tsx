@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { addTransaction, addDebt, getAllPeople, addPerson } from '../lib/db'
 import type { Person } from '../lib/db'
-import { CATEGORIES } from './CategoryBadge'
+import { useCategories } from '../hooks/useCategories'
 import AddPersonModal from './AddPersonModal'
-
-// Expense-only categories (remove income-only ones)
-const EXPENSE_CATEGORIES = CATEGORIES.filter(
-  c => !['salary', 'freelance'].includes(c)
-)
 
 interface Props {
   onClose: () => void
@@ -25,6 +20,9 @@ export default function AddTransactionModal({ onClose, onSuccess }: Props) {
   const [date,        setDate]     = useState(todayISO())
   const [saving,      setSaving]   = useState(false)
   const [error,       setError]    = useState('')
+
+  const { categories } = useCategories()
+  const expenseCategories = categories.filter(c => !['salary', 'freelance'].includes(c.name))
 
   // ── Split state ────────────────────────────────────────────────────────────
   const [splitEnabled,   setSplit]         = useState(false)
@@ -119,6 +117,7 @@ export default function AddTransactionModal({ onClose, onSuccess }: Props) {
             person_id:      pid,
             transaction_id: tx.id,
             amount:         friendShare,   // positive = they owe me
+            category,
             note:           description || category,
             settled:        false,
           })
@@ -198,8 +197,8 @@ export default function AddTransactionModal({ onClose, onSuccess }: Props) {
               value={category}
               onChange={e => setCategory(e.target.value)}
             >
-              {EXPENSE_CATEGORIES.map(c => (
-                <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
+              {expenseCategories.map(c => (
+                <option key={c.name} value={c.name}>{c.icon} {c.name.charAt(0).toUpperCase() + c.name.slice(1)}</option>
               ))}
             </select>
           </div>

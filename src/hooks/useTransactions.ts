@@ -22,6 +22,9 @@ export function useTransactions() {
   // Initial load
   useEffect(() => {
     refresh()
+    const onUpdate = () => refresh()
+    window.addEventListener('transactions-updated', onUpdate)
+    return () => window.removeEventListener('transactions-updated', onUpdate)
   }, [refresh])
 
   // Try to sync whenever we come online

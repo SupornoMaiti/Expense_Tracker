@@ -5,19 +5,11 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
 } from 'recharts'
 import { useTransactions } from '../hooks/useTransactions'
+import { useCategories } from '../hooks/useCategories'
 import CategoryBadge from '../components/CategoryBadge'
+import ManageCategoriesModal from '../components/ManageCategoriesModal'
+import DetailedPieChartModal from '../components/DetailedPieChartModal'
 
-const CATEGORY_COLORS: Record<string, string> = {
-  food:          '#00ff88',
-  transport:     '#00ccff',
-  rent:          '#ffaa00',
-  entertainment: '#ff6b6b',
-  health:        '#bb88ff',
-  other:         '#888888',
-  utilities:     '#f39c12',
-  shopping:      '#e91e63',
-  education:     '#1abc9c',
-}
 
 function formatINR(n: number) {
   return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n)
@@ -35,8 +27,11 @@ export default function Spend() {
   const now = new Date()
   const [year,  setYear]  = useState(now.getFullYear())
   const [month, setMonth] = useState(now.getMonth())   // 0-indexed
+  const [showManageCat, setShowManageCat] = useState(false)
+  const [showDetailedPie, setShowDetailedPie] = useState(false)
 
   const { transactions, loading } = useTransactions()
+  const { categories } = useCategories()
 
   // Filter to selected month — expenses + refunds both needed
   const monthTxs = useMemo(() => {
@@ -59,7 +54,9 @@ export default function Spend() {
   const pieData = useMemo(() => {
     const map: Record<string, number> = {}
     expenseTxs.forEach(t => { map[t.category] = (map[t.category] || 0) + t.amount })
-    return Object.entries(map).map(([name, value]) => ({ name, value }))
+    return Object.entries(map)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value)
   }, [expenseTxs])
 
   // Bar: daily spend — expenses only
@@ -88,9 +85,14 @@ export default function Spend() {
     else setMonth(m => m + 1)
   }
 
-  // Custom pie label
-  const renderLabel = ({ name, percent }: { name?: string; percent?: number }) =>
-    `${name ?? ''} ${((percent ?? 0) * 100).toFixed(0)}%`
+  // Custom pie label - only label top 2
+  const top2Categories = pieData.slice(0, 2).map(d => d.name)
+  const renderLabel = ({ name, percent }: { name?: string; percent?: number }) => {
+    if (name && top2Categories.includes(name)) {
+      return `${name} ${((percent ?? 0) * 100).toFixed(0)}%`
+    }
+    return ''
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
@@ -109,6 +111,14 @@ export default function Spend() {
             {MONTH_NAMES[month]} {year}
           </span>
           <button className="btn btn-ghost btn-sm" onClick={nextMonth}>→</button>
+          <button 
+            className="btn btn-ghost btn-sm" 
+            style={{ fontSize: '1.2rem', padding: '0 8px', marginLeft: 'var(--space-2)' }}
+            onClick={() => setShowManageCat(true)}
+            title="Manage Categories"
+          >
+            ⚙️
+          </button>
         </div>
       </div>
 
@@ -157,8 +167,13 @@ export default function Spend() {
                 <div className="empty-state" style={{ padding: 'var(--space-6)' }}>No data</div>
               ) : (
                 <>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <PieChart>
+                  <div 
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => setShowDetailedPie(true)}
+                    title="Click for detailed view"
+                  >
+                    <ResponsiveContainer width="100%" height={200}>
+                      <PieChart>
                       <Pie
                         data={pieData}
                         cx="50%"
@@ -170,9 +185,10 @@ export default function Spend() {
                         label={renderLabel}
                         labelLine={false}
                       >
-                        {pieData.map((entry) => (
-                          <Cell key={entry.name} fill={CATEGORY_COLORS[entry.name] || '#888888'} />
-                        ))}
+                        {pieData.map((entry) => {
+                          const color = categories.find(c => c.name === entry.name)?.color || '#888888'
+                          return <Cell key={entry.name} fill={color} />
+                        })}
                       </Pie>
                       <Tooltip
                         formatter={(v) => [typeof v === 'number' ? formatINR(v) : v, 'Amount']}
@@ -180,13 +196,6 @@ export default function Spend() {
                       />
                     </PieChart>
                   </ResponsiveContainer>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginTop: 'var(--space-3)' }}>
-                    {pieData.map(d => (
-                      <div key={d.name} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>
-                        <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: CATEGORY_COLORS[d.name] || '#888' }} />
-                        {d.name} · {formatINR(d.value)}
-                      </div>
-                    ))}
                   </div>
                 </>
               )}
@@ -269,6 +278,18 @@ export default function Spend() {
             </div>
           </div>
         </>
+      )}
+
+      {showManageCat && (
+        <ManageCategoriesModal onClose={() => setShowManageCat(false)} />
+      )}
+
+      {showDetailedPie && (
+        <DetailedPieChartModal 
+          onClose={() => setShowDetailedPie(false)} 
+          pieData={pieData} 
+          categories={categories} 
+        />
       )}
     </div>
   )

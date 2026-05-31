@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { addDebt, settleDebt, deleteDebt } from '../lib/db'
 import type { PersonWithBalance } from '../hooks/useDebts'
+import { useCategories } from '../hooks/useCategories'
 
 interface Props {
   people: PersonWithBalance[]
@@ -26,8 +27,11 @@ export default function DebtLedger({ people, onRefresh }: Props) {
   const [amount, setAmount] = useState('')
   const [note, setNote] = useState('')
   const [dueDate, setDueDate] = useState('')
+  const [category, setCategory] = useState('other')
   const [adding, setAdding] = useState(false)
   const [error, setError] = useState('')
+
+  const { categories } = useCategories()
 
   async function handleAddDebt(e: React.FormEvent) {
     e.preventDefault()
@@ -43,6 +47,7 @@ export default function DebtLedger({ people, onRefresh }: Props) {
         person_id: selectedPerson,
         transaction_id: null,
         amount: direction === 'credit' ? num : -num,
+        category,
         note: note.trim(),
         settled: false,
         due_date: dueDate || undefined,
@@ -135,6 +140,19 @@ export default function DebtLedger({ people, onRefresh }: Props) {
             />
           </div>
 
+          <div className="form-group" style={{ flex: '1 1 140px', minWidth: 130 }}>
+            <label className="form-label">Category</label>
+            <select
+              className="form-select"
+              value={category}
+              onChange={e => setCategory(e.target.value)}
+            >
+              {categories.map(c => (
+                <option key={c.name} value={c.name}>{c.icon} {c.name.charAt(0).toUpperCase() + c.name.slice(1)}</option>
+              ))}
+            </select>
+          </div>
+
           {/* Due date — only relevant when they owe me */}
           {direction === 'credit' && (
             <div className="form-group" style={{ flex: '1 1 140px', minWidth: 130 }}>
@@ -178,6 +196,7 @@ export default function DebtLedger({ people, onRefresh }: Props) {
               <tr>
                 <th>DATE</th>
                 <th>PERSON</th>
+                <th>CATEGORY</th>
                 <th>NOTE</th>
                 <th>DUE</th>
                 <th style={{ textAlign: 'right' }}>AMOUNT</th>
@@ -193,6 +212,9 @@ export default function DebtLedger({ people, onRefresh }: Props) {
                       {formatDate(debt.created_at)}
                     </td>
                     <td style={{ fontWeight: 600 }}>{debt.personName}</td>
+                    <td className="text-xs" style={{ textTransform: 'capitalize' }}>
+                      {categories.find(c => c.name === debt.category)?.icon} {debt.category || 'other'}
+                    </td>
                     <td style={{ color: 'var(--color-text-dim)' }}>{debt.note || '—'}</td>
                     <td>
                       {debt.due_date ? (() => {

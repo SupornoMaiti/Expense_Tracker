@@ -53,6 +53,7 @@ create table if not exists public.debts (
   person_id      uuid not null references public.people(id) on delete cascade,
   transaction_id uuid references public.transactions(id) on delete set null,
   amount         numeric(10,2) not null,  -- positive = they owe me, negative = I owe
+  category       text not null default 'other',
   note           text not null default '',
   settled        boolean not null default false,
   created_at     timestamptz not null default now()
@@ -69,8 +70,27 @@ create policy "Users can manage own debts"
 create index if not exists debts_person_id on public.debts (person_id);
 create index if not exists debts_settled   on public.debts (settled);
 
+-- ─── Categories ────────────────────────────────────────────────────────────
+create table if not exists public.categories (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    uuid not null references auth.users(id) on delete cascade,
+  name       text not null,
+  icon       text not null default '📌',
+  color      text not null default '#888888',
+  created_at timestamptz not null default now()
+);
+
+alter table public.categories enable row level security;
+
+create policy "Users can manage own categories"
+  on public.categories
+  for all
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
 -- ─── Realtime subscriptions ────────────────────────────────────────────────
 -- Enable realtime for cross-device sync
 alter publication supabase_realtime add table public.transactions;
 alter publication supabase_realtime add table public.people;
 alter publication supabase_realtime add table public.debts;
+alter publication supabase_realtime add table public.categories;

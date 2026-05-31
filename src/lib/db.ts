@@ -25,12 +25,22 @@ export interface Person {
   created_at: string
 }
 
+export interface Category {
+  id: string
+  user_id: string
+  name: string
+  icon: string
+  color: string
+  created_at: string
+}
+
 export interface Debt {
   id: string
   user_id: string
   person_id: string
   transaction_id: string | null
   amount: number          // positive = they owe me, negative = I owe them
+  category: string
   note: string
   settled: boolean
   created_at: string
@@ -48,9 +58,9 @@ export interface DebtReminder {
 
 export type OutboxOp = {
   id: string
-  table: 'transactions' | 'people' | 'debts'
+  table: 'transactions' | 'people' | 'debts' | 'categories'
   operation: 'INSERT' | 'UPDATE' | 'DELETE'
-  payload: Transaction | Person | Debt
+  payload: Transaction | Person | Debt | Category
   created_at: string
 }
 
@@ -72,6 +82,11 @@ interface FinTrackDB extends DBSchema {
     value: Debt
     indexes: { 'by-person': string; 'by-settled': string }
   }
+  categories: {
+    key: string
+    value: Category
+    indexes: { 'by-name': string }
+  }
   outbox: {
     key: string
     value: OutboxOp
@@ -85,25 +100,39 @@ let dbPromise: Promise<IDBPDatabase<FinTrackDB>> | null = null
 
 export function getDB(): Promise<IDBPDatabase<FinTrackDB>> {
   if (!dbPromise) {
-    dbPromise = openDB<FinTrackDB>('fintrack-db', 1, {
+    dbPromise = openDB<FinTrackDB>('fintrack-db', 2, {
       upgrade(db) {
         // Transactions store
-        const txStore = db.createObjectStore('transactions', { keyPath: 'id' })
-        txStore.createIndex('by-created', 'created_at')
-        txStore.createIndex('by-type', 'type')
+        if (!db.objectStoreNames.contains('transactions')) {
+          const txStore = db.createObjectStore('transactions', { keyPath: 'id' })
+          txStore.createIndex('by-created', 'created_at')
+          txStore.createIndex('by-type', 'type')
+        }
 
         // People store
-        const pplStore = db.createObjectStore('people', { keyPath: 'id' })
-        pplStore.createIndex('by-name', 'name')
+        if (!db.objectStoreNames.contains('people')) {
+          const pplStore = db.createObjectStore('people', { keyPath: 'id' })
+          pplStore.createIndex('by-name', 'name')
+        }
 
         // Debts store
-        const debtStore = db.createObjectStore('debts', { keyPath: 'id' })
-        debtStore.createIndex('by-person', 'person_id')
-        debtStore.createIndex('by-settled', 'settled')
+        if (!db.objectStoreNames.contains('debts')) {
+          const debtStore = db.createObjectStore('debts', { keyPath: 'id' })
+          debtStore.createIndex('by-person', 'person_id')
+          debtStore.createIndex('by-settled', 'settled')
+        }
+
+        // Categories store
+        if (!db.objectStoreNames.contains('categories')) {
+          const catStore = db.createObjectStore('categories', { keyPath: 'id' })
+          catStore.createIndex('by-name', 'name')
+        }
 
         // Outbox store (pending sync ops)
-        const outboxStore = db.createObjectStore('outbox', { keyPath: 'id' })
-        outboxStore.createIndex('by-created', 'created_at')
+        if (!db.objectStoreNames.contains('outbox')) {
+          const outboxStore = db.createObjectStore('outbox', { keyPath: 'id' })
+          outboxStore.createIndex('by-created', 'created_at')
+        }
       },
     })
   }
@@ -153,6 +182,7 @@ export async function addTransaction(
   }
   await db.put('transactions', tx)
   await enqueueOutbox('transactions', 'INSERT', tx)
+  window.dispatchEvent(new CustomEvent('transactions-updated'))
   return tx
 }
 
@@ -162,6 +192,7 @@ export async function deleteTransaction(id: string): Promise<void> {
   if (!tx) return
   await db.delete('transactions', id)
   await enqueueOutbox('transactions', 'DELETE', tx)
+  window.dispatchEvent(new CustomEvent('transactions-updated'))
 }
 
 export async function getTransactionsByType(type: TransactionType): Promise<Transaction[]> {
@@ -205,6 +236,36 @@ export async function deletePerson(id: string): Promise<void> {
 export async function getPerson(id: string): Promise<Person | undefined> {
   const db = await getDB()
   return db.get('people', id)
+}
+
+// ─── Categories CRUD ─────────────────────────────────────────────────────────
+
+export async function getAllCategories(): Promise<Category[]> {
+  const db = await getDB()
+  return db.getAllFromIndex('categories', 'by-name')
+}
+
+export async function addCategory(
+  data: Omit<Category, 'id' | 'user_id' | 'created_at'>
+): Promise<Category> {
+  const db = await getDB()
+  const cat: Category = {
+    ...data,
+    id: uuid(),
+    user_id: USER_ID,
+    created_at: now(),
+  }
+  await db.put('categories', cat)
+  await enqueueOutbox('categories', 'INSERT', cat)
+  return cat
+}
+
+export async function deleteCategory(id: string): Promise<void> {
+  const db = await getDB()
+  const cat = await db.get('categories', id)
+  if (!cat) return
+  await db.delete('categories', id)
+  await enqueueOutbox('categories', 'DELETE', cat)
 }
 
 // ─── Debts CRUD ──────────────────────────────────────────────────────────────
@@ -257,7 +318,7 @@ export async function settleDebt(id: string): Promise<void> {
     user_id:     USER_ID,
     type:        debt.amount > 0 ? 'refund' : 'expense',
     amount:      Math.abs(debt.amount),
-    category:    'other',
+    category:    debt.category || 'other',
     description: debt.amount > 0
       ? `Refund from ${pName} – ${debt.note || 'settled'}` 
       : `Paid to ${pName} – ${debt.note || 'settled'}`,
@@ -267,6 +328,7 @@ export async function settleDebt(id: string): Promise<void> {
   }
   await db.put('transactions', tx)
   await enqueueOutbox('transactions', 'INSERT', tx)
+  window.dispatchEvent(new CustomEvent('transactions-updated'))
 }
 
 // Settle every unsettled debt for a given person at once
@@ -292,7 +354,7 @@ export async function deleteDebt(id: string): Promise<void> {
 export async function enqueueOutbox(
   table: OutboxOp['table'],
   operation: OutboxOp['operation'],
-  payload: Transaction | Person | Debt
+  payload: Transaction | Person | Debt | Category
 ): Promise<void> {
   const db = await getDB()
   const op: OutboxOp = {
