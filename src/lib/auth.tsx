@@ -90,6 +90,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           console.info('[auth] user changed — wiping local cache')
           await wipeLocalData()
           localStorage.setItem(LAST_USER_KEY, incomingId)
+          window.location.reload() // Force clean slate to avoid IDB connection race conditions
+          return
         }
 
         setSession(session)

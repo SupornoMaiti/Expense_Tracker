@@ -41,9 +41,20 @@ export async function pushOutbox(): Promise<{ pushed: number; errors: number }> 
       await executeOp(op)
       await removeFromOutbox(op.id)
       pushed++
-    } catch (err) {
+    } catch (err: any) {
       console.warn('[sync] Failed op', op.id, err)
-      errors++
+      
+      // If the error object has a 'code' property, it is a Supabase PostgrestError.
+      // This means the server actively rejected the data (e.g. invalid UUID format, 
+      // RLS policy denial, schema mismatch). Retrying will never succeed, so we 
+      // MUST discard the operation to prevent an infinite syncing loop.
+      if (err && typeof err.code === 'string') {
+        console.warn('[sync] Permanent server error detected. Discarding stale op:', op.id)
+        await removeFromOutbox(op.id)
+      } else {
+        // Network errors or other transient issues will retry on the next tick
+        errors++
+      }
     }
   }
 
