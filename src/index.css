@@ -945,7 +945,7 @@ input[type="date"] {
 
 /* ─── User Avatar & Sign-out Dropdown ───────────────────────────────────────── */
 
-.user-avatar-btn {
+.account-badge {
   width: 30px;
   height: 30px;
   border-radius: var(--radius-md);
@@ -965,12 +965,12 @@ input[type="date"] {
   flex-shrink: 0;
 }
 
-.user-avatar-btn:hover {
+.account-badge:hover {
   background: var(--color-accent-glow);
   box-shadow: 0 0 14px rgba(0, 255, 136, 0.3);
 }
 
-.user-dropdown {
+.account-dropdown {
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
@@ -984,7 +984,7 @@ input[type="date"] {
   animation: slideUp 150ms ease;
 }
 
-.user-dropdown__email {
+.account-dropdown__email {
   padding: var(--space-3) var(--space-4);
   font-size: var(--font-size-xs);
   color: var(--color-text-dim);
@@ -994,13 +994,13 @@ input[type="date"] {
   letter-spacing: 0.04em;
 }
 
-.user-dropdown__divider {
+.account-dropdown__divider {
   border: none;
   border-top: 1px solid var(--color-border);
   margin: 0;
 }
 
-.user-dropdown__signout {
+.account-dropdown__signout {
   width: 100%;
   padding: var(--space-3) var(--space-4);
   background: transparent;
@@ -1018,6 +1018,6 @@ input[type="date"] {
   gap: var(--space-2);
 }
 
-.user-dropdown__signout:hover {
+.account-dropdown__signout:hover {
   background: rgba(255, 71, 87, 0.08);
 }

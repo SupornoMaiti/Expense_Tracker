@@ -44,15 +44,6 @@ async function wipeLocalData(): Promise<void> {
       req.onerror   = () => reject(req.error)
       req.onblocked = () => resolve() // fallback
     })
-    // Also wipe Supabase auth tokens manually. If signOut() timed out due to 
-    // network issues, it leaves the token in localStorage. The next page load 
-    // will hang trying to refresh it. This guarantees a clean local state.
-    Object.keys(localStorage).forEach(key => {
-      if (key.startsWith('sb-') && key.endsWith('-auth-token')) {
-        localStorage.removeItem(key)
-      }
-    })
-    
     localStorage.removeItem('fintrack-device-id')
     localStorage.removeItem('fintrack-last-user')
   } catch (err) {
@@ -75,99 +66,80 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     let unsubscribeRealtime: (() => void) | null = null
+    const LAST_USER_KEY = 'fintrack-last-user'
 
-  const LAST_USER_KEY = 'fintrack-last-user'
+    // ── Single source of truth: onAuthStateChange ────────────────────────────
+    // Supabase fires INITIAL_SESSION exactly once when it has resolved the
+    // persisted session from localStorage (or determined there is none).
+    // This is immune to React 18 StrictMode double-invoke because Supabase's
+    // internal client deduplicates the event — we never need a custom timeout.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
 
-    // ── Restore existing session ─────────────────────────────────────────────
-    // Timeout guard: if Supabase doesn't respond quickly, unblock the app.
-    // 2.5s is enough for a local token check. But if this is an OAuth redirect,
-    // Supabase needs to verify the token with the server, so give it 10s.
-    const isOAuthRedirect = window.location.hash.includes('access_token=')
-    const timeoutId = setTimeout(() => {
-      console.warn('[auth] getSession timed out — running unauthenticated')
-      setCurrentUserId('local-user')
-      setLoading(false)
-    }, isOAuthRedirect ? 10000 : 2500)
+        if (event === 'INITIAL_SESSION') {
+          // ── First boot: restore session ─────────────────────────────────
+          const incomingId = session?.user?.id ?? 'local-user'
+          const lastId     = localStorage.getItem(LAST_USER_KEY) ?? 'local-user'
 
-    if (!supabase) {
-      clearTimeout(timeoutId)
-      setCurrentUserId('local-user')
-      setLoading(false)
-      return
-    }
+          if (session && incomingId !== lastId) {
+            // User changed — wipe stale IndexedDB then reload clean
+            console.info('[auth] user changed — wiping local cache')
+            await wipeLocalData()
+            localStorage.setItem(LAST_USER_KEY, incomingId)
+            setTimeout(() => window.location.reload(), 50)
+            return
+          }
 
-    supabase.auth.getSession()
-      .then(async ({ data: { session } }) => {
-        clearTimeout(timeoutId)
+          setSession(session)
+          setUser(session?.user ?? null)
+          setCurrentUserId(incomingId)
+          setLoading(false)
 
-        const incomingId = session?.user?.id ?? 'local-user'
-        const lastId     = localStorage.getItem(LAST_USER_KEY) ?? 'local-user'
-
-        // If the user changed (or first real login after anonymous use) wipe
-        // stale IndexedDB data so the pull starts from a clean slate.
-        if (session && incomingId !== lastId) {
-          console.info('[auth] user changed — wiping local cache')
-          await wipeLocalData()
-          localStorage.setItem(LAST_USER_KEY, incomingId)
-          window.location.reload() // Force clean slate to avoid IDB connection race conditions
+          if (session) {
+            await pullFromSupabase()
+            unsubscribeRealtime = subscribeToRealtime()
+          }
           return
         }
 
-        setSession(session)
-        setUser(session?.user ?? null)
-        setCurrentUserId(incomingId)
-        setLoading(false)
-
-        if (session) {
-          await pullFromSupabase()
-          unsubscribeRealtime = subscribeToRealtime()
-        }
-      })
-      .catch((err) => {
-        clearTimeout(timeoutId)
-        console.error('[auth] getSession error:', err)
-        setCurrentUserId('local-user')
-        setLoading(false)
-      })
-
-    // ── Listen for future auth events ────────────────────────────────────────
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        // Prevent race conditions: if onAuthStateChange fires before getSession
-        // during an OAuth login, it must enforce the wipe-and-reload guard.
         if (event === 'SIGNED_IN' && session) {
           const incomingId = session.user.id
           const lastId     = localStorage.getItem(LAST_USER_KEY) ?? 'local-user'
           if (incomingId !== lastId) {
-            console.info('[auth] user changed (OAuth) — wiping local cache')
+            console.info('[auth] user changed (sign-in) — wiping local cache')
             await wipeLocalData()
             localStorage.setItem(LAST_USER_KEY, incomingId)
-            window.location.reload()
+            setTimeout(() => window.location.reload(), 50)
             return
           }
-        }
 
-        setSession(session)
-        setUser(session?.user ?? null)
-        setCurrentUserId(session?.user?.id ?? 'local-user')
-
-        if (event === 'SIGNED_IN' && session) {
-          await pullFromSupabase()
+          setSession(session)
+          setUser(session.user)
+          setCurrentUserId(incomingId)
           if (unsubscribeRealtime) unsubscribeRealtime()
           unsubscribeRealtime = subscribeToRealtime()
+          return
         }
 
         if (event === 'SIGNED_OUT') {
+          setSession(null)
+          setUser(null)
+          setCurrentUserId('local-user')
           if (unsubscribeRealtime) {
             unsubscribeRealtime()
             unsubscribeRealtime = null
           }
+          return
+        }
+
+        if (event === 'TOKEN_REFRESHED' && session) {
+          setSession(session)
+          return
         }
       }
     )
 
     return () => {
-      clearTimeout(timeoutId)
       subscription.unsubscribe()
       if (unsubscribeRealtime) unsubscribeRealtime()
     }
@@ -189,10 +161,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.warn('[auth] signOut error (continuing anyway):', err)
     }
 
-    // 2. Wipe all local data regardless of network result
+    // 2. Wipe Supabase auth tokens manually in case signOut() timed out
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('sb-') && key.endsWith('-auth-token')) {
+        localStorage.removeItem(key)
+      }
+    })
+
+    // 3. Wipe all local data regardless of network result
     await wipeLocalData()
 
-    // 3. Force a full page reload — this closes all IDB connections cleanly,
+    // 4. Force a full page reload — this closes all IDB connections cleanly,
     //    clears in-memory React state, and resets any SW-cached code.
     //    The app will reload with no session → shows Login page.
     window.location.href = window.location.origin

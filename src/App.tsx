@@ -37,10 +37,10 @@ function UserMenu() {
   const initials = (user.email ?? 'U').slice(0, 1).toUpperCase()
 
   return (
-    <div className="user-menu" style={{ position: 'relative' }}>
+    <div className="account-box" style={{ position: 'relative' }}>
       <button
-        id="user-menu-trigger"
-        className="user-avatar-btn"
+        id="account-trigger"
+        className="account-badge"
         onClick={() => setOpen(o => !o)}
         title={user.email ?? 'User menu'}
         aria-expanded={open}
@@ -56,12 +56,12 @@ function UserMenu() {
             style={{ position: 'fixed', inset: 0, zIndex: 299 }}
             onClick={() => setOpen(false)}
           />
-          <div className="user-dropdown" role="menu">
-            <div className="user-dropdown__email">{user.email}</div>
-            <hr className="user-dropdown__divider" />
+          <div className="account-dropdown" role="menu">
+            <div className="account-dropdown__email">{user.email}</div>
+            <hr className="account-dropdown__divider" />
             <button
               id="sign-out-btn"
-              className="user-dropdown__signout"
+              className="account-dropdown__signout"
               role="menuitem"
               onClick={async () => {
                 setOpen(false)
