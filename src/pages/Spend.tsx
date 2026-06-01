@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
@@ -12,7 +12,7 @@ import DetailedPieChartModal from '../components/DetailedPieChartModal'
 
 
 function formatINR(n: number) {
-  return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n)
+  return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n)
 }
 
 function formatDate(iso: string) {
@@ -29,6 +29,16 @@ export default function Spend() {
   const [month, setMonth] = useState(now.getMonth())   // 0-indexed
   const [showManageCat, setShowManageCat] = useState(false)
   const [showDetailedPie, setShowDetailedPie] = useState(false)
+
+  // Hide global FAB while pie modal is open
+  useEffect(() => {
+    if (showDetailedPie) {
+      document.body.classList.add('modal-pie-open')
+    } else {
+      document.body.classList.remove('modal-pie-open')
+    }
+    return () => document.body.classList.remove('modal-pie-open')
+  }, [showDetailedPie])
 
   const { transactions, loading } = useTransactions()
   const { categories } = useCategories()
@@ -85,9 +95,10 @@ export default function Spend() {
     else setMonth(m => m + 1)
   }
 
-  // Custom pie label - only label top 2
+  // Custom pie label - only label top 2, and only on wider screens
   const top2Categories = pieData.slice(0, 2).map(d => d.name)
   const renderLabel = ({ name, percent }: { name?: string; percent?: number }) => {
+    if (window.innerWidth < 640) return '' // No labels on mobile
     if (name && top2Categories.includes(name)) {
       return `${name} ${((percent ?? 0) * 100).toFixed(0)}%`
     }
