@@ -90,15 +90,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             return
           }
 
-          setSession(session)
-          setUser(session?.user ?? null)
+          // Set the user ID FIRST so db.ts filter uses the correct uid
           setCurrentUserId(incomingId)
-          setLoading(false)
 
           if (session) {
+            // Pull data into IDB BEFORE setting loading=false so the
+            // dashboard components see real data on their very first read.
             await pullFromSupabase()
             unsubscribeRealtime = subscribeToRealtime()
           }
+
+          // Now that IDB is populated, reveal the UI
+          setSession(session)
+          setUser(session?.user ?? null)
+          setLoading(false)
           return
         }
 
@@ -113,11 +118,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             return
           }
 
-          setSession(session)
-          setUser(session.user)
+          // Update user ID before pulling so db.ts uses the correct uid
           setCurrentUserId(incomingId)
           if (unsubscribeRealtime) unsubscribeRealtime()
           unsubscribeRealtime = subscribeToRealtime()
+          setSession(session)
+          setUser(session.user)
           return
         }
 
