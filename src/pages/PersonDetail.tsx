@@ -162,7 +162,8 @@ export default function PersonDetail() {
                       const amt = Math.abs(d.amount).toFixed(2)
                       const action = d.amount > 0 ? 'You owe me' : 'I owe you'
                       const note = d.note ? ` for ${d.note}` : ''
-                      msg += `• ${action} ₹${amt}${note}\n`
+                      const date = new Date(d.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+                      msg += `• ${action} ₹${amt}${note} (${date})\n`
                     })
                     
                     msg += `\nNet Balance: *${isCredit ? 'You owe me' : 'I owe you'} ₹${Math.abs(netBalance).toFixed(2)}*\n\nLet's settle up soon!`

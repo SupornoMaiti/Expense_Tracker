@@ -314,6 +314,34 @@ export async function addDebt(
   }
   await db.put('debts', debt)
   await enqueueOutbox('debts', 'INSERT', debt)
+
+  // ── Accounting side-effect ────────────────────────────────────────────────
+  // amount > 0 (they owe me) → I already paid for them at a shop etc.
+  //   → record an EXPENSE now (money already left my pocket)
+  // amount < 0 (I owe them) → I haven't paid yet, just a future obligation
+  //   → no transaction now; expense is recorded when the debt is settled
+  if (debt.amount > 0) {
+    const person = await db.get('people', debt.person_id)
+    const pName  = person ? person.name : 'friend'
+
+    const tx: Transaction = {
+      id:          uuid(),
+      user_id:     getCurrentUserId(),
+      type:        'expense',
+      amount:      Math.abs(debt.amount),
+      category:    debt.category || 'other',
+      description: `Paid for ${pName} – ${debt.note || 'debt'}`,
+      created_at:  debt.created_at,
+      synced_at:   null,
+      device_id:   DEVICE_ID,
+    }
+    debt.transaction_id = tx.id
+    await db.put('debts', debt)          // update with linked tx id
+    await db.put('transactions', tx)
+    await enqueueOutbox('transactions', 'INSERT', tx)
+    window.dispatchEvent(new CustomEvent('transactions-updated'))
+  }
+
   return debt
 }
 
@@ -328,10 +356,10 @@ export async function settleDebt(id: string): Promise<void> {
   await enqueueOutbox('debts', 'UPDATE', updated)
 
   // ── Accounting side-effect ───────────────────────────────────────────────
-  // debt.amount > 0  → they owed me, they paid back  → create a REFUND
-  //                    (money returned, so net expense goes DOWN)
-  // debt.amount < 0  → I owed them, I paid them back → create an EXPENSE
-  //                    (cash left my pocket, so expense goes UP)
+  // amount > 0 (they owed me, now paid back) → money returns to me
+  //   → REFUND to reduce monthly expense (reverses the expense from addDebt)
+  // amount < 0 (I owed them, now I'm paying) → money leaves my pocket NOW
+  //   → EXPENSE recorded at settlement time
   const person = await db.get('people', debt.person_id)
   const pName  = person ? person.name : 'friend'
 
@@ -342,7 +370,7 @@ export async function settleDebt(id: string): Promise<void> {
     amount:      Math.abs(debt.amount),
     category:    debt.category || 'other',
     description: debt.amount > 0
-      ? `Refund from ${pName} – ${debt.note || 'settled'}` 
+      ? `${pName} paid back – ${debt.note || 'settled'}`
       : `Paid to ${pName} – ${debt.note || 'settled'}`,
     created_at:  now(),
     synced_at:   null,
