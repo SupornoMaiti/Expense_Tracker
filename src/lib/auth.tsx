@@ -157,7 +157,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       if (supabase) {
         await Promise.race([
-          supabase.auth.signOut(),
+          supabase.auth.signOut({ scope: 'local' }),
           new Promise<never>((_, reject) =>
             setTimeout(() => reject(new Error('signOut timeout')), 5000)
           ),
