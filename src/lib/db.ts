@@ -47,6 +47,7 @@ export interface Debt {
   created_at: string
   due_date?: string       // ISO date string — when they should repay
   remind_at?: string      // ISO string — last notification fired
+  settle_tx_id?: string   // ID of the refund/expense transaction created upon settlement
 }
 
 // ─── Reminder helpers ────────────────────────────────────────────────────────
@@ -202,6 +203,33 @@ export async function deleteTransaction(id: string): Promise<void> {
   const db = await getDB()
   const tx = await db.get('transactions', id)
   if (!tx) return
+
+  // Cascading deletes/updates for debts
+  const allDebts = await db.getAll('debts')
+
+  // 1. If this is a parent transaction (e.g. split expense), delete linked debts
+  const linkedDebts = allDebts.filter(d => d.transaction_id === id)
+  for (const debt of linkedDebts) {
+    if (debt.settle_tx_id) {
+      const sTx = await db.get('transactions', debt.settle_tx_id)
+      if (sTx) {
+        await db.delete('transactions', debt.settle_tx_id)
+        await enqueueOutbox('transactions', 'DELETE', sTx)
+      }
+    }
+    await db.delete('debts', debt.id)
+    await enqueueOutbox('debts', 'DELETE', debt)
+  }
+
+  // 2. If this is a settlement transaction (e.g. refund), unsettle the linked debt
+  const settledDebts = allDebts.filter(d => d.settle_tx_id === id)
+  for (const debt of settledDebts) {
+    const updated = { ...debt, settled: false }
+    delete updated.settle_tx_id
+    await db.put('debts', updated)
+    await enqueueOutbox('debts', 'UPDATE', updated)
+  }
+
   await db.delete('transactions', id)
   await enqueueOutbox('transactions', 'DELETE', tx)
   window.dispatchEvent(new CustomEvent('transactions-updated'))
@@ -352,16 +380,6 @@ export async function settleDebt(id: string): Promise<void> {
   const debt = await db.get('debts', id)
   if (!debt || debt.settled) return
 
-  // Mark the debt settled
-  const updated = { ...debt, settled: true }
-  await db.put('debts', updated)
-  await enqueueOutbox('debts', 'UPDATE', updated)
-
-  // ── Accounting side-effect ───────────────────────────────────────────────
-  // amount > 0 (they owed me, now paid back) → money returns to me
-  //   → REFUND to reduce monthly expense (reverses the expense from addDebt)
-  // amount < 0 (I owed them, now I'm paying) → money leaves my pocket NOW
-  //   → EXPENSE recorded at settlement time
   const person = await db.get('people', debt.person_id)
   const pName  = person ? person.name : 'friend'
 
@@ -378,6 +396,12 @@ export async function settleDebt(id: string): Promise<void> {
     synced_at:   null,
     device_id:   DEVICE_ID,
   }
+
+  // Mark the debt settled (moved down to include settle_tx_id)
+  const updated = { ...debt, settled: true, settle_tx_id: tx.id }
+  await db.put('debts', updated)
+  await enqueueOutbox('debts', 'UPDATE', updated)
+
   await db.put('transactions', tx)
   await enqueueOutbox('transactions', 'INSERT', tx)
   window.dispatchEvent(new CustomEvent('transactions-updated'))
