@@ -316,11 +316,13 @@ export async function addDebt(
   await enqueueOutbox('debts', 'INSERT', debt)
 
   // ── Accounting side-effect ────────────────────────────────────────────────
-  // amount > 0 (they owe me) → I already paid for them at a shop etc.
+  // amount > 0 (they owe me) with no linked transaction
   //   → record an EXPENSE now (money already left my pocket)
+  // amount > 0 with linked transaction_id (split expense)
+  //   → do not add another expense, it's already counted in the original expense
   // amount < 0 (I owe them) → I haven't paid yet, just a future obligation
   //   → no transaction now; expense is recorded when the debt is settled
-  if (debt.amount > 0) {
+  if (debt.amount > 0 && !debt.transaction_id) {
     const person = await db.get('people', debt.person_id)
     const pName  = person ? person.name : 'friend'
 
