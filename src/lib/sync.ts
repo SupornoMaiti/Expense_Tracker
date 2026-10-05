@@ -64,11 +64,18 @@ export async function pushOutbox(): Promise<{ pushed: number; errors: number }> 
 async function executeOp(op: OutboxOp): Promise<void> {
   if (!supabase) return
 
+  let payload = op.payload as Record<string, any>
+  if (op.table === 'debts' && payload) {
+    // Strip settle_tx_id because the remote Supabase schema doesn't have it yet
+    const { settle_tx_id, ...rest } = payload
+    payload = rest
+  }
+
   if (op.operation === 'INSERT' || op.operation === 'UPDATE') {
-    const { error } = await supabase.from(op.table).upsert(op.payload as never)
+    const { error } = await supabase.from(op.table).upsert(payload as never)
     if (error) throw error
   } else if (op.operation === 'DELETE') {
-    const { error } = await supabase.from(op.table).delete().eq('id', (op.payload as { id: string }).id)
+    const { error } = await supabase.from(op.table).delete().eq('id', payload.id)
     if (error) throw error
   }
 }
@@ -125,8 +132,9 @@ export async function pullFromSupabase(): Promise<{ pulled: number }> {
       console.warn('[sync/pull] debts:', debtErr.message)
     } else if (debts) {
       for (const row of debts) {
-        // Postgres returns boolean as-is; normalize just in case
-        await db.put('debts', { ...row, settled: Boolean(row.settled) } as Debt)
+        const existing = await db.get('debts', row.id)
+        // Preserve local properties (like settle_tx_id) that don't exist remotely
+        await db.put('debts', { ...existing, ...row, settled: Boolean(row.settled) } as Debt)
         pulled++
       }
     }
@@ -214,7 +222,8 @@ export function subscribeToRealtime(): () => void {
           await db.delete('debts', (payload.old as { id: string }).id)
         } else {
           const row = payload.new as Debt
-          await db.put('debts', { ...row, settled: Boolean(row.settled) })
+          const existing = await db.get('debts', row.id)
+          await db.put('debts', { ...existing, ...row, settled: Boolean(row.settled) })
         }
         window.dispatchEvent(new CustomEvent('debts-updated'))
       }

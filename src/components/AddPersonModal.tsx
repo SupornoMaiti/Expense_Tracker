@@ -1,5 +1,10 @@
 import React, { useState } from 'react'
 import { addPerson } from '../lib/db'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Download } from 'lucide-react'
 
 interface Props {
   onClose: () => void
@@ -7,10 +12,12 @@ interface Props {
 }
 
 export default function AddPersonModal({ onClose, onSuccess }: Props) {
-  const [name, setName]   = useState('')
+  const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [saving, setSaving] = useState(false)
-  const [error, setError]   = useState('')
+  const [error, setError] = useState('')
+
+  const contactsApiSupported = 'contacts' in navigator && 'ContactsManager' in window
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -32,16 +39,22 @@ export default function AddPersonModal({ onClose, onSuccess }: Props) {
   }
 
   return (
-    <div className="modal-backdrop" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="modal">
-        <div className="modal-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-            <span className="modal-title">+ Add Contact</span>
-            {'contacts' in navigator && 'ContactsManager' in window && (
-              <button
+    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <div className="flex items-center justify-between mt-2">
+            <div>
+              <DialogTitle className="text-xl">Add Contact</DialogTitle>
+              <DialogDescription className="mt-1">
+                Add a new friend to split bills with.
+              </DialogDescription>
+            </div>
+            {contactsApiSupported && (
+              <Button
                 type="button"
-                className="btn btn-ghost btn-sm"
-                style={{ fontSize: 'var(--font-size-xs)', padding: '2px 8px', color: 'var(--color-info)' }}
+                variant="outline"
+                size="sm"
+                className="h-8 text-indigo-600 hover:text-indigo-700"
                 onClick={async () => {
                   try {
                     setSaving(true)
@@ -64,20 +77,19 @@ export default function AddPersonModal({ onClose, onSuccess }: Props) {
                   }
                 }}
               >
-                📥 IMPORT
-              </button>
+                <Download className="mr-2 h-3.5 w-3.5" />
+                Import
+              </Button>
             )}
           </div>
-          <button className="modal-close" onClick={onClose}>✕</button>
-        </div>
+        </DialogHeader>
 
-        <form className="modal-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label" htmlFor="person-name">Name</label>
-            <input
+        <form id="add-person-form" onSubmit={handleSubmit} className="space-y-4 py-2">
+          <div className="space-y-2">
+            <Label htmlFor="person-name">Name</Label>
+            <Input
               id="person-name"
               type="text"
-              className="form-input"
               placeholder="e.g., Rahul"
               value={name}
               onChange={e => setName(e.target.value)}
@@ -86,14 +98,13 @@ export default function AddPersonModal({ onClose, onSuccess }: Props) {
             />
           </div>
 
-          <div className="form-group">
-            <label className="form-label" htmlFor="person-phone">
-              Phone (optional — for WhatsApp)
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="person-phone">
+              Phone <span className="text-muted-foreground font-normal">(optional — for WhatsApp)</span>
+            </Label>
+            <Input
               id="person-phone"
               type="tel"
-              className="form-input"
               placeholder="+91 98765 43210"
               value={phone}
               onChange={e => setPhone(e.target.value)}
@@ -101,21 +112,19 @@ export default function AddPersonModal({ onClose, onSuccess }: Props) {
           </div>
 
           {error && (
-            <p style={{ color: 'var(--color-expense)', fontSize: 'var(--font-size-sm)' }}>
-              ⚠ {error}
-            </p>
+            <p className="text-sm text-destructive font-medium">{error}</p>
           )}
-
-          <div className="modal-actions">
-            <button type="button" className="btn btn-ghost" onClick={onClose}>
-              CANCEL
-            </button>
-            <button type="submit" className="btn btn-primary" disabled={saving}>
-              {saving ? 'SAVING…' : '[ ADD ]'}
-            </button>
-          </div>
         </form>
-      </div>
-    </div>
+
+        <DialogFooter className="gap-2 sm:gap-0">
+          <Button type="button" variant="ghost" onClick={onClose} disabled={saving}>
+            Cancel
+          </Button>
+          <Button type="submit" form="add-person-form" disabled={saving} className="bg-indigo-600 hover:bg-indigo-700 text-white">
+            {saving ? 'Saving...' : 'Add Contact'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

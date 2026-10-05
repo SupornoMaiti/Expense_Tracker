@@ -1,4 +1,5 @@
 import { useCategories, DEFAULT_CATEGORIES } from '../hooks/useCategories'
+import { Badge } from '@/components/ui/badge'
 
 interface Props {
   category: string
@@ -16,21 +17,21 @@ function hexToRgba(hex: string, alpha: number) {
 export default function CategoryBadge({ category, showIcon = true }: Props) {
   const { categories } = useCategories()
   
-  // Find category or fallback to 'other'
   const meta = categories.find(c => c.name === category) 
     || DEFAULT_CATEGORIES.find(c => c.name === 'other')!
 
   return (
-    <span
-      className="badge"
+    <Badge
+      variant="outline"
+      className="gap-1 px-2 py-0.5 whitespace-nowrap"
       style={{
         color: meta.color,
-        backgroundColor: hexToRgba(meta.color, 0.12),
+        backgroundColor: hexToRgba(meta.color, 0.1),
         borderColor: hexToRgba(meta.color, 0.3),
       }}
     >
-      {showIcon && <span style={{ marginRight: 4 }}>{meta.icon}</span>}
-      {meta.name}
-    </span>
+      {showIcon && <span className="text-xs">{meta.icon}</span>}
+      <span className="capitalize">{meta.name}</span>
+    </Badge>
   )
 }

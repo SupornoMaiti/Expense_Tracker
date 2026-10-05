@@ -3,6 +3,14 @@ import { addTransaction, addDebt, getAllPeople, addPerson } from '../lib/db'
 import type { Person } from '../lib/db'
 import { useCategories } from '../hooks/useCategories'
 import AddPersonModal from './AddPersonModal'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Download, Users, UserPlus, SplitSquareHorizontal } from 'lucide-react'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 interface Props {
   onClose: () => void
@@ -10,25 +18,24 @@ interface Props {
 }
 
 function todayISO() {
-  return new Date().toISOString().slice(0, 10) // YYYY-MM-DD
+  return new Date().toISOString().slice(0, 10)
 }
 
 export default function AddTransactionModal({ onClose, onSuccess }: Props) {
-  const [amount,      setAmount]   = useState('')
-  const [category,    setCategory] = useState('food')
-  const [description, setDesc]     = useState('')
-  const [date,        setDate]     = useState(todayISO())
-  const [saving,      setSaving]   = useState(false)
-  const [error,       setError]    = useState('')
+  const [amount, setAmount] = useState('')
+  const [category, setCategory] = useState('food')
+  const [description, setDesc] = useState('')
+  const [date, setDate] = useState(todayISO())
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
 
   const { categories } = useCategories()
   const expenseCategories = categories.filter(c => !['salary', 'freelance'].includes(c.name))
 
-  // ── Split state ────────────────────────────────────────────────────────────
-  const [splitEnabled,   setSplit]         = useState(false)
-  const [people,         setPeople]        = useState<Person[]>([])
+  const [splitEnabled, setSplit] = useState(false)
+  const [people, setPeople] = useState<Person[]>([])
   const [splitPersonIds, setSplitPersonIds] = useState<string[]>([])
-  const [showAddPerson,  setShowAddPerson] = useState(false)
+  const [showAddPerson, setShowAddPerson] = useState(false)
 
   const fetchPeople = async () => {
     const p = await getAllPeople()
@@ -43,7 +50,6 @@ export default function AddTransactionModal({ onClose, onSuccess }: Props) {
 
   const totalAmount = parseFloat(amount) || 0
 
-  // Equal split: total / (friends + 1)
   const friendShare = splitEnabled && splitPersonIds.length > 0 && totalAmount > 0
     ? Math.round((totalAmount / (splitPersonIds.length + 1)) * 100) / 100
     : 0
@@ -63,7 +69,7 @@ export default function AddTransactionModal({ onClose, onSuccess }: Props) {
         'The native Contacts picker requires:\n' +
         '• Chrome on Android\n' +
         '• Safari on iOS 14.5+\n\n' +
-        'Please use the \"+ ADD\" button to add contacts manually on this device.'
+        'Please use the "+ ADD" button to add contacts manually on this device.'
       )
       return
     }
@@ -102,7 +108,6 @@ export default function AddTransactionModal({ onClose, onSuccess }: Props) {
     setSaving(true)
     setError('')
     try {
-      // 1. Write expense transaction
       const tx = await addTransaction({
         type: 'expense',
         amount: totalAmount,
@@ -110,16 +115,15 @@ export default function AddTransactionModal({ onClose, onSuccess }: Props) {
         description,
       })
 
-      // 2. Write a debt per selected friend
       if (splitEnabled && splitPersonIds.length > 0 && friendShare > 0) {
         for (const pid of splitPersonIds) {
           await addDebt({
-            person_id:      pid,
+            person_id: pid,
             transaction_id: tx.id,
-            amount:         friendShare,   // positive = they owe me
+            amount: friendShare,
             category,
-            note:           description || category,
-            settled:        false,
+            note: description || category,
+            settled: false,
           })
         }
       }
@@ -134,176 +138,186 @@ export default function AddTransactionModal({ onClose, onSuccess }: Props) {
   }
 
   return (
-    <div className="modal-backdrop" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="modal">
-        <div className="modal-header">
-          <span className="modal-title">+ Add Expense</span>
-          <button className="modal-close" onClick={onClose}>✕</button>
-        </div>
+    <>
+      <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+        <DialogContent className="sm:max-w-[425px] overflow-hidden p-0 bg-background max-h-[90vh] flex flex-col">
+          <DialogHeader className="p-6 pb-4 border-b">
+            <DialogTitle className="text-xl">Add Expense</DialogTitle>
+            <DialogDescription>
+              Record a new expense and optionally split it.
+            </DialogDescription>
+          </DialogHeader>
 
-        <form className="modal-form" onSubmit={handleSubmit}>
+          <ScrollArea className="flex-1 px-6 py-4">
+            <form id="add-transaction-form" onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="amount">Amount (₹)</Label>
+                <Input
+                  id="amount"
+                  type="number"
+                  placeholder="0.00"
+                  value={amount}
+                  onChange={e => setAmount(e.target.value)}
+                  min="0.01"
+                  step="0.01"
+                  autoFocus
+                  required
+                  className="text-lg"
+                />
+              </div>
 
-          {/* Amount */}
-          <div className="form-group">
-            <label className="form-label" htmlFor="tx-amount">Amount (₹)</label>
-            <input
-              id="tx-amount"
-              type="number"
-              className="form-input"
-              placeholder="0.00"
-              value={amount}
-              onChange={e => setAmount(e.target.value)}
-              min="0.01"
-              step="0.01"
-              autoFocus
-              required
-            />
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="desc">Description</Label>
+                <Input
+                  id="desc"
+                  type="text"
+                  placeholder="e.g., lunch at mess, auto to college..."
+                  value={description}
+                  onChange={e => setDesc(e.target.value)}
+                  maxLength={200}
+                  required
+                />
+              </div>
 
-          {/* Description */}
-          <div className="form-group">
-            <label className="form-label" htmlFor="tx-desc">Description</label>
-            <input
-              id="tx-desc"
-              type="text"
-              className="form-input"
-              placeholder="e.g., lunch at mess, auto to college..."
-              value={description}
-              onChange={e => setDesc(e.target.value)}
-              maxLength={200}
-              required
-            />
-          </div>
-
-          {/* Date */}
-          <div className="form-group">
-            <label className="form-label" htmlFor="tx-date">Date</label>
-            <input
-              id="tx-date"
-              type="date"
-              className="form-input"
-              value={date}
-              onChange={e => setDate(e.target.value)}
-              max={todayISO()}
-            />
-          </div>
-
-          {/* Category */}
-          <div className="form-group">
-            <label className="form-label" htmlFor="tx-category">Category</label>
-            <select
-              id="tx-category"
-              className="form-select"
-              value={category}
-              onChange={e => setCategory(e.target.value)}
-            >
-              {expenseCategories.map(c => (
-                <option key={c.name} value={c.name}>{c.icon} {c.name.charAt(0).toUpperCase() + c.name.slice(1)}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* ── Split Section ─────────────────────────────────────────────── */}
-          <div className="split-section">
-            <button
-              type="button"
-              className={`split-toggle ${splitEnabled ? 'split-toggle--on' : ''}`}
-              onClick={() => setSplit(s => !s)}
-            >
-              <span className="split-toggle__icon">{splitEnabled ? '⊟' : '⊞'}</span>
-              <span>SPLIT WITH FRIENDS</span>
-              {splitEnabled && totalAmount > 0 && splitPersonIds.length > 0 && (
-                <span className="split-toggle__badge">
-                  your share: ₹{myShare.toFixed(2)}
-                </span>
-              )}
-            </button>
-
-            {splitEnabled && (
-              <div className="split-body">
-                <div className="form-group">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)' }}>
-                    <label className="form-label" style={{ margin: 0 }}>Friends</label>
-                    <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-                      <button
-                        type="button"
-                        className="btn btn-ghost btn-sm"
-                        style={{ fontSize: 'var(--font-size-xs)', padding: '2px 8px', color: contactsApiSupported ? 'var(--color-info)' : 'var(--color-text-muted)' }}
-                        onClick={handleBulkImport}
-                        disabled={saving}
-                        title={contactsApiSupported ? 'Import from phone contacts' : 'Requires Android Chrome or iOS Safari'}
-                      >
-                        📥 IMPORT
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-ghost btn-sm"
-                        style={{ fontSize: 'var(--font-size-xs)', padding: '2px 8px', color: 'var(--color-primary)' }}
-                        onClick={() => setShowAddPerson(true)}
-                        disabled={saving}
-                      >
-                        + ADD
-                      </button>
-                    </div>
-                  </div>
-
-                  {people.length === 0 ? (
-                    <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', padding: 'var(--space-3)' }}>
-                      ⚠ No contacts yet — import or go to Contacts tab to add.
-                    </p>
-                  ) : (
-                    <div style={{
-                      display: 'flex', flexDirection: 'column', gap: 'var(--space-2)',
-                      maxHeight: 150, overflowY: 'auto',
-                      padding: 'var(--space-2)', background: 'var(--color-surface-2)',
-                      borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)',
-                    }}>
-                      {people.map(p => (
-                        <label key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', cursor: 'pointer', fontSize: 'var(--font-size-sm)' }}>
-                          <input
-                            type="checkbox"
-                            checked={splitPersonIds.includes(p.id)}
-                            onChange={() => togglePerson(p.id)}
-                          />
-                          {p.name}
-                        </label>
-                      ))}
-                    </div>
-                  )}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="date">Date</Label>
+                  <Input
+                    id="date"
+                    type="date"
+                    value={date}
+                    onChange={e => setDate(e.target.value)}
+                    max={todayISO()}
+                  />
                 </div>
 
-                {/* Preview */}
-                {totalAmount > 0 && splitPersonIds.length > 0 && (
-                  <div className="split-preview">
-                    <div className="split-preview__row">
-                      <span>Your share</span>
-                      <span style={{ color: 'var(--color-expense)', fontWeight: 700 }}>₹{myShare.toFixed(2)}</span>
+                <div className="space-y-2">
+                  <Label htmlFor="category">Category</Label>
+                  <Select value={category} onValueChange={(v) => v && setCategory(v)}>
+                    <SelectTrigger id="category">
+                      <SelectValue placeholder="Category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {expenseCategories.map(c => (
+                        <SelectItem key={c.name} value={c.name} className="capitalize">
+                          {c.icon} {c.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Split Section */}
+              <div className="mt-6 pt-4 border-t">
+                <Button
+                  type="button"
+                  variant={splitEnabled ? 'secondary' : 'outline'}
+                  className={`w-full justify-start ${splitEnabled ? 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border-indigo-200 dark:bg-indigo-500/10 dark:text-indigo-400 dark:border-indigo-500/20 dark:hover:bg-indigo-500/20' : ''}`}
+                  onClick={() => setSplit(!splitEnabled)}
+                >
+                  <SplitSquareHorizontal className="mr-2 h-4 w-4" />
+                  Split with friends
+                  {splitEnabled && totalAmount > 0 && splitPersonIds.length > 0 && (
+                    <span className="ml-auto text-xs font-semibold bg-background/50 px-2 py-0.5 rounded-full">
+                      Your share: ₹{myShare.toFixed(2)}
+                    </span>
+                  )}
+                </Button>
+
+                {splitEnabled && (
+                  <div className="mt-4 space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="flex items-center justify-between">
+                      <Label>Select Friends</Label>
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 px-2 text-xs text-indigo-600"
+                          onClick={handleBulkImport}
+                          disabled={saving || !contactsApiSupported}
+                          title={contactsApiSupported ? 'Import from contacts' : 'Unsupported on this browser'}
+                        >
+                          <Download className="mr-1 h-3 w-3" />
+                          Import
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 px-2 text-xs text-indigo-600"
+                          onClick={() => setShowAddPerson(true)}
+                          disabled={saving}
+                        >
+                          <UserPlus className="mr-1 h-3 w-3" />
+                          Add
+                        </Button>
+                      </div>
                     </div>
-                    <div className="split-preview__row">
-                      <span>Each friend owes you</span>
-                      <span style={{ color: 'var(--color-income)', fontWeight: 700 }}>₹{friendShare.toFixed(2)}</span>
-                    </div>
-                    <div className="split-preview__note">
-                      Debt will be added for {splitPersonIds.length} friend{splitPersonIds.length > 1 ? 's' : ''}.
-                    </div>
+
+                    {people.length === 0 ? (
+                      <div className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg flex items-start gap-2">
+                        <Users className="h-4 w-4 mt-0.5 shrink-0" />
+                        <p>No contacts yet. Add or import someone to split this expense.</p>
+                      </div>
+                    ) : (
+                      <div className="bg-muted/30 border rounded-lg p-3 max-h-40 overflow-y-auto space-y-3">
+                        {people.map(p => (
+                          <div key={p.id} className="flex items-center space-x-2">
+                            <Checkbox 
+                              id={`person-${p.id}`} 
+                              checked={splitPersonIds.includes(p.id)}
+                              onCheckedChange={() => togglePerson(p.id)}
+                            />
+                            <label
+                              htmlFor={`person-${p.id}`}
+                              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex-1"
+                            >
+                              {p.name}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {totalAmount > 0 && splitPersonIds.length > 0 && (
+                      <div className="bg-indigo-50 dark:bg-indigo-500/10 p-3 rounded-lg text-sm border border-indigo-100 dark:border-indigo-500/20">
+                        <div className="flex justify-between mb-1">
+                          <span className="text-muted-foreground">Your share</span>
+                          <span className="font-semibold text-foreground">₹{myShare.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between mb-2">
+                          <span className="text-muted-foreground">Each friend owes you</span>
+                          <span className="font-semibold text-emerald-600 dark:text-emerald-400">₹{friendShare.toFixed(2)}</span>
+                        </div>
+                        <p className="text-[10px] text-muted-foreground/80 mt-1 pt-2 border-t border-indigo-200 dark:border-indigo-500/20">
+                          Debt will be added for {splitPersonIds.length} friend{splitPersonIds.length > 1 ? 's' : ''}.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
-            )}
-          </div>
 
-          {error && (
-            <p style={{ color: 'var(--color-expense)', fontSize: 'var(--font-size-sm)' }}>⚠ {error}</p>
-          )}
+              {error && (
+                <div className="text-sm text-destructive font-medium bg-destructive/10 p-3 rounded-md">
+                  {error}
+                </div>
+              )}
+            </form>
+          </ScrollArea>
 
-          <div className="modal-actions">
-            <button type="button" className="btn btn-ghost" onClick={onClose}>CANCEL</button>
-            <button type="submit" className="btn btn-primary" disabled={saving}>
-              {saving ? 'SAVING…' : splitEnabled ? '[ SAVE + SPLIT ]' : '[ SAVE ]'}
-            </button>
-          </div>
-        </form>
-      </div>
+          <DialogFooter className="p-6 pt-4 border-t gap-2 sm:gap-0">
+            <Button type="button" variant="ghost" onClick={onClose} disabled={saving}>
+              Cancel
+            </Button>
+            <Button type="submit" form="add-transaction-form" disabled={saving} className="bg-indigo-600 hover:bg-indigo-700 text-white">
+              {saving ? 'Saving...' : splitEnabled ? 'Save & Split' : 'Save'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {showAddPerson && (
         <AddPersonModal
@@ -314,6 +328,6 @@ export default function AddTransactionModal({ onClose, onSuccess }: Props) {
           }}
         />
       )}
-    </div>
+    </>
   )
 }

@@ -1,16 +1,18 @@
 import { useState, type FormEvent } from 'react'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
-import './Login.css'
-
-// ─── Types ────────────────────────────────────────────────────────────────────
+import { IndianRupee, Loader2, AlertCircle } from 'lucide-react'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 
 type AuthMode = 'signin' | 'register'
 
-// ─── Google SVG icon (inline — no CDN dependency) ────────────────────────────
-
 function GoogleIcon() {
   return (
-    <svg className="login-google-icon" viewBox="0 0 24 24" aria-hidden="true">
+    <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" aria-hidden="true">
       <path
         fill="#4285F4"
         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -31,37 +33,38 @@ function GoogleIcon() {
   )
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
 export default function Login() {
-  const [mode, setMode]         = useState<AuthMode>('signin')
-  const [email, setEmail]       = useState('')
+  const [mode, setMode] = useState<AuthMode>('signin')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [loading, setLoading]   = useState(false)
-  const [error, setError]       = useState<string | null>(null)
-  const [info, setInfo]         = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [info, setInfo] = useState<string | null>(null)
 
-  // ── Guard: Supabase not configured ──────────────────────────────────────────
   if (!isSupabaseConfigured) {
     return (
-      <div className="login-page">
-        <div className="login-card">
-          <div className="login-brand">
-            <span className="login-brand__icon">₹</span>
-            <div className="login-brand__name">FINTRACK</div>
-          </div>
-          <div className="login-error">
-            <span className="login-error-prefix">ERR</span>
-            Supabase is not configured. Add{' '}
-            <code>VITE_SUPABASE_URL</code> and{' '}
-            <code>VITE_SUPABASE_ANON_KEY</code> to your <code>.env.local</code> file.
-          </div>
-        </div>
+      <div className="min-h-dvh flex items-center justify-center p-4 bg-muted/40">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 mb-4 shadow-sm">
+              <IndianRupee className="h-8 w-8" />
+            </div>
+            <CardTitle className="text-2xl font-bold tracking-tight text-indigo-600">FINTRACK</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Configuration Error</AlertTitle>
+              <AlertDescription>
+                Supabase is not configured. Add <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code> to your <code>.env.local</code> file.
+              </AlertDescription>
+            </Alert>
+          </CardContent>
+        </Card>
       </div>
     )
   }
 
-  // ── Email / Password submit ──────────────────────────────────────────────────
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setError(null)
@@ -72,7 +75,6 @@ export default function Login() {
       if (mode === 'signin') {
         const { error } = await supabase!.auth.signInWithPassword({ email, password })
         if (error) throw error
-        // Auth state change in AuthProvider handles the redirect
       } else {
         const { error } = await supabase!.auth.signUp({ email, password })
         if (error) throw error
@@ -87,7 +89,6 @@ export default function Login() {
     }
   }
 
-  // ── Google OAuth ─────────────────────────────────────────────────────────────
   const handleGoogle = async () => {
     setError(null)
     setInfo(null)
@@ -102,7 +103,6 @@ export default function Login() {
       if (error) throw error
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Google sign-in failed'
-      // Surface a friendly message if Google isn't configured yet
       if (msg.toLowerCase().includes('provider') || msg.toLowerCase().includes('disabled')) {
         setError('Google OAuth not yet configured in Supabase dashboard. Use email/password for now.')
       } else {
@@ -112,145 +112,107 @@ export default function Login() {
     }
   }
 
-  // ── Switch mode — reset state ────────────────────────────────────────────────
-  const switchMode = (next: AuthMode) => {
-    setMode(next)
-    setError(null)
-    setInfo(null)
-  }
-
   return (
-    <div className="login-page">
-      <div className="login-card">
-
-        {/* ── Brand ───────────────────────────────────────────────────────── */}
-        <div className="login-brand">
-          <span className="login-brand__icon">₹</span>
-          <div className="login-brand__name">FINTRACK</div>
-          <div className="login-brand__tagline">
-            personal finance terminal<span className="login-cursor" />
+    <div className="min-h-dvh flex items-center justify-center p-4 bg-muted/40 selection:bg-indigo-500/30">
+      <Card className="w-full max-w-md shadow-xl border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <CardHeader className="space-y-4 text-center pt-8 pb-4">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 mb-2 shadow-sm">
+            <IndianRupee className="h-8 w-8" />
           </div>
-        </div>
-
-        {/* ── Mode tabs ───────────────────────────────────────────────────── */}
-        <div className="login-tabs" role="tablist">
-          <button
-            id="tab-signin"
-            role="tab"
-            aria-selected={mode === 'signin'}
-            className={`login-tab ${mode === 'signin' ? 'login-tab--active' : ''}`}
-            onClick={() => switchMode('signin')}
-          >
-            Sign In
-          </button>
-          <button
-            id="tab-register"
-            role="tab"
-            aria-selected={mode === 'register'}
-            className={`login-tab ${mode === 'register' ? 'login-tab--active' : ''}`}
-            onClick={() => switchMode('register')}
-          >
-            Register
-          </button>
-        </div>
-
-        {/* ── Info banner ─────────────────────────────────────────────────── */}
-        {info && (
-          <div className="login-info" role="status">
-            {info}
+          <div className="space-y-1">
+            <CardTitle className="text-2xl font-bold tracking-tight text-indigo-600 dark:text-indigo-400">
+              FINTRACK
+            </CardTitle>
+            <CardDescription className="text-xs uppercase tracking-widest font-medium">
+              Personal Finance Terminal
+            </CardDescription>
           </div>
-        )}
-
-        {/* ── Error banner ────────────────────────────────────────────────── */}
-        {error && (
-          <div className="login-error" role="alert">
-            <span className="login-error-prefix">ERR &gt;</span>
-            {error}
-          </div>
-        )}
-
-        {/* ── Email / Password form ────────────────────────────────────────── */}
-        <form
-          id="login-form"
-          className="login-form"
-          onSubmit={handleSubmit}
-          noValidate
-          aria-labelledby={`tab-${mode}`}
-        >
-          <div>
-            <label htmlFor="login-email" className="login-label">
-              <span>›</span> Email
-            </label>
-            <input
-              id="login-email"
-              type="email"
-              className={`login-input${error ? ' login-input--error' : ''}`}
-              placeholder="user@example.com"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-              disabled={loading}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="login-password" className="login-label">
-              <span>›</span> Password
-            </label>
-            <input
-              id="login-password"
-              type="password"
-              className={`login-input${error ? ' login-input--error' : ''}`}
-              placeholder={mode === 'register' ? 'Min 6 characters' : '••••••••'}
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              required
-              autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
-              disabled={loading}
-              minLength={6}
-            />
-          </div>
-
-          <button
-            id="login-submit-btn"
-            type="submit"
-            className="login-submit"
-            disabled={loading || !email || !password}
-          >
-            {loading ? (
-              <><div className="login-spinner" aria-hidden="true" /> Processing...</>
-            ) : mode === 'signin' ? (
-              '› Sign In'
-            ) : (
-              '› Create Account'
+        </CardHeader>
+        <CardContent>
+          <Tabs value={mode} onValueChange={(v: string) => { setMode(v as AuthMode); setError(null); setInfo(null); }} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsTrigger value="signin">Sign In</TabsTrigger>
+              <TabsTrigger value="register">Register</TabsTrigger>
+            </TabsList>
+            
+            {info && (
+              <Alert className="mb-6 bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-900">
+                <AlertDescription>{info}</AlertDescription>
+              </Alert>
             )}
-          </button>
-        </form>
 
-        {/* ── Divider ─────────────────────────────────────────────────────── */}
-        <div className="login-divider">
-          <span>or continue with</span>
-        </div>
+            {error && (
+              <Alert variant="destructive" className="mb-6">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
-        {/* ── Google OAuth ────────────────────────────────────────────────── */}
-        <button
-          id="login-google-btn"
-          type="button"
-          className="login-google"
-          onClick={handleGoogle}
-          disabled={loading}
-        >
-          <GoogleIcon />
-          Google
-        </button>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="user@example.com"
+                  value={email}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                  required
+                  disabled={loading}
+                />
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Password</Label>
+                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder={mode === 'register' ? 'Min 6 characters' : '••••••••'}
+                  value={password}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  disabled={loading}
+                />
+              </div>
+              <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white" disabled={loading || !email || !password}>
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Please wait
+                  </>
+                ) : mode === 'signin' ? (
+                  'Sign In'
+                ) : (
+                  'Create Account'
+                )}
+              </Button>
+            </form>
+          </Tabs>
 
-        {/* ── Footer ──────────────────────────────────────────────────────── */}
-        <div className="login-footer">
-          FINTRACK v2.0 · offline-first PWA
-        </div>
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                Or continue with
+              </span>
+            </div>
+          </div>
 
-      </div>
+          <Button variant="outline" type="button" className="w-full font-normal" onClick={handleGoogle} disabled={loading}>
+            <GoogleIcon />
+            Google
+          </Button>
+        </CardContent>
+        <CardFooter className="flex justify-center pb-8">
+          <p className="text-xs text-muted-foreground">
+            FINTRACK v2.0 · offline-first PWA
+          </p>
+        </CardFooter>
+      </Card>
     </div>
   )
 }

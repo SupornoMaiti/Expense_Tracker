@@ -1,6 +1,12 @@
 import React, { useState } from 'react'
 import { addCategory, deleteCategory } from '../lib/db'
 import { useCategories, DEFAULT_CATEGORIES } from '../hooks/useCategories'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Tags, Trash2 } from 'lucide-react'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 interface Props {
   onClose: () => void
@@ -10,7 +16,7 @@ export default function ManageCategoriesModal({ onClose }: Props) {
   const { categories, refresh } = useCategories()
   const [name, setName] = useState('')
   const [icon, setIcon] = useState('📌')
-  const [color, setColor] = useState('#00ff88')
+  const [color, setColor] = useState('#10b981')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -54,54 +60,96 @@ export default function ManageCategoriesModal({ onClose }: Props) {
   }
 
   return (
-    <div className="modal-backdrop" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="modal">
-        <div className="modal-header">
-          <span className="modal-title">Manage Categories</span>
-          <button className="modal-close" onClick={onClose}>✕</button>
-        </div>
+    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <div className="flex items-center gap-2">
+            <Tags className="h-5 w-5 text-indigo-600" />
+            <DialogTitle className="text-xl">Manage Categories</DialogTitle>
+          </div>
+          <DialogDescription>
+            Add or remove custom categories for your transactions.
+          </DialogDescription>
+        </DialogHeader>
 
-        <form className="modal-form" onSubmit={handleAdd} style={{ marginBottom: 'var(--space-6)', padding: 'var(--space-4)', background: 'var(--color-surface-2)', borderRadius: 'var(--radius-md)' }}>
-          <div style={{ fontSize: 'var(--font-size-sm)', fontWeight: 600, marginBottom: 'var(--space-3)' }}>Add Custom Category</div>
-          <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
-            <div className="form-group" style={{ flex: '0 0 60px' }}>
-              <label className="form-label">Emoji</label>
-              <input type="text" className="form-input" style={{ textAlign: 'center' }} maxLength={2} value={icon} onChange={e => setIcon(e.target.value)} required />
+        <form onSubmit={handleAdd} className="mt-4 bg-muted/20 border p-4 rounded-xl space-y-4">
+          <div className="text-sm font-semibold text-foreground">Add Custom Category</div>
+          
+          <div className="flex gap-3 items-end">
+            <div className="space-y-2 w-16 shrink-0">
+              <Label>Emoji</Label>
+              <Input 
+                className="text-center text-lg h-10 px-1" 
+                maxLength={2} 
+                value={icon} 
+                onChange={e => setIcon(e.target.value)} 
+                required 
+              />
             </div>
-            <div className="form-group" style={{ flex: 1 }}>
-              <label className="form-label">Name</label>
-              <input type="text" className="form-input" placeholder="e.g. beer" value={name} onChange={e => setName(e.target.value)} maxLength={20} required />
+            
+            <div className="space-y-2 flex-1 min-w-0">
+              <Label>Name</Label>
+              <Input 
+                placeholder="e.g. beer" 
+                value={name} 
+                onChange={e => setName(e.target.value)} 
+                maxLength={20} 
+                className="h-10"
+                required 
+              />
             </div>
-            <div className="form-group" style={{ flex: '0 0 60px' }}>
-              <label className="form-label">Color</label>
-              <input type="color" className="form-input" style={{ padding: 0, height: 42, cursor: 'pointer' }} value={color} onChange={e => setColor(e.target.value)} required />
+            
+            <div className="space-y-2 w-12 shrink-0">
+              <Label>Color</Label>
+              <Input 
+                type="color" 
+                className="p-1 h-10 cursor-pointer w-full" 
+                value={color} 
+                onChange={e => setColor(e.target.value)} 
+                required 
+              />
             </div>
           </div>
-          {error && <div style={{ color: 'var(--color-expense)', fontSize: 'var(--font-size-xs)', marginTop: 4 }}>⚠ {error}</div>}
-          <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: 'var(--space-3)' }} disabled={saving}>
-            {saving ? 'ADDING...' : 'ADD CATEGORY'}
-          </button>
+          
+          {error && <div className="text-sm text-destructive font-medium">{error}</div>}
+          
+          <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white" disabled={saving}>
+            {saving ? 'Adding...' : 'Add Category'}
+          </Button>
         </form>
 
-        <div style={{ maxHeight: 250, overflowY: 'auto' }}>
-          <div style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-2)' }}>Custom Categories</div>
-          {customCategories.length === 0 ? (
-            <div className="text-muted text-xs">No custom categories yet.</div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-              {customCategories.map(c => (
-                <div key={c.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 'var(--space-2)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                    <span style={{ fontSize: '1.2rem' }}>{c.icon}</span>
-                    <span style={{ textTransform: 'capitalize', color: c.color, fontWeight: 600 }}>{c.name}</span>
+        <div className="mt-6">
+          <div className="text-sm font-medium text-muted-foreground mb-3">Custom Categories</div>
+          
+          <ScrollArea className="h-[200px] pr-4">
+            {customCategories.length === 0 ? (
+              <div className="text-muted-foreground text-sm italic py-4 text-center bg-muted/20 rounded-lg border border-dashed">
+                No custom categories yet.
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {customCategories.map(c => (
+                  <div key={c.id} className="flex items-center justify-between p-3 border rounded-lg bg-background">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xl leading-none">{c.icon}</span>
+                      <span className="capitalize font-semibold text-sm" style={{ color: c.color }}>{c.name}</span>
+                    </div>
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10" 
+                      onClick={() => handleDelete(c.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <button type="button" className="btn btn-ghost btn-sm" style={{ color: 'var(--color-expense)' }} onClick={() => handleDelete(c.id)}>DEL</button>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </ScrollArea>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }

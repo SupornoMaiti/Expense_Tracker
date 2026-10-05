@@ -2,6 +2,11 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { PersonWithBalance } from '../hooks/useDebts'
 import { deletePerson, settleAllDebts } from '../lib/db'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Trash2, CheckCircle2, ArrowRight, MessageCircle } from 'lucide-react'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
 
 interface Props {
   person: PersonWithBalance
@@ -48,120 +53,107 @@ export default function PersonCard({ person, onDelete }: Props) {
     setSettling(true)
     await settleAllDebts(person.id)
     setSettling(false)
-    onDelete() // refresh parent list
+    onDelete()
   }
 
   return (
-    <div
-      className="card"
-      style={{
-        borderColor: isCredit
-          ? 'rgba(0,255,136,0.2)'
-          : isDebit
-          ? 'rgba(255,165,2,0.2)'
-          : 'var(--color-border)',
-        transition: 'border-color 220ms ease, box-shadow 220ms ease',
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
-        {/* Avatar */}
-        <div
-          className="avatar"
-          style={{
-            color: isCredit ? 'var(--color-income)' : isDebit ? 'var(--color-warn)' : 'var(--color-text-muted)',
-            borderColor: isCredit ? 'rgba(0,255,136,0.3)' : isDebit ? 'rgba(255,165,2,0.3)' : 'var(--color-border)',
-          }}
-        >
-          {getInitials(person.name)}
-        </div>
+    <Card className={`overflow-hidden transition-all duration-200 hover:shadow-md ${isCredit ? 'border-emerald-500/30' : isDebit ? 'border-amber-500/30' : 'border-border'}`}>
+      <CardContent className="p-4 sm:p-6">
+        <div className="flex items-center gap-4">
+          <Avatar className="h-12 w-12 border-2 shadow-sm" style={{ borderColor: isCredit ? 'rgb(16 185 129 / 0.5)' : isDebit ? 'rgb(245 158 11 / 0.5)' : 'transparent' }}>
+            <AvatarFallback className={`font-semibold ${isCredit ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400' : isDebit ? 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400' : 'bg-muted text-muted-foreground'}`}>
+              {getInitials(person.name)}
+            </AvatarFallback>
+          </Avatar>
 
-        {/* Info */}
-        <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 600, color: 'var(--color-text)' }}>{person.name}</div>
-          <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>
-            {activeDebts.length} active debt{activeDebts.length !== 1 ? 's' : ''}
-            {person.phone && (
-              <span style={{ marginLeft: 8 }}>· {person.phone}</span>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-foreground truncate text-base">{person.name}</h3>
+            <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
+              <span>{activeDebts.length} active</span>
+              {person.phone && (
+                <>
+                  <span>•</span>
+                  <span className="truncate">{person.phone}</span>
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className="text-right flex-shrink-0">
+            {isSettled ? (
+              <Badge variant="secondary" className="font-medium">
+                Settled
+              </Badge>
+            ) : (
+              <div className="flex flex-col items-end">
+                <span className={`text-lg font-bold tabular-nums tracking-tight ${isCredit ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-500'}`}>
+                  {isCredit ? '+' : '-'}{formatINR(netBalance)}
+                </span>
+                <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mt-0.5">
+                  {isCredit ? 'owes you' : 'you owe'}
+                </span>
+              </div>
             )}
           </div>
         </div>
 
-        {/* Balance badge */}
-        <div style={{ textAlign: 'right' }}>
-          {isSettled ? (
-            <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>
-              SETTLED
-            </span>
-          ) : (
-            <>
-              <div
-                style={{
-                  fontSize: 'var(--font-size-md)',
-                  fontWeight: 700,
-                  color: isCredit ? 'var(--color-income)' : 'var(--color-warn)',
-                }}
-              >
-                {isCredit ? '+' : '-'}{formatINR(netBalance)}
-              </div>
-              <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>
-                {isCredit ? 'owes you' : 'you owe'}
-              </div>
-            </>
+        <div className="flex items-center gap-2 mt-5 pt-4 border-t border-border justify-end flex-wrap">
+          {activeDebts.length > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              className={`h-8 font-medium ${isCredit ? 'text-emerald-700 border-emerald-200 hover:bg-emerald-50 dark:text-emerald-400 dark:border-emerald-900/50 dark:hover:bg-emerald-900/20' : 'text-amber-700 border-amber-200 hover:bg-amber-50 dark:text-amber-400 dark:border-amber-900/50 dark:hover:bg-amber-900/20'}`}
+              onClick={handleSettleAll}
+              disabled={settling}
+            >
+              <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
+              {settling ? 'Settling...' : 'Settle All'}
+            </Button>
           )}
-        </div>
-      </div>
 
-      {/* Actions */}
-      <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-4)', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-        {/* SETTLE ALL — only shown when there are active debts */}
-        {activeDebts.length > 0 && (
-          <button
-            className="btn btn-sm"
-            style={{
-              background: isCredit ? 'rgba(0,255,136,0.12)' : 'rgba(255,165,2,0.12)',
-              color:       isCredit ? 'var(--color-income)'  : 'var(--color-warn)',
-              border:      `1px solid ${isCredit ? 'rgba(0,255,136,0.3)' : 'rgba(255,165,2,0.3)'}`,
-            }}
-            onClick={handleSettleAll}
-            disabled={settling}
+          {person.phone && (
+            <a
+              href={`https://wa.me/${person.phone.replace(/\D/g, '')}?text=${(() => {
+                if (activeDebts.length === 0) return encodeURIComponent(`Hey ${person.name}, we are all settled up! 🎉`)
+                
+                let msg = `Hey ${person.name}!\n\nHere is our current balance breakdown:\n`
+                activeDebts.forEach(d => {
+                  const amt = Math.abs(d.amount).toFixed(2)
+                  const action = d.amount > 0 ? 'You owe me' : 'I owe you'
+                  const note = d.note ? ` for ${d.note}` : ''
+                  msg += `• ${action} ₹${amt}${note}\n`
+                })
+                
+                msg += `\nNet Balance: *${isCredit ? 'You owe me' : 'I owe you'} ₹${Math.abs(netBalance).toFixed(2)}*\n\nLet's settle up soon!`
+                return encodeURIComponent(msg)
+              })()}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={buttonVariants({ variant: "outline", size: "sm", className: "h-8 text-[#25D366] hover:text-[#25D366] hover:bg-[#25D366]/10 border-[#25D366]/20 font-medium" })}
+            >
+              <MessageCircle className="mr-1.5 h-3.5 w-3.5" />
+              WhatsApp
+            </a>
+          )}
+
+          <Link 
+            to={`/contacts/${person.id}`}
+            className={buttonVariants({ variant: "ghost", size: "sm", className: "h-8 font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-500/10" })}
           >
-            {settling ? '⏳' : '✓'} SETTLE ALL
-          </button>
-        )}
-        <Link
-          to={`/contacts/${person.id}`}
-          className="btn btn-ghost btn-sm"
-        >
-          VIEW →
-        </Link>
-        {person.phone && (
-          <a
-            href={`https://wa.me/${person.phone.replace(/\D/g, '')}?text=${(() => {
-              if (activeDebts.length === 0) return encodeURIComponent(`Hey ${person.name}, we are all settled up! 🎉`)
-              
-              let msg = `Hey ${person.name}!\n\nHere is our current balance breakdown:\n`
-              activeDebts.forEach(d => {
-                const amt = Math.abs(d.amount).toFixed(2)
-                const action = d.amount > 0 ? 'You owe me' : 'I owe you'
-                const note = d.note ? ` for ${d.note}` : ''
-                msg += `• ${action} ₹${amt}${note}\n`
-              })
-              
-              msg += `\nNet Balance: *${isCredit ? 'You owe me' : 'I owe you'} ₹${Math.abs(netBalance).toFixed(2)}*\n\nLet's settle up soon!`
-              return encodeURIComponent(msg)
-            })()}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-ghost btn-sm"
-            style={{ color: '#25D366' }}
+            View <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+          </Link>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+            onClick={handleDelete}
+            title="Delete contact"
           >
-            WhatsApp
-          </a>
-        )}
-        <button className="btn btn-danger btn-sm" onClick={handleDelete}>
-          DEL
-        </button>
-      </div>
-    </div>
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   )
 }
