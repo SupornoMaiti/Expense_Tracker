@@ -1,4 +1,5 @@
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
+import { PieChart, Pie, Cell } from 'recharts'
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import type { Category } from '../lib/db'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -45,7 +46,13 @@ export default function DetailedPieChartModal({ onClose, pieData, categories }: 
           ) : (
             <>
               <div className="h-[250px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
+                <ChartContainer
+                  config={categories.reduce((acc, cat) => {
+                    acc[cat.name] = { label: cat.name, color: cat.color || '#888888' }
+                    return acc
+                  }, {} as Record<string, any>)}
+                  className="h-full w-full"
+                >
                   <PieChart>
                     <Pie
                       data={pieData}
@@ -63,20 +70,11 @@ export default function DetailedPieChartModal({ onClose, pieData, categories }: 
                         return <Cell key={entry.name} fill={color} />
                       })}
                     </Pie>
-                    <Tooltip
-                      formatter={(v) => [typeof v === 'number' ? formatINR(v) : v, 'Amount']}
-                      contentStyle={{ 
-                        background: 'hsl(var(--background))', 
-                        border: '1px solid hsl(var(--border))', 
-                        borderRadius: '0.5rem', 
-                        fontSize: '0.875rem', 
-                        color: 'hsl(var(--foreground))',
-                        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)'
-                      }}
-                      itemStyle={{ color: 'hsl(var(--foreground))' }}
+                    <ChartTooltip
+                      content={<ChartTooltipContent formatter={(value) => formatINR(value as number)} />}
                     />
                   </PieChart>
-                </ResponsiveContainer>
+                </ChartContainer>
               </div>
               
               <ScrollArea className="h-[200px] mt-4 pr-4">

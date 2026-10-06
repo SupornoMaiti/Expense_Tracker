@@ -89,7 +89,8 @@ function AppShell() {
           <IndianRupee className="h-5 w-5" />
           FINTRACK
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
           <SyncStatusBar />
           <UserMenu />
         </div>

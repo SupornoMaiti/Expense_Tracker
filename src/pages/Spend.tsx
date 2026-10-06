@@ -1,9 +1,10 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer,
-  BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  PieChart, Pie, Cell,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid
 } from 'recharts'
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import { useTransactions } from '../hooks/useTransactions'
 import { useCategories } from '../hooks/useCategories'
 import CategoryBadge from '../components/CategoryBadge'
@@ -166,7 +167,13 @@ export default function Spend() {
                     onClick={() => setShowDetailedPie(true)}
                     title="Click for detailed view"
                   >
-                    <ResponsiveContainer width="100%" height={240}>
+                    <ChartContainer
+                      config={categories.reduce((acc, cat) => {
+                        acc[cat.name] = { label: cat.name, color: cat.color || '#94a3b8' }
+                        return acc
+                      }, {} as Record<string, any>)}
+                      className="h-[240px] w-full"
+                    >
                       <PieChart>
                         <Pie
                           data={pieData}
@@ -185,12 +192,11 @@ export default function Spend() {
                             return <Cell key={entry.name} fill={color} />
                           })}
                         </Pie>
-                        <RechartsTooltip
-                          formatter={(v) => [typeof v === 'number' ? formatINR(v) : v, 'Amount']}
-                          contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--background)', fontSize: '13px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        <ChartTooltip
+                          content={<ChartTooltipContent formatter={(value) => formatINR(value as number)} />}
                         />
                       </PieChart>
-                    </ResponsiveContainer>
+                    </ChartContainer>
                   </div>
                 )}
               </CardContent>
@@ -201,39 +207,38 @@ export default function Spend() {
                 <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Daily Trend</CardTitle>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={240}>
+                <ChartContainer
+                  config={{ amount: { label: 'Amount', color: 'hsl(var(--primary))' } }}
+                  className="h-[240px] w-full"
+                >
                   <BarChart data={barData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.5} />
                     <XAxis
                       dataKey="day"
-                      tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
                       tickLine={false}
                       axisLine={false}
                       interval={4}
                     />
                     <YAxis
-                      tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
                       tickLine={false}
                       axisLine={false}
                       tickFormatter={(v: number) => v >= 1000 ? `${(v/1000).toFixed(0)}k` : String(v)}
                     />
-                    <RechartsTooltip
-                      formatter={(v) => [typeof v === 'number' ? formatINR(v) : v, 'Amount']}
-                      labelFormatter={(l) => `${MONTH_NAMES[month]} ${l}`}
+                    <ChartTooltip
                       cursor={{ fill: 'var(--muted)', opacity: 0.4 }}
-                      contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--background)', fontSize: '13px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                      content={<ChartTooltipContent hideLabel formatter={(value) => formatINR(value as number)} />}
                     />
-                    <Bar dataKey="amount" radius={[4, 4, 0, 0]}>
+                    <Bar dataKey="amount" fill="var(--color-amount)" radius={[4, 4, 0, 0]}>
                       {barData.map((entry) => (
                         <Cell
                           key={entry.day}
-                          fill={entry.day === todayDay ? 'var(--primary)' : 'var(--primary)'}
+                          fill="var(--color-amount)"
                           fillOpacity={entry.day === todayDay ? 1 : 0.6}
                         />
                       ))}
                     </Bar>
                   </BarChart>
-                </ResponsiveContainer>
+                </ChartContainer>
               </CardContent>
             </Card>
           </div>
