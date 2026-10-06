@@ -114,10 +114,20 @@ export default function PersonCard({ person, onDelete }: Props) {
           {person.phone && (
             <a
               href={`https://wa.me/${person.phone.replace(/\D/g, '')}?text=${(() => {
-                if (activeDebts.length === 0) return encodeURIComponent(`Hey ${person.name}, we are all settled up! 🎉`)
+                const sortedActiveDebts = [...activeDebts].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
                 
-                let msg = `Hey ${person.name}!\n\nHere is our current balance breakdown:\n`
-                activeDebts.forEach(d => {
+                if (sortedActiveDebts.length === 0) return encodeURIComponent(`Hey ${person.name}, we are all settled up! 🎉`)
+                
+                let msg = `Hey ${person.name}!\n\nHere is our current balance breakdown:\n\n`
+                let currentGroup = ''
+                
+                sortedActiveDebts.forEach(d => {
+                  const dateStr = new Date(d.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+                  if (dateStr !== currentGroup) {
+                    if (currentGroup !== '') msg += '\n'
+                    msg += `*${dateStr}*\n`
+                    currentGroup = dateStr
+                  }
                   const amt = Math.abs(d.amount).toFixed(2)
                   const action = d.amount > 0 ? 'You owe me' : 'I owe you'
                   const note = d.note ? ` for ${d.note}` : ''
