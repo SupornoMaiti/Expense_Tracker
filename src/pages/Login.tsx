@@ -46,10 +46,10 @@ export default function Login() {
       <div className="min-h-dvh flex items-center justify-center p-4 bg-muted/40">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 mb-4 shadow-sm">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 mb-4 shadow-sm">
               <IndianRupee className="h-8 w-8" />
             </div>
-            <CardTitle className="text-2xl font-bold tracking-tight text-indigo-600">FINTRACK</CardTitle>
+            <CardTitle className="text-2xl font-bold tracking-tight text-indigo-600 dark:text-indigo-400">FINTRACK</CardTitle>
           </CardHeader>
           <CardContent>
             <Alert variant="destructive">

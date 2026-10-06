@@ -12,6 +12,8 @@ import Transactions from './pages/Transactions'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { LayoutDashboard, ArrowRightLeft, Users, Contact, IndianRupee, Plus, LogOut, Loader2 } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuGroup } from '@/components/ui/dropdown-menu'
+import { ThemeProvider } from './components/theme-provider'
+import { ThemeToggle } from './components/ThemeToggle'
 
 const NAV_ITEMS = [
   { to: '/',         label: 'Spend',       icon: LayoutDashboard, end: true  },
@@ -104,7 +106,10 @@ function AppShell() {
         
         <div className="px-4 py-4 flex items-center justify-between">
            <UserMenu />
-           <SyncStatusBar />
+           <div className="flex items-center gap-2">
+             <ThemeToggle />
+             <SyncStatusBar />
+           </div>
         </div>
 
         <nav className="flex-1 space-y-1 px-4 py-4">
@@ -224,8 +229,10 @@ function AuthGate() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AuthGate />
-    </AuthProvider>
+    <ThemeProvider defaultTheme="system" storageKey="fintrack-theme">
+      <AuthProvider>
+        <AuthGate />
+      </AuthProvider>
+    </ThemeProvider>
   )
 }

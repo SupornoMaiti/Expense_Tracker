@@ -49,7 +49,7 @@ export default function ReminderBanner({ reminders, onSettle, notifPermission, o
         </div>
 
         {notifPermission === 'default' && (
-          <Button variant="ghost" size="sm" onClick={onAskPermission} className="h-7 text-xs font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50">
+          <Button variant="ghost" size="sm" onClick={onAskPermission} className="h-7 text-xs font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:text-indigo-300 dark:hover:bg-indigo-500/10">
             <BellRing className="mr-1.5 h-3.5 w-3.5" />
             Enable Notifications
           </Button>
@@ -61,7 +61,7 @@ export default function ReminderBanner({ reminders, onSettle, notifPermission, o
           </div>
         )}
         {notifPermission === 'granted' && (
-          <div className="flex items-center text-xs text-indigo-600 font-medium">
+          <div className="flex items-center text-xs text-indigo-600 dark:text-indigo-400 font-medium">
             <Bell className="mr-1.5 h-3.5 w-3.5" />
             Notifications on
           </div>

@@ -234,7 +234,7 @@ export default function AddTransactionModal({ onClose, onSuccess }: Props) {
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="h-7 px-2 text-xs text-indigo-600"
+                          className="h-7 px-2 text-xs text-indigo-600 dark:text-indigo-400"
                           onClick={handleBulkImport}
                           disabled={saving || !contactsApiSupported}
                           title={contactsApiSupported ? 'Import from contacts' : 'Unsupported on this browser'}
@@ -246,7 +246,7 @@ export default function AddTransactionModal({ onClose, onSuccess }: Props) {
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="h-7 px-2 text-xs text-indigo-600"
+                          className="h-7 px-2 text-xs text-indigo-600 dark:text-indigo-400"
                           onClick={() => setShowAddPerson(true)}
                           disabled={saving}
                         >

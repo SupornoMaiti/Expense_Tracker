@@ -52,7 +52,7 @@ export default function Contacts() {
             variant="outline"
             onClick={handleBulkImport}
             disabled={importing || !contactsApiSupported}
-            className={contactsApiSupported ? 'text-indigo-600 hover:text-indigo-700' : 'text-muted-foreground'}
+            className={contactsApiSupported ? 'text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300' : 'text-muted-foreground'}
             title={contactsApiSupported ? 'Import from phone contacts' : 'Requires Android Chrome or iOS Safari'}
           >
             {importing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}

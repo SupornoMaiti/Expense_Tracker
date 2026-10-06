@@ -29,7 +29,7 @@ export default function DetailedPieChartModal({ onClose, pieData, categories }: 
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <div className="flex items-center gap-2">
-            <PieChartIcon className="h-5 w-5 text-indigo-600" />
+            <PieChartIcon className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
             <DialogTitle className="text-xl">Category Breakdown</DialogTitle>
           </div>
           <DialogDescription>

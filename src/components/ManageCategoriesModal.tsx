@@ -64,7 +64,7 @@ export default function ManageCategoriesModal({ onClose }: Props) {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <div className="flex items-center gap-2">
-            <Tags className="h-5 w-5 text-indigo-600" />
+            <Tags className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
             <DialogTitle className="text-xl">Manage Categories</DialogTitle>
           </div>
           <DialogDescription>

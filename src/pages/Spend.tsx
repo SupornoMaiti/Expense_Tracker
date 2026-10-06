@@ -241,7 +241,7 @@ export default function Spend() {
           <Card className="shadow-sm overflow-hidden">
             <CardHeader className="flex flex-row items-center justify-between py-4 bg-muted/20 border-b">
               <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Recent Activity</CardTitle>
-              <Link to="/log" className={buttonVariants({ variant: "ghost", size: "sm", className: "text-xs h-8 text-indigo-600 hover:text-indigo-700" })}>
+              <Link to="/log" className={buttonVariants({ variant: "ghost", size: "sm", className: "text-xs h-8 text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300" })}>
                 View All <ArrowRight className="ml-1 h-3 w-3" />
               </Link>
             </CardHeader>
