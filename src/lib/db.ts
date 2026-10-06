@@ -331,14 +331,14 @@ export async function getDebtsByPerson(personId: string): Promise<Debt[]> {
 }
 
 export async function addDebt(
-  data: Omit<Debt, 'id' | 'user_id' | 'created_at'>
+  data: Omit<Debt, 'id' | 'user_id' | 'created_at'> & { created_at?: string }
 ): Promise<Debt> {
   const db = await getDB()
   const debt: Debt = {
     ...data,
     id: uuid(),
     user_id: getCurrentUserId(),
-    created_at: now(),
+    created_at: data.created_at || now(),
   }
   await db.put('debts', debt)
   await enqueueOutbox('debts', 'INSERT', debt)

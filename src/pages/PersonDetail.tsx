@@ -44,6 +44,7 @@ export default function PersonDetail() {
   const [adding, setAdding] = useState(false)
   const [settling, setSettling] = useState(false)
   const [category, setCategory] = useState('other')
+  const [txDate, setTxDate] = useState(new Date().toISOString().slice(0, 10))
   const { categories } = useCategories()
   
   const refresh = useCallback(async () => {
@@ -66,6 +67,11 @@ export default function PersonDetail() {
     if (!id) return
     const num = parseFloat(amount)
     if (isNaN(num) || num <= 0) return
+    let finalDate = new Date().toISOString()
+    if (txDate && txDate !== new Date().toISOString().slice(0, 10)) {
+      finalDate = new Date(`${txDate}T12:00:00.000Z`).toISOString()
+    }
+
     setAdding(true)
     await addDebt({
       person_id: id,
@@ -75,10 +81,12 @@ export default function PersonDetail() {
       note: note.trim(),
       settled: false,
       due_date: dueDate || undefined,
+      created_at: finalDate,
     })
     setAmount('')
     setNote('')
     setDueDate('')
+    setTxDate(new Date().toISOString().slice(0, 10))
     setAdding(false)
     refresh()
   }
@@ -256,6 +264,19 @@ export default function PersonDetail() {
                 value={note}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNote(e.target.value)}
                 maxLength={200}
+              />
+            </div>
+            
+            <div className="space-y-2 flex-1 min-w-[150px]">
+              <Label htmlFor="txDate">Date</Label>
+              <Input
+                id="txDate"
+                type="date"
+                value={txDate}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTxDate(e.target.value)}
+                max={new Date().toISOString().slice(0, 10)}
+                className="w-full"
+                required
               />
             </div>
             
