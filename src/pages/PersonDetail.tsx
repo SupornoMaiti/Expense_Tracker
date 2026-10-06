@@ -164,16 +164,26 @@ export default function PersonDetail() {
                 {person.phone && (
                   <a
                     href={`https://wa.me/${person.phone.replace(/\D/g, '')}?text=${(() => {
-                      const activeDebts = debts.filter(d => !d.settled)
+                      const activeDebts = [...debts]
+                        .filter(d => !d.settled)
+                        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                        
                       if (activeDebts.length === 0) return encodeURIComponent(`Hey ${person.name}, we are all settled up! 🎉`)
                       
-                      let msg = `Hey ${person.name}!\n\nHere is our current balance breakdown:\n`
+                      let msg = `Hey ${person.name}!\n\nHere is our current balance breakdown:\n\n`
+                      let currentGroup = ''
+                      
                       activeDebts.forEach(d => {
+                        const dateStr = new Date(d.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+                        if (dateStr !== currentGroup) {
+                          if (currentGroup !== '') msg += '\n'
+                          msg += `*${dateStr}*\n`
+                          currentGroup = dateStr
+                        }
                         const amt = Math.abs(d.amount).toFixed(2)
                         const action = d.amount > 0 ? 'You owe me' : 'I owe you'
                         const note = d.note ? ` for ${d.note}` : ''
-                        const date = new Date(d.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
-                        msg += `• ${action} ₹${amt}${note} (${date})\n`
+                        msg += `• ${action} ₹${amt}${note}\n`
                       })
                       
                       msg += `\nNet Balance: *${isCredit ? 'You owe me' : 'I owe you'} ₹${Math.abs(netBalance).toFixed(2)}*\n\nLet's settle up soon!`

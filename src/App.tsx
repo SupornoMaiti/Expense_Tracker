@@ -139,7 +139,7 @@ function AppShell() {
       </aside>
 
       {/* ── Main content ──────────────────────────── */}
-      <main id="main-scroll-area" className="flex-1 overflow-y-auto relative pb-20 md:pb-0 scroll-smooth">
+      <main id="main-scroll-area" className="flex-1 overflow-y-auto relative pb-32 md:pb-0 scroll-smooth">
         <ScrollToTop />
         <div className="mx-auto max-w-5xl p-4 md:p-8 lg:p-10">
           <Routes>

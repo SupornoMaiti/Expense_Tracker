@@ -3,12 +3,8 @@ import { deleteTransaction } from '../lib/db'
 import type { Transaction } from '../lib/db'
 import CategoryBadge from './CategoryBadge'
 import { Button } from '@/components/ui/button'
-import { Trash2, RefreshCw, FileText } from 'lucide-react'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
+import { Trash2, FileText } from 'lucide-react'
+
 
 interface Props {
   transactions: Transaction[]
@@ -86,14 +82,7 @@ export default function TransactionList({ transactions, onDelete, limit }: Props
                         Refund
                       </span>
                     )}
-                    {tx.synced_at === null && (
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <RefreshCw className="h-3 w-3 text-amber-500 animate-spin" />
-                        </TooltipTrigger>
-                        <TooltipContent>Pending Sync</TooltipContent>
-                      </Tooltip>
-                    )}
+
                   </div>
                   <div className="mt-1 flex items-center gap-2">
                     <CategoryBadge category={tx.category} />

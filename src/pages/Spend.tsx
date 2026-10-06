@@ -84,14 +84,7 @@ export default function Spend() {
     else setMonth(m => m + 1)
   }
 
-  const top2Categories = pieData.slice(0, 2).map(d => d.name)
-  const renderLabel = ({ name, percent }: { name?: string; percent?: number }) => {
-    if (window.innerWidth < 640) return ''
-    if (name && top2Categories.includes(name)) {
-      return `${name} ${((percent ?? 0) * 100).toFixed(0)}%`
-    }
-    return ''
-  }
+
 
   return (
     <div className="flex flex-col gap-6">
@@ -172,7 +165,7 @@ export default function Spend() {
                         acc[cat.name] = { label: cat.name, color: cat.color || '#94a3b8' }
                         return acc
                       }, {} as Record<string, any>)}
-                      className="h-[240px] w-full"
+                      className="mx-auto aspect-square max-h-[250px] [&_.recharts-responsive-container]:!aspect-auto"
                     >
                       <PieChart>
                         <Pie
@@ -183,8 +176,6 @@ export default function Spend() {
                           outerRadius={85}
                           paddingAngle={2}
                           dataKey="value"
-                          label={renderLabel}
-                          labelLine={false}
                           stroke="transparent"
                         >
                           {pieData.map((entry) => {
@@ -209,7 +200,7 @@ export default function Spend() {
               <CardContent>
                 <ChartContainer
                   config={{ amount: { label: 'Amount', color: 'hsl(var(--primary))' } }}
-                  className="h-[240px] w-full"
+                  className="h-[240px] w-full [&_.recharts-responsive-container]:!aspect-auto"
                 >
                   <BarChart data={barData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.5} />

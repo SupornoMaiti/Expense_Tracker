@@ -22,8 +22,6 @@ function formatINR(amount: number) {
 }
 
 export default function DetailedPieChartModal({ onClose, pieData, categories }: Props) {
-  const renderLabel = ({ name, percent }: { name?: string; percent?: number }) =>
-    `${name ?? ''} ${((percent ?? 0) * 100).toFixed(0)}%`
 
   return (
     <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
@@ -51,7 +49,7 @@ export default function DetailedPieChartModal({ onClose, pieData, categories }: 
                     acc[cat.name] = { label: cat.name, color: cat.color || '#888888' }
                     return acc
                   }, {} as Record<string, any>)}
-                  className="h-full w-full"
+                  className="mx-auto aspect-square max-h-[250px] [&_.recharts-responsive-container]:!aspect-auto"
                 >
                   <PieChart>
                     <Pie
@@ -62,8 +60,6 @@ export default function DetailedPieChartModal({ onClose, pieData, categories }: 
                       outerRadius={90}
                       paddingAngle={3}
                       dataKey="value"
-                      label={renderLabel}
-                      labelLine={true}
                     >
                       {pieData.map((entry) => {
                         const color = categories.find(c => c.name === entry.name)?.color || '#888888'

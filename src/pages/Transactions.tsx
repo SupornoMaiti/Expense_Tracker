@@ -61,7 +61,15 @@ export default function Transactions() {
           <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto flex-1">
             <Select value={catFilter} onValueChange={(v) => v && setCatFilter(v)}>
               <SelectTrigger className="w-full sm:w-[180px] bg-background">
-                <SelectValue placeholder="Category" />
+                <SelectValue placeholder="Category">
+                  {catFilter === 'all' ? (
+                    'All Categories'
+                  ) : (
+                    <span className="capitalize">
+                      {categories.find(c => c.name === catFilter)?.icon} {catFilter}
+                    </span>
+                  )}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
@@ -75,7 +83,9 @@ export default function Transactions() {
 
             <Select value={personFilter} onValueChange={(v) => v && setPersonFilter(v)}>
               <SelectTrigger className="w-full sm:w-[180px] bg-background">
-                <SelectValue placeholder="Person" />
+                <SelectValue placeholder="Person">
+                  {personFilter === 'all' ? 'All People' : people.find(p => p.id === personFilter)?.name || 'Person'}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All People</SelectItem>
