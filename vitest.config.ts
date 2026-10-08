@@ -5,6 +5,7 @@ export default defineConfig({
   plugins: [react()],
   test: {
     include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
-    exclude: ['node_modules', 'dist', '.idea', '.git', '.cache', 'tests/**']
+    exclude: ['node_modules', 'dist', '.idea', '.git', '.cache', 'tests/**'],
+    setupFiles: ['./vitest.setup.ts']
   },
 })

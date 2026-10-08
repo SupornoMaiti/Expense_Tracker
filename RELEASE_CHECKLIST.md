@@ -14,17 +14,21 @@ This document details the manual steps the end-user (QA or the App Owner) must p
 - [ ] Verify that the app loads the dashboard completely.
 - [ ] Add a new expense ("Coffee", "250 INR") offline.
 - [ ] Navigate to a different page (e.g. Friends list) and back to the Dashboard. Verify the UI did not break and the expense persists.
+- [ ] Perform a full page refresh (pull-to-refresh or reload button) on a deep link (e.g., `/insights`) while offline and verify it still loads without a dinosaur screen.
 - [ ] Turn off Airplane mode. No "sync" spinner or errors should appear because the app is 100% local by design.
 
 ## 3. Contact Import Test
-- [ ] Go to the Contacts/Friends page and tap "Import Contact".
-- [ ] Use the native Contact Picker to select a real contact.
+- [ ] On Chrome Android, go to the Contacts/Friends page and tap "Import Contact", use the native Contact Picker to select a real contact.
+- [ ] On iOS (which lacks the Contact Picker API), verify there is an option to import via `.vcf` or `.csv` and that parsing malformed or UTF-8 data works.
 - [ ] Verify that the name and phone number (e.g., +91 format) import correctly without silent crashes.
-- [ ] Add an expense with this contact, confirming the math holds up.
+- [ ] Add a person manually with NO phone number and verify the app doesn't crash.
+- [ ] Add an expense with these contacts, confirming the math holds up.
 
 ## 4. WhatsApp Reminder Test
 - [ ] Open a friend's details page who owes you money.
+- [ ] Verify that if the person has NO phone number, the "Send Reminder" button is visibly disabled.
 - [ ] Tap the "Send Reminder" or "WhatsApp" button.
+- [ ] Cancel the WhatsApp send from the native prompt, return to the app, and verify it did NOT log an erroneous 'Last reminded' timestamp.
 - [ ] Verify that the URL opens a new tab directed to `wa.me/<PhoneNumber>`.
 - [ ] Verify that the pre-filled message correctly substitutes `{name}`, `{amount}`, and `{currency}` without leaking placeholder template text.
 - [ ] Send the message (optional) and verify the "Last reminded" label updates on the detail page when returning.
@@ -40,6 +44,8 @@ This document details the manual steps the end-user (QA or the App Owner) must p
 ## 6. Edge Case and Crash Recovery
 - [ ] Try creating an expense with an extremely large number (e.g., above JS `MAX_SAFE_INTEGER`). Confirm the UI rejects it safely instead of computing `NaN` or incorrect bounds.
 - [ ] Open the app in two different tabs simultaneously. Make an edit in tab A and switch to tab B. Check if data stays consistent (or requires a simple refresh without data corruption).
+- [ ] Check if the Service Worker Update prompt appears when a new version of the app is pushed to production, and verify tapping "Reload" updates the app.
+- [ ] Add multiple circular debts (A owes B, B owes C, C owes A) and verify that the "Simplify Debts" feature reduces the transactions optimally without changing net balances.
 
 ## Verdict
 *Once all items above are checked without issue, the application is clear for production use.*

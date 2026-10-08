@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { parseDecimalToMinor } from '../lib/money';
 import { db } from '../db/db';
 import { createExpense } from '../db/repositories';
 import type { SplitType } from '../domain/types';
@@ -50,7 +51,7 @@ export default function AddExpenseModal({ onClose }: Props) {
   const handleSave = async () => {
     try {
       if (!description.trim()) return toast.error('Description required');
-      const amountMinor = Math.round(parseFloat(amount) * 100);
+      const amountMinor = parseDecimalToMinor(amount);
       if (isNaN(amountMinor) || amountMinor <= 0) return toast.error('Valid amount required');
       if (selectedParticipants.size === 0) return toast.error('Select at least one participant');
       if (!payerId) return toast.error('Select a payer');

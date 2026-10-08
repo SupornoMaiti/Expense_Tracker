@@ -1,5 +1,5 @@
 {
-  "name": "fintrack",
+  "name": "splitlocal",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -22,7 +22,6 @@
     "react-dom": "^19.2.6",
     "react-hook-form": "^7.89.0",
     "react-router-dom": "^7.16.0",
-    "recharts": "^3.8.0",
     "shadcn": "^4.21.1",
     "sonner": "^2.0.8",
     "tailwindcss-animate": "^1.0.7",

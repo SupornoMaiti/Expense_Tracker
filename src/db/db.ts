@@ -39,3 +39,28 @@ export class SplitLocalDB extends Dexie {
 }
 
 export const db = new SplitLocalDB();
+
+db.on('blocked', () => {
+  alert('An app update is blocked by another open tab. Please close other tabs of this app and refresh.');
+});
+
+
+export async function exportBackup(): Promise<string> {
+  const backup: Record<string, unknown> = {};
+  for (const table of db.tables) {
+    backup[table.name] = await table.toArray();
+  }
+  return JSON.stringify(backup);
+}
+
+export async function importBackup(jsonStr: string): Promise<void> {
+  const parsed = JSON.parse(jsonStr);
+  await db.transaction('rw', db.tables, async () => {
+    for (const table of db.tables) {
+      await table.clear();
+      if (parsed[table.name]) {
+        await table.bulkAdd(parsed[table.name]);
+      }
+    }
+  });
+}
