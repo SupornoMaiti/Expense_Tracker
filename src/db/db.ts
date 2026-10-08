@@ -1,0 +1,41 @@
+import Dexie from 'dexie';
+import type { Table } from 'dexie';
+import type {
+  Person,
+  Group,
+  Category,
+  Expense,
+  Settlement,
+  Reminder,
+  Settings,
+  Receipt
+} from '../domain/types';
+
+export class SplitLocalDB extends Dexie {
+  people!: Table<Person, string>;
+  groups!: Table<Group, string>;
+  categories!: Table<Category, string>;
+  expenses!: Table<Expense, string>;
+  settlements!: Table<Settlement, string>;
+  receipts!: Table<Receipt, string>;
+  reminders!: Table<Reminder, string>;
+  settings!: Table<Settings, string>;
+
+  constructor() {
+    super('SplitLocalDB');
+    
+    // Dexie Version(1) Stores Definition
+    this.version(1).stores({
+      people: '&id, &phone, deletedAt, archivedAt',
+      groups: '&id, *members, deletedAt, archivedAt',
+      categories: '&id, deletedAt',
+      expenses: '&id, groupId, date, deletedAt, *participantIds, [groupId+date]',
+      settlements: '&id, groupId, fromId, toId, deletedAt',
+      receipts: '&expenseId',
+      reminders: '&id, personId, groupId',
+      settings: '&id'
+    });
+  }
+}
+
+export const db = new SplitLocalDB();
