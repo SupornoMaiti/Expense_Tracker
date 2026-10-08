@@ -24,6 +24,7 @@ export function getWhatsAppLink(
     .replace('{group}', groupName || 'our expenses')
     .replace('{breakdown}', 'You can view the full breakdown in the app.'); // Simplify for now
 
+  return `https://wa.me/${phoneDigits}?text=${encodeURIComponent(message)}`;
 }
 
 export async function sendWhatsAppReminder(
@@ -48,7 +49,7 @@ export async function sendWhatsAppReminder(
       amountMinor: netBalance,
       currency: settings.defaultCurrency,
       messageSnapshot: `You owe ${formatMoney(netBalance, settings.defaultCurrency)}`,
-      createdAt: now,
+      sentAt: now,
     });
     return true;
   }

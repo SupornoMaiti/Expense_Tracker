@@ -2,7 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/db';
 import { getActiveExpenses, getActiveSettlements, getActivePeople } from '../db/repositories';
 import { computeBalances, simplifyDebts } from '../domain/ledger';
-import { getWhatsAppLink, sendWhatsAppReminder } from '../lib/whatsapp';
+import { sendWhatsAppReminder } from '../lib/whatsapp';
 import { formatMoney } from '../lib/money';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -72,7 +72,6 @@ export default function Friends() {
           {friendBalances.map(friend => {
             const isOwed = friend.netBalance > 0;
             const isOwing = friend.netBalance < 0;
-            const waLink = isOwed && settings ? getWhatsAppLink(friend, friend.netBalance, settings.defaultCurrency, settings) : null;
 
             return (
               <Card key={friend.id} className="overflow-hidden hover:bg-muted/50 transition-colors">
