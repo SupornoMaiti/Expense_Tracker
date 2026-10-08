@@ -2,7 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/db';
 import { getActiveExpenses, getActiveSettlements, getActivePeople } from '../db/repositories';
 import { computeBalances, simplifyDebts } from '../domain/ledger';
-import { getWhatsAppLink } from '../lib/whatsapp';
+import { getWhatsAppLink, sendWhatsAppReminder } from '../lib/whatsapp';
 import { formatMoney } from '../lib/money';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -116,10 +116,13 @@ export default function Friends() {
                           size="icon" 
                           variant="ghost" 
                           className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-100 dark:hover:bg-green-900/50"
-                          disabled={!friend.phone}
+                          disabled={!friend.phone || friend.netBalance <= 0}
                           title={friend.phone ? "Remind on WhatsApp" : "No phone number added"}
                           onClick={() => {
-                            if (waLink) window.open(waLink, '_blank', 'noopener,noreferrer');
+                            if (settings) {
+                              // We use setTimeout so the prompt doesn't block the button animation immediately
+                              setTimeout(() => sendWhatsAppReminder(friend, friend.netBalance, settings), 10);
+                            }
                           }}
                         >
                           <MessageCircle className="h-4 w-4" />

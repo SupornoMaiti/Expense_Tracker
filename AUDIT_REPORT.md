@@ -31,7 +31,7 @@
   - **Text Search (Filter):** 1.29ms
 
 ## Phase 3: Import / Export Audit
-- **Normalization & Parsing:** Added rigorous tests for `+91` normalization, malformed CSV protection, and formula injection safeguards (`=1+2` -> `'=1+2`). The CSV escaping is proven idempotent (`"'=1+2"` remains unchanged) and applies strictly to the CSV parsing/export boundary. 
+- **Normalization & Parsing:** Added rigorous tests for `+91` normalization, malformed CSV protection, and formula injection safeguards (`=1+2` -> `'=1+2`). The CSV escaping is proven idempotent (`'=1+2` remains unchanged) and applies strictly to the CSV parsing/export boundary. 
 - **Backup Roundtrip:** Tests prove that exporting, wiping the DB, and re-importing identical JSON results in identical ledger states, verifying that JSON payloads properly retain special characters unescaped (e.g. descriptions starting with `@`, `=`, etc.).
 
 ## Phase 4: WhatsApp Reminder Audit
@@ -52,4 +52,4 @@
 8. **Axe and Responsive Checks:** E2E browser tests are needed to ensure screen-reader completeness and layout robustness.
 
 ## Verdict
-**Ready for Manual QA.** All automated tests (26/26) pass, vulnerabilities are cleared, the architecture correctly isolates side-effects, and there is 0% cloud/sync code. The final step is executing `RELEASE_CHECKLIST.md` on a physical device to clear the "NOT VERIFIED" items above.
+**Ready for Manual QA.** All automated tests pass, vulnerabilities are cleared, the architecture correctly isolates side-effects, and there is 0% cloud/sync code. The final step is executing `RELEASE_CHECKLIST.md` on a physical device to clear the "NOT VERIFIED" items above. (Note: If any command in the final proof fails, this verdict automatically degrades to **Not ready**).

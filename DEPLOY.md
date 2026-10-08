@@ -28,5 +28,10 @@ If you deploy to `https://splitlocal.app` and later migrate to `https://new-spli
 
 **The Fix:** Users must manually "Export" their backup file from the old domain *before* migrating, and "Import" it into the new domain.
 
+**Deployment Best Practices:**
+1. Serve over HTTPS only (Service Workers require it).
+2. Keep one stable URL.
+3. To test offline mode, users must load the app once online before testing offline.
+
 ## 4. Service Worker Updates
 When you push a new build, users with the app already installed will see a "New update available" prompt inside the app. Clicking "Reload" clears the old cache and activates the new Service Worker.

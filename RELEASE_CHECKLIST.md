@@ -26,14 +26,16 @@ This document details the manual steps the end-user (QA or the App Owner) must p
 
 ## 4. WhatsApp Reminder Test
 - [ ] Open a friend's details page who owes you money.
-- [ ] Verify that if the person has NO phone number, the "Send Reminder" button is visibly disabled.
+- [ ] Verify that if the person has NO phone number or a zero/negative balance, the "Send Reminder" button is visibly disabled.
 - [ ] Tap the "Send Reminder" or "WhatsApp" button.
-- [ ] Cancel the WhatsApp send from the native prompt, return to the app, and verify it did NOT log an erroneous 'Last reminded' timestamp.
 - [ ] Verify that the URL opens a new tab directed to `wa.me/<PhoneNumber>`.
-- [ ] Verify that the pre-filled message correctly substitutes `{name}`, `{amount}`, and `{currency}` without leaking placeholder template text.
-- [ ] Send the message (optional) and verify the "Last reminded" label updates on the detail page when returning.
+- [ ] Verify that the pre-filled message correctly substitutes `{name}`, `{amount}`, and `{currency}`.
+- [ ] After returning to the app, a "Did you send it?" Yes / No prompt will appear.
+- [ ] Tap "No", return to the app, and verify it did NOT log an erroneous 'Last reminded' timestamp.
+- [ ] Tap "Yes", and verify the "Last reminded" label updates on the detail page.
 
 ## 5. Export / Restore Backup Flow
+- [ ] **NOTE**: On iOS the installed home-screen app and Safari tabs have separate storage, so install first and then enter data. Run the full checklist on the final deployed HTTPS URL. Export a backup after the first real entries.
 - [ ] Go to Settings -> Export Data.
 - [ ] Save the generated `splitlocal-backup.json` to your local files or iCloud/Google Drive.
 - [ ] Open a secondary browser on your device (e.g., Firefox or Brave) where SplitLocal has never been opened.

@@ -41,7 +41,7 @@ export default function Insights() {
               <div key={personId} className="space-y-1">
                 <div className="flex justify-between text-sm">
                   <span>{personId.replace('p', 'Person ')}</span>
-                  <span className="font-medium">{formatMoney(amount)} ({pct.toFixed(0)}%)</span>
+                  <span className="font-medium">{formatMoney(amount)} ({Math.round(pct)}%)</span>
                 </div>
                 <div className="h-2 w-full bg-secondary rounded-full overflow-hidden flex">
                   <div className="h-full bg-primary" style={{ width: `${pct}%` }} />

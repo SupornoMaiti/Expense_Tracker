@@ -44,7 +44,7 @@ export function allocateLargestRemainder(
   // Sort by remainder descending, then personId ascending to break ties
   allocations.sort((a, b) => {
     // If difference > 0, we want largest remainders first
-    if (Math.abs(a.remainder - b.remainder) > 1e-9) {
+    if (a.remainder !== b.remainder) {
       return b.remainder - a.remainder;
     }
     // Stable tie-breaking
