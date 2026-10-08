@@ -1,7 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { getWhatsAppLink, sendWhatsAppReminder } from '../whatsapp';
-import { db } from '../../db/db';
-import type { Person, Settings } from '../../domain/types';
+import type { Person, Settings, Reminder } from '../../domain/types';
 
 describe('whatsapp url building', () => {
   it('builds URL exactly as https://wa.me/<digits>?text=<encoded>', () => {
@@ -57,51 +56,57 @@ describe('whatsapp url building', () => {
       lastBackupAt: null
     };
 
-    beforeEach(async () => {
-      await db.reminders.clear();
-      // Mock window.open to prevent actual tabs from opening in tests
-      vi.stubGlobal('open', vi.fn());
-    });
-
-    afterEach(() => {
-      vi.unstubAllGlobals();
-    });
-
     it('logs exactly one reminder when user clicks Yes', async () => {
-      vi.stubGlobal('confirm', () => true); // Mock Yes
+      let openedLink = '';
+      const reminders: Reminder[] = [];
+      const deps = {
+        openLink: (url: string) => { openedLink = url; },
+        askSent: () => true,
+        logReminder: async (rem: Reminder) => { reminders.push(rem); },
+        now: () => '2026-10-08T12:00:00Z',
+      };
       
-      const sent = await sendWhatsAppReminder(person, 1000, settings);
+      const sent = await sendWhatsAppReminder(person, 1000, settings, deps);
       expect(sent).toBe(true);
       
-      const reminders = await db.reminders.toArray();
       expect(reminders).toHaveLength(1);
       expect(reminders[0].personId).toBe('p1');
       expect(reminders[0].amountMinor).toBe(1000);
+      expect(openedLink).toContain('https://wa.me');
     });
 
     it('logs nothing when user clicks No', async () => {
-      vi.stubGlobal('confirm', () => false); // Mock No
+      const reminders: Reminder[] = [];
+      const deps = {
+        openLink: () => {},
+        askSent: () => false,
+        logReminder: async (rem: Reminder) => { reminders.push(rem); },
+        now: () => '2026-10-08T12:00:00Z',
+      };
       
-      const sent = await sendWhatsAppReminder(person, 1000, settings);
+      const sent = await sendWhatsAppReminder(person, 1000, settings, deps);
       expect(sent).toBe(false);
       
-      const reminders = await db.reminders.toArray();
       expect(reminders).toHaveLength(0);
     });
 
     it('blocks the reminder (returns false) if balance is zero or negative', async () => {
-      vi.stubGlobal('confirm', () => true); // Should never be called
-      const confirmSpy = vi.spyOn(window, 'confirm');
+      let askCalled = false;
+      const reminders: Reminder[] = [];
+      const deps = {
+        openLink: () => {},
+        askSent: () => { askCalled = true; return true; },
+        logReminder: async (rem: Reminder) => { reminders.push(rem); },
+        now: () => '2026-10-08T12:00:00Z',
+      };
 
-      const sentZero = await sendWhatsAppReminder(person, 0, settings);
+      const sentZero = await sendWhatsAppReminder(person, 0, settings, deps);
       expect(sentZero).toBe(false);
       
-      const sentNeg = await sendWhatsAppReminder(person, -500, settings);
+      const sentNeg = await sendWhatsAppReminder(person, -500, settings, deps);
       expect(sentNeg).toBe(false);
       
-      expect(confirmSpy).not.toHaveBeenCalled();
-      
-      const reminders = await db.reminders.toArray();
+      expect(askCalled).toBe(false);
       expect(reminders).toHaveLength(0);
     });
   });

@@ -1,6 +1,6 @@
-import type { Person, Settings } from '../domain/types';
+import type { Person, Settings, Reminder } from '../domain/types';
 import { formatMoney } from './money';
-import { db } from '../db/db';
+
 
 export function getWhatsAppLink(
   person: Person,
@@ -30,26 +30,31 @@ export function getWhatsAppLink(
 export async function sendWhatsAppReminder(
   friend: Person,
   netBalance: number,
-  settings: Settings
+  settings: Settings,
+  deps: {
+    openLink: (url: string) => void;
+    askSent: () => Promise<boolean> | boolean;
+    logReminder: (reminder: Reminder) => Promise<void>;
+    now: () => string;
+  }
 ): Promise<boolean> {
   if (netBalance <= 0) return false;
 
   const waLink = getWhatsAppLink(friend, netBalance, settings.defaultCurrency, settings);
   if (!waLink) return false;
 
-  window.open(waLink, '_blank', 'noopener,noreferrer');
+  deps.openLink(waLink);
 
-  const didSend = window.confirm('Did you send the reminder on WhatsApp?');
+  const didSend = await deps.askSent();
   if (didSend) {
-    const now = new Date().toISOString();
-    await db.reminders.add({
+    await deps.logReminder({
       id: crypto.randomUUID(),
       personId: friend.id,
       groupId: null,
       amountMinor: netBalance,
       currency: settings.defaultCurrency,
       messageSnapshot: `You owe ${formatMoney(netBalance, settings.defaultCurrency)}`,
-      sentAt: now,
+      sentAt: deps.now(),
     });
     return true;
   }

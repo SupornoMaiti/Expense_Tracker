@@ -1,4 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks';
+import type { Reminder } from '../domain/types';
 import { db } from '../db/db';
 import { getActiveExpenses, getActiveSettlements, getActivePeople } from '../db/repositories';
 import { computeBalances, simplifyDebts } from '../domain/ledger';
@@ -8,9 +9,13 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MessageCircle, UserPlus, ArrowRight } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { useState, useRef } from 'react';
 
 export default function Friends() {
   const navigate = useNavigate();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const resolvePromiseRef = useRef<((val: boolean) => void) | undefined>(undefined);
   const people = useLiveQuery(() => getActivePeople()) || [];
   const expenses = useLiveQuery(() => getActiveExpenses()) || [];
   const settlements = useLiveQuery(() => getActiveSettlements()) || [];
@@ -119,8 +124,29 @@ export default function Friends() {
                           title={friend.phone ? "Remind on WhatsApp" : "No phone number added"}
                           onClick={() => {
                             if (settings) {
-                              // We use setTimeout so the prompt doesn't block the button animation immediately
-                              setTimeout(() => sendWhatsAppReminder(friend, friend.netBalance, settings), 10);
+                              const openLink = (url: string) => window.open(url, '_blank', 'noopener,noreferrer');
+                              const askSent = () => {
+                                return new Promise<boolean>((resolve) => {
+                                  resolvePromiseRef.current = resolve;
+                                  const onVisibilityChange = () => {
+                                    if (document.visibilityState === 'visible') {
+                                      setDialogOpen(true);
+                                      document.removeEventListener('visibilitychange', onVisibilityChange);
+                                    }
+                                  };
+                                  document.addEventListener('visibilitychange', onVisibilityChange);
+                                  // Fallback in case tab isn't hidden
+                                  setTimeout(() => {
+                                    if (resolvePromiseRef.current === resolve) {
+                                      document.removeEventListener('visibilitychange', onVisibilityChange);
+                                      setDialogOpen(true);
+                                    }
+                                  }, 2000);
+                                });
+                              };
+                              const logReminder = async (rem: Reminder) => { await db.reminders.add(rem); };
+                              const now = () => new Date().toISOString();
+                              sendWhatsAppReminder(friend, friend.netBalance, settings, { openLink, askSent, logReminder, now });
                             }
                           }}
                         >
@@ -138,6 +164,33 @@ export default function Friends() {
           })}
         </div>
       )}
+
+      <Dialog open={dialogOpen} onOpenChange={(open) => {
+        if (!open) {
+          setDialogOpen(false);
+          if (resolvePromiseRef.current) {
+            resolvePromiseRef.current(false);
+            resolvePromiseRef.current = undefined;
+          }
+        }
+      }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Did you send the reminder?</DialogTitle>
+            <DialogDescription>Marking it as sent will update the 'Last reminded' timestamp.</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => {
+              setDialogOpen(false);
+              if (resolvePromiseRef.current) resolvePromiseRef.current(false);
+            }}>No</Button>
+            <Button onClick={() => {
+              setDialogOpen(false);
+              if (resolvePromiseRef.current) resolvePromiseRef.current(true);
+            }}>Yes, I sent it</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

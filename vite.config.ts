@@ -1,12 +1,12 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
-import basicSsl from '@vitejs/plugin-basic-ssl' // 1. Import the SSL plugin
+
 import path from "path"
 
 export default defineConfig({
   plugins: [
-    basicSsl(), // 2. Add the SSL plugin here
+
     react(),
     VitePWA({
       registerType: 'autoUpdate',
