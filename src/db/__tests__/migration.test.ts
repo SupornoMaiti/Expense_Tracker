@@ -12,8 +12,8 @@ describe('Database Migration and Upgrade Events', () => {
     // Manually trigger the 'blocked' event on the db instance
     // since fake-indexeddb doesn't simulate cross-tab locking properly
     const event = new Event('blocked');
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (db as any).on.blocked.fire(event);
+    const dbEvents = db as unknown as { on: { blocked: { fire: (e: Event) => void } } };
+    dbEvents.on.blocked.fire(event);
 
     expect(alertMock).toHaveBeenCalledWith('An app update is blocked by another open tab. Please close other tabs of this app and refresh.');
     

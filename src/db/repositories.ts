@@ -12,6 +12,14 @@ export async function createExpense(data: Omit<Expense, 'createdAt' | 'updatedAt
     deletedAt: null
   };
   
+  if (!Number.isInteger(expense.amountMinor)) throw new Error('amountMinor must be an integer');
+  for (const payer of expense.payers) {
+    if (!Number.isInteger(payer.amountMinor)) throw new Error('payer amountMinor must be an integer');
+  }
+  for (const share of expense.shares) {
+    if (!Number.isInteger(share.amountMinor)) throw new Error('share amountMinor must be an integer');
+  }
+
   // Zod Validation (will throw if invalid)
   ExpenseSchema.parse(expense);
   
@@ -30,6 +38,14 @@ export async function updateExpense(id: string, data: Partial<Omit<Expense, 'id'
       ...data,
       updatedAt: new Date().toISOString()
     };
+
+    if (!Number.isInteger(updated.amountMinor)) throw new Error('amountMinor must be an integer');
+    for (const payer of updated.payers) {
+      if (!Number.isInteger(payer.amountMinor)) throw new Error('payer amountMinor must be an integer');
+    }
+    for (const share of updated.shares) {
+      if (!Number.isInteger(share.amountMinor)) throw new Error('share amountMinor must be an integer');
+    }
 
     ExpenseSchema.parse(updated);
     await db.expenses.put(updated);

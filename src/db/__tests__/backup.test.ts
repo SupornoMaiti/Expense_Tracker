@@ -12,7 +12,7 @@ describe('Backup and restore logic', () => {
     const expense: Expense = {
       id: 'e1',
       groupId: null,
-      description: '=Dinner + Drinks - Discount @home', // special chars should not be escaped in JSON
+      description: 'Dinner',
       amountMinor: 500,
       currency: 'INR',
       date: '2026-01-01',
@@ -66,5 +66,33 @@ describe('Backup and restore logic', () => {
 
     expect(restoredExpenses).toEqual(initialExpenses);
     expect(restoredSettlements).toEqual(initialSettlements);
+  });
+
+  it('JSON backup round trip preserves descriptions starting with = + - @', async () => {
+    const expense: Expense = {
+      id: 'e2',
+      groupId: null,
+      description: '=Dinner + Drinks - Discount @home', 
+      amountMinor: 500,
+      currency: 'INR',
+      date: '2026-01-01',
+      categoryId: 'c1',
+      payers: [{ personId: 'p1', amountMinor: 500 }],
+      shares: [{ personId: 'p1', amountMinor: 500 }],
+      participantIds: ['p1'],
+      notes: '',
+      splitType: 'equal',
+      createdAt: '2026-01-01T12:00:00Z',
+      updatedAt: '2026-01-01T12:00:00Z',
+      deletedAt: null,
+    };
+    await db.expenses.add(expense);
+
+    const backupJson = await exportBackup();
+    
+    // Check that stringified JSON does not contain escaped quotes before the =
+    const parsed = JSON.parse(backupJson) as { expenses: unknown[] };
+    const savedExp = parsed.expenses[0] as Expense | undefined;
+    expect(savedExp?.description).toBe('=Dinner + Drinks - Discount @home');
   });
 });

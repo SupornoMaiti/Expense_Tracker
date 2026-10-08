@@ -34,9 +34,48 @@ export function parseDecimalToMinor(input: string): number {
   
   const totalMinorStr = cleanIntPart + decPart;
   
+  
   const minor = parseInt(totalMinorStr, 10);
   
   if (minor > Number.MAX_SAFE_INTEGER) return NaN;
   
   return minor;
+}
+
+export function formatMoney(minor: number, currency: string = 'INR'): string {
+  const isNegative = minor < 0;
+  const absMinor = Math.abs(minor);
+  
+  // Integer division for integer part
+  const intPart = Math.floor(absMinor / 100);
+  // Modulo for decimal part
+  let decPart = (absMinor % 100).toString();
+  if (decPart.length === 1) decPart = '0' + decPart;
+
+  const formatter = new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: currency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+  // We format the integer part as number, then manually construct the string 
+  // or we can use Intl.NumberFormat on the float but the prompt strictly says: "no /100 float".
+  // Let's create the string ourselves to avoid float completely, then parse it?
+  // Intl.NumberFormat accepts a string/number. If we pass a string it might just format it.
+
+  // Custom grouping for en-IN manually or using Intl.NumberFormat on the integer?
+  // Intl.NumberFormat on the integer part:
+  const groupedInt = new Intl.NumberFormat('en-IN').format(intPart);
+  
+  // Get currency symbol
+  const parts = formatter.formatToParts(0);
+  const symbolPart = parts.find(p => p.type === 'currency');
+  const symbol = symbolPart ? symbolPart.value : currency;
+
+  const sign = isNegative ? '-' : '';
+  
+  // Determine if symbol is prefix or suffix (usually prefix for INR/USD)
+  // To be safe, just prefix it like ₹ 1,00,000.00
+  return `${sign}${symbol}${groupedInt}.${decPart}`;
 }

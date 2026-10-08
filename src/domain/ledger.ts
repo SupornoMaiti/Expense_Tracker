@@ -76,7 +76,7 @@ export function computeBalances(expenses: Expense[], settlements: Settlement[]):
     for (const amount of map.values()) {
       sum += amount;
     }
-    if (Math.abs(sum) > 1e-9) { // Using a tiny tolerance just in case of any weird JS integer issues, though integers should be exact
+    if (sum !== 0) {
       throw new Error(`Invariant failed: Sum of net balances for currency ${currency} is not zero. It is ${sum}.`);
     }
   }

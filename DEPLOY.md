@@ -24,7 +24,9 @@ Your static host must enforce HTTPS. Service Workers (which power the offline ca
 All user data is stored locally in the browser's IndexedDB, which is tightly bound to the domain (Origin). 
 
 **CRITICAL WARNING:** 
-If you deploy to `https://splitlocal.app` and later migrate to `https://new-splitlocal.app`, **ALL USERS WILL LOSE ACCESS TO THEIR DATA.** IndexedDB cannot be transferred across origins automatically. Users must manually "Export" their backup file from the old domain and "Import" it into the new domain.
+If you deploy to `https://splitlocal.app` and later migrate to `https://new-splitlocal.app`, **ALL USERS WILL LOSE ACCESS TO THEIR DATA on the new origin.** The data is not deleted, but it is bound to the old origin and inaccessible from the new one. 
+
+**The Fix:** Users must manually "Export" their backup file from the old domain *before* migrating, and "Import" it into the new domain.
 
 ## 4. Service Worker Updates
 When you push a new build, users with the app already installed will see a "New update available" prompt inside the app. Clicking "Reload" clears the old cache and activates the new Service Worker.

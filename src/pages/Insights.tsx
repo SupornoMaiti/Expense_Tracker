@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { db } from '../db/db';
 import type { Expense } from '../domain/types';
+import { formatMoney } from '../lib/money';
 
 export default function Insights() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -27,7 +28,7 @@ export default function Insights() {
       <div className="bg-card p-4 rounded-xl border">
         <h2 className="font-semibold mb-4 text-muted-foreground">Total Expenses Logged</h2>
         <div className="text-4xl font-bold">
-          {(total / 100).toFixed(2)}
+          {formatMoney(total)}
         </div>
       </div>
 
@@ -40,7 +41,7 @@ export default function Insights() {
               <div key={personId} className="space-y-1">
                 <div className="flex justify-between text-sm">
                   <span>{personId.replace('p', 'Person ')}</span>
-                  <span className="font-medium">{(amount / 100).toFixed(2)} ({pct.toFixed(0)}%)</span>
+                  <span className="font-medium">{formatMoney(amount)} ({pct.toFixed(0)}%)</span>
                 </div>
                 <div className="h-2 w-full bg-secondary rounded-full overflow-hidden flex">
                   <div className="h-full bg-primary" style={{ width: `${pct}%` }} />

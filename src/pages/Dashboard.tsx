@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { getActiveExpenses, getActiveSettlements, getActivePeople } from '../db/repositories';
 import { computeBalances, simplifyDebts } from '../domain/ledger';
+import { formatMoney } from '../lib/money';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { IndianRupee, ArrowDownLeft, ArrowUpRight, Clock, Users } from 'lucide-react';
 
@@ -28,7 +29,7 @@ export default function Dashboard() {
 
   const netBalance = totalOwedToMe - totalIOwe;
 
-  const formatMoney = (minor: number) => `₹${(minor / 100).toFixed(2)}`;
+
 
   // Recent activity: Combine expenses and settlements, sort by createdAt desc
   const activity = [...expenses, ...settlements].sort(

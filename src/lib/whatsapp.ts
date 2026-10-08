@@ -1,4 +1,5 @@
 import type { Person, Settings } from '../domain/types';
+import { formatMoney } from './money';
 
 export function getWhatsAppLink(
   person: Person,
@@ -12,7 +13,7 @@ export function getWhatsAppLink(
   // digits only E.164
   const phoneDigits = person.phone.replace(/\D/g, '');
   
-  const amountStr = (amountMinor / 100).toFixed(2);
+  const amountStr = formatMoney(amountMinor, currency);
   
   // replace variables
   const message = settings.whatsappTemplate

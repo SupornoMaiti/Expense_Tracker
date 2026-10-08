@@ -3,6 +3,7 @@ import { db } from '../db/db';
 import { getActiveExpenses, getActiveSettlements, getActivePeople } from '../db/repositories';
 import { computeBalances, simplifyDebts } from '../domain/ledger';
 import { getWhatsAppLink } from '../lib/whatsapp';
+import { formatMoney } from '../lib/money';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MessageCircle, UserPlus, ArrowRight } from 'lucide-react';
@@ -39,7 +40,7 @@ export default function Friends() {
     };
   });
 
-  const formatMoney = (minor: number) => `₹${(Math.abs(minor) / 100).toFixed(2)}`;
+
 
   return (
     <div className="space-y-6">
@@ -101,7 +102,7 @@ export default function Friends() {
                       {isOwing && (
                         <>
                           <span className="text-xs text-red-600 font-medium">You owe</span>
-                          <span className="font-bold text-red-600">{formatMoney(friend.netBalance)}</span>
+                          <span className="font-bold text-red-600">{formatMoney(Math.abs(friend.netBalance))}</span>
                         </>
                       )}
                       {!isOwed && !isOwing && (
