@@ -10,7 +10,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'icons/*.png', 'icons/*.svg'],
+      includeAssets: ['favicon.svg', 'icons/*.png', 'icons/*.svg'],
       manifest: {
         name: 'SplitLocal',
         short_name: 'SplitLocal',

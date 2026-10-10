@@ -1,7 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/db';
 import { formatMoney } from '../lib/money';
-import { Clock, Users, IndianRupee, MessageCircle, Undo2, Search, Trash2, RotateCcw } from 'lucide-react';
+import { Clock, Users, IndianRupee, Undo2, Search, Trash2, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';

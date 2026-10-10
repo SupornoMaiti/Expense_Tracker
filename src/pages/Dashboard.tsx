@@ -37,7 +37,7 @@ export default function Dashboard() {
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   ).slice(0, 5);
 
-  const now = new Date();
+
   const analyzeResult = myId ? computeAnalyze(expenses, myId, 'INR', 'all') : null;
   const totalSpendThisMonth = analyzeResult ? analyzeResult.totalSpendMinor : 0;
 
