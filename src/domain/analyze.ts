@@ -36,16 +36,19 @@ export function computeAnalyze(
     if (yearMonth !== 'all' && !exp.date.startsWith(yearMonth)) continue;
 
     const myShare = exp.shares.find((s) => s.personId === myId);
-    if (!myShare || myShare.amountMinor <= 0) continue;
+    if (!myShare || myShare.amountMinor === 0) continue;
 
-    totalSpendMinor += myShare.amountMinor;
-    expenseCount += 1;
+    const sign = exp.isRefund ? -1 : 1;
+    totalSpendMinor += sign * myShare.amountMinor;
+    if (!exp.isRefund) {
+      expenseCount += 1;
+    }
     
     const catId = exp.categoryId || 'Uncategorized';
     const current = catMap.get(catId) || 0;
-    catMap.set(catId, current + myShare.amountMinor);
+    catMap.set(catId, current + sign * myShare.amountMinor);
     const currentDaily = dailyMap.get(exp.date) || 0;
-    dailyMap.set(exp.date, currentDaily + myShare.amountMinor);
+    dailyMap.set(exp.date, currentDaily + sign * myShare.amountMinor);
   }
 
   const categories = Array.from(catMap.entries())

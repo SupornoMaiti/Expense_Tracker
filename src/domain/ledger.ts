@@ -33,14 +33,15 @@ export function computeBalances(expenses: Expense[], settlements: Settlement[]):
   for (const exp of expenses) {
     if (exp.deletedAt) continue; // safety check, though we should only pass active expenses
 
+    const sign = exp.isRefund ? -1 : 1;
     // Payers add to their balance (they paid, so they are owed money)
     for (const payer of exp.payers) {
-      addBalance(exp.currency, payer.personId, payer.amountMinor);
+      addBalance(exp.currency, payer.personId, sign * payer.amountMinor);
     }
 
     // Shares subtract from their balance (they consumed, so they owe money)
     for (const share of exp.shares) {
-      addBalance(exp.currency, share.personId, -share.amountMinor);
+      addBalance(exp.currency, share.personId, -sign * share.amountMinor);
     }
   }
 
@@ -172,7 +173,7 @@ export function computePairwiseBalance(
 export function getExpensePairwiseImpact(exp: Expense, personAId: string, personBId: string): number {
   if (exp.deletedAt) return 0;
   const totalAmount = exp.amountMinor;
-  if (totalAmount <= 0) return 0;
+  if (totalAmount === 0) return 0;
 
   const paidByA = exp.payers
     .filter(p => p.personId === personAId)
@@ -197,5 +198,5 @@ export function getExpensePairwiseImpact(exp: Expense, personAId: string, person
   if (paidByB > 0 && shareOfA > 0) {
     impact -= Math.round((paidByB * shareOfA) / totalAmount);
   }
-  return impact;
+  return exp.isRefund ? -impact : impact;
 }
