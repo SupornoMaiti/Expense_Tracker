@@ -3,14 +3,14 @@ import { z } from 'zod';
 // Strict Integer check since all money is in minor units
 const AmountMinorSchema = z.number().int().nonnegative();
 const CurrencySchema = z.string().min(1).max(5).toUpperCase();
-const DateSchema = z.string().regex(/^\d{2}-\d{2}-\d{4}$/, 'Date must be DD-MM-YYYY');
+const DateSchema = z.string().regex(/^(\d{2}-\d{2}-\d{4}|\d{4}-\d{2}-\d{2})$/, 'Date must be DD-MM-YYYY or YYYY-MM-DD');
 
-export const ExpensePayerSchema = z.object({
+const ExpensePayerSchema = z.object({
   personId: z.string().uuid(),
   amountMinor: AmountMinorSchema,
 });
 
-export const ExpenseShareSchema = z.object({
+const ExpenseShareSchema = z.object({
   personId: z.string().uuid(),
   amountMinor: AmountMinorSchema,
   rawValue: z.number().optional(),
@@ -32,6 +32,8 @@ export const ExpenseSchema = z.object({
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   deletedAt: z.string().datetime().nullable(),
+  refundOfId: z.string().uuid().nullable().optional(),
+  isRefund: z.boolean().optional(),
 }).superRefine((data, ctx) => {
   const sumPayers = data.payers.reduce((acc, p) => acc + p.amountMinor, 0);
   if (sumPayers !== data.amountMinor) {
@@ -65,6 +67,8 @@ export const SettlementSchema = z.object({
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   deletedAt: z.string().datetime().nullable(),
+  expenseId: z.string().uuid().nullable().optional(),
+  refundOfId: z.string().uuid().nullable().optional(),
 }).superRefine((data, ctx) => {
   if (data.fromId === data.toId) {
     ctx.addIssue({

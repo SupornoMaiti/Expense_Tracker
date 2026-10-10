@@ -3,10 +3,11 @@
 This document details the manual steps the end-user (QA or the App Owner) must perform on a real mobile device before officially signing off on a production release of "SplitLocal."
 
 ## 1. Installation & PWA Manifest Check
-- [ ] Open the app URL in Safari (iOS) or Chrome (Android).
+- [ ] Open the app URL in Chrome (Android).
 - [ ] Tap the "Share" or menu button and select "Add to Home Screen".
 - [ ] Verify that the correct app icon (192x192 and 512x512 maskable) and short name ("SplitLocal") appear.
 - [ ] Launch the app from the Home Screen and confirm it opens in standalone mode (no browser address bar or navigation UI).
+- [ ] Scroll to the bottom of every screen and confirm the last item is reachable above the nav.
 
 ## 2. Airplane Mode (Offline) Test
 - [ ] With the app running, turn on Airplane Mode on your device (ensure Wi-Fi is also off).
@@ -19,7 +20,7 @@ This document details the manual steps the end-user (QA or the App Owner) must p
 
 ## 3. Contact Import Test
 - [ ] On Chrome Android, go to the Contacts/Friends page and tap "Import Contact", use the native Contact Picker to select a real contact.
-- [ ] On iOS (which lacks the Contact Picker API), verify there is an option to import via `.vcf` or `.csv` and that parsing malformed or UTF-8 data works.
+- [ ] Verify there is an option to import via `.vcf` or `.csv` and that parsing malformed or UTF-8 data works.
 - [ ] Verify that the name and phone number (e.g., +91 format) import correctly without silent crashes.
 - [ ] Add a person manually with NO phone number and verify the app doesn't crash.
 - [ ] Add an expense with these contacts, confirming the math holds up.
@@ -35,7 +36,7 @@ This document details the manual steps the end-user (QA or the App Owner) must p
 - [ ] Tap "Yes", and verify the "Last reminded" label updates on the detail page.
 
 ## 5. Export / Restore Backup Flow
-- [ ] **NOTE**: On iOS the installed home-screen app and Safari tabs have separate storage, so install first and then enter data. Run the full checklist on the final deployed HTTPS URL. Export a backup after the first real entries.
+- [ ] **NOTE**: Install via Chrome > Add to Home screen, then enter data. Run the full checklist on the final deployed HTTPS URL. Export a backup after the first real entries.
 - [ ] Go to Settings -> Export Data.
 - [ ] Save the generated `splitlocal-backup.json` to your local files or iCloud/Google Drive.
 - [ ] Open a secondary browser on your device (e.g., Firefox or Brave) where SplitLocal has never been opened.

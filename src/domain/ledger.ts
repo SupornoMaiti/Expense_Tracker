@@ -126,3 +126,76 @@ export function simplifyDebts(balances: Balance[], currency: string): Debt[] {
 
   return debts;
 }
+
+/**
+ * Computes the pairwise net balance between Person A and Person B for a given currency.
+ * Positive return value means Person B owes Person A (Person A is owed).
+ * Negative return value means Person A owes Person B (Person A owes).
+ * Zero return value means they are settled up.
+ */
+export function computePairwiseBalance(
+  expenses: Expense[],
+  settlements: Settlement[],
+  personAId: string,
+  personBId: string,
+  currency: string
+): number {
+  let netMinor = 0;
+
+  for (const exp of expenses) {
+    if (exp.deletedAt || exp.currency !== currency) continue;
+    netMinor += getExpensePairwiseImpact(exp, personAId, personBId);
+  }
+
+  for (const st of settlements) {
+    if (st.deletedAt || st.currency !== currency) continue;
+
+    // Person B paid Person A directly: reduces what B owes A
+    if (st.fromId === personBId && st.toId === personAId) {
+      netMinor -= st.amountMinor;
+    }
+
+    // Person A paid Person B directly: reduces what A owes B (increases what B owes A)
+    if (st.fromId === personAId && st.toId === personBId) {
+      netMinor += st.amountMinor;
+    }
+  }
+
+  return netMinor;
+}
+
+/**
+ * Returns how much Person B owes Person A as a result of this specific expense.
+ * Positive: Person B owes Person A.
+ * Negative: Person A owes Person B.
+ */
+export function getExpensePairwiseImpact(exp: Expense, personAId: string, personBId: string): number {
+  if (exp.deletedAt) return 0;
+  const totalAmount = exp.amountMinor;
+  if (totalAmount <= 0) return 0;
+
+  const paidByA = exp.payers
+    .filter(p => p.personId === personAId)
+    .reduce((sum, p) => sum + p.amountMinor, 0);
+
+  const paidByB = exp.payers
+    .filter(p => p.personId === personBId)
+    .reduce((sum, p) => sum + p.amountMinor, 0);
+
+  const shareOfA = exp.shares
+    .filter(s => s.personId === personAId)
+    .reduce((sum, s) => sum + s.amountMinor, 0);
+
+  const shareOfB = exp.shares
+    .filter(s => s.personId === personBId)
+    .reduce((sum, s) => sum + s.amountMinor, 0);
+
+  let impact = 0;
+  if (paidByA > 0 && shareOfB > 0) {
+    impact += Math.round((paidByA * shareOfB) / totalAmount);
+  }
+  if (paidByB > 0 && shareOfA > 0) {
+    impact -= Math.round((paidByB * shareOfA) / totalAmount);
+  }
+  return impact;
+}

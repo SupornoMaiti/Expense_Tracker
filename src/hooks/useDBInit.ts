@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { db } from '../db/db';
-import type { Person } from '../domain/types';
+import { ensureMe, ensureDefaultCategories, seedSampleData } from '../db/repositories';
 
 export function useDBInit() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -8,39 +8,31 @@ export function useDBInit() {
   useEffect(() => {
     async function init() {
       try {
-        const count = await db.people.count();
-        if (count === 0) {
-          // Create the "Me" profile automatically on first launch
-          const me: Person = {
-            id: crypto.randomUUID(),
-            name: 'Me',
-            phone: null,
-            avatarColor: '#4f46e5', // indigo-600
-            source: 'manual',
-            isMe: true,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            archivedAt: null,
-            deletedAt: null,
-          };
-          
-          await db.people.add(me);
+        await ensureMe();
+        await ensureDefaultCategories();
 
+        const count = await db.settings.count();
+        if (count === 0) {
           // Seed default settings
           await db.settings.add({
             id: 'user_settings',
             defaultCurrency: 'INR',
             defaultCountryCode: '+91',
-            whatsappTemplate: 'Hey {name}, just a friendly reminder that you owe {amount} {currency} for {group}. Please send it when you can!',
+            whatsappTemplate: 'Hi {name}, here is your pending balance:\n\n{breakdown}\n\nTotal pending: {amount}',
             theme: 'system',
             lastBackupAt: null
           });
         }
+
+        const friendCount = await db.people.filter(p => !p.isMe && !p.deletedAt).count();
+        if (friendCount === 0) {
+          await seedSampleData();
+        }
+
         setIsInitialized(true);
       } catch (err) {
         console.error('Failed to initialize local DB:', err);
-        // We could handle quota errors here
-        setIsInitialized(true); // Still let it load, let error boundary catch it if db is fully broken
+        setIsInitialized(true); 
       }
     }
     

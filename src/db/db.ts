@@ -41,7 +41,7 @@ export class SplitLocalDB extends Dexie {
 export const db = new SplitLocalDB();
 
 db.on('blocked', () => {
-  alert('An app update is blocked by another open tab. Please close other tabs of this app and refresh.');
+  console.warn('An app update is blocked by another open tab. Please close other tabs of this app and refresh.');
 });
 
 

@@ -2,20 +2,19 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import type { Reminder } from '../domain/types';
 import { db } from '../db/db';
 import { getActiveExpenses, getActiveSettlements, getActivePeople } from '../db/repositories';
-import { computeBalances, simplifyDebts } from '../domain/ledger';
+import { computePairwiseBalance } from '../domain/ledger';
 import { sendWhatsAppReminder } from '../lib/whatsapp';
 import { formatMoney } from '../lib/money';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MessageCircle, UserPlus, ArrowRight } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
+import { AddFriendModal } from '../components/AddFriendModal';
 
 export default function Friends() {
   const navigate = useNavigate();
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const resolvePromiseRef = useRef<((val: boolean) => void) | undefined>(undefined);
+  const [addFriendOpen, setAddFriendOpen] = useState(false);
   const people = useLiveQuery(() => getActivePeople()) || [];
   const expenses = useLiveQuery(() => getActiveExpenses()) || [];
   const settlements = useLiveQuery(() => getActiveSettlements()) || [];
@@ -26,24 +25,13 @@ export default function Friends() {
   const myId = me?.id || '';
   const friends = people.filter(p => !p.isMe);
 
-  const balances = computeBalances(expenses, settlements).filter(b => b.currency === (settings?.defaultCurrency || 'INR'));
-  const debts = simplifyDebts(balances, settings?.defaultCurrency || 'INR');
+  const currency = settings?.defaultCurrency || 'INR';
 
   // Map each friend to their net balance with me
-  const friendBalances = friends.map(friend => {
-    let owedToMe = 0;
-    let iOwe = 0;
-    
-    for (const d of debts) {
-      if (d.fromId === friend.id && d.toId === myId) owedToMe += d.amountMinor;
-      if (d.fromId === myId && d.toId === friend.id) iOwe += d.amountMinor;
-    }
-    
-    return {
-      ...friend,
-      netBalance: owedToMe - iOwe
-    };
-  });
+  const friendBalances = friends.map(friend => ({
+    ...friend,
+    netBalance: computePairwiseBalance(expenses, settlements, myId, friend.id, currency)
+  }));
 
 
 
@@ -55,10 +43,7 @@ export default function Friends() {
           <p className="text-muted-foreground">Manage your connections and balances</p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => navigate('/import-contacts')} variant="outline">
-            Import Contacts
-          </Button>
-          <Button onClick={() => alert('TODO: Add Friend Modal')}>
+          <Button onClick={() => setAddFriendOpen(true)}>
             <UserPlus className="h-4 w-4 mr-2" />
             Add Friend
           </Button>
@@ -70,7 +55,7 @@ export default function Friends() {
           <UserPlus className="h-12 w-12 text-muted-foreground/30 mb-4" />
           <h3 className="text-lg font-medium">No friends yet</h3>
           <p className="text-sm text-muted-foreground mt-1 mb-4">Add your friends to start tracking expenses.</p>
-          <Button onClick={() => navigate('/import-contacts')}>Import from Contacts</Button>
+          <Button onClick={() => setAddFriendOpen(true)}>Add or Import Friends</Button>
         </div>
       ) : (
         <div className="grid gap-4">
@@ -89,14 +74,14 @@ export default function Friends() {
                       {friend.name.charAt(0).toUpperCase()}
                     </div>
                     
-                    <div className="ml-4 flex-1">
-                      <Link to={`/friends/${friend.id}`} className="font-medium hover:underline block">
+                    <div className="ml-4 flex-1 min-w-0">
+                      <Link to={`/friends/${friend.id}`} className="font-medium hover:underline block truncate">
                         {friend.name}
                       </Link>
                       {friend.phone && <p className="text-xs text-muted-foreground">{friend.phone}</p>}
                     </div>
 
-                    <div className="flex flex-col items-end mr-4">
+                    <div className="flex flex-col items-end mr-4 shrink-0">
                       {isOwed && (
                         <>
                           <span className="text-xs text-green-600 font-medium">Owes you</span>
@@ -114,39 +99,20 @@ export default function Friends() {
                       )}
                     </div>
 
-                    <div className="flex items-center gap-2 border-l pl-4">
-                      {isOwed && (
+                    <div className="flex items-center gap-2 border-l pl-4 shrink-0">
+                      {friend.phone && (
                         <Button 
                           size="icon" 
                           variant="ghost" 
                           className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-100 dark:hover:bg-green-900/50"
-                          disabled={!friend.phone || friend.netBalance <= 0}
-                          title={friend.phone ? "Remind on WhatsApp" : "No phone number added"}
+                          title="Remind on WhatsApp"
                           onClick={() => {
                             if (settings) {
                               const openLink = (url: string) => window.open(url, '_blank', 'noopener,noreferrer');
-                              const askSent = () => {
-                                return new Promise<boolean>((resolve) => {
-                                  resolvePromiseRef.current = resolve;
-                                  const onVisibilityChange = () => {
-                                    if (document.visibilityState === 'visible') {
-                                      setDialogOpen(true);
-                                      document.removeEventListener('visibilitychange', onVisibilityChange);
-                                    }
-                                  };
-                                  document.addEventListener('visibilitychange', onVisibilityChange);
-                                  // Fallback in case tab isn't hidden
-                                  setTimeout(() => {
-                                    if (resolvePromiseRef.current === resolve) {
-                                      document.removeEventListener('visibilitychange', onVisibilityChange);
-                                      setDialogOpen(true);
-                                    }
-                                  }, 2000);
-                                });
-                              };
+                              const askSent = () => true; // No longer used, handled directly in sendWhatsAppReminder
                               const logReminder = async (rem: Reminder) => { await db.reminders.add(rem); };
                               const now = () => new Date().toISOString();
-                              sendWhatsAppReminder(friend, friend.netBalance, settings, { openLink, askSent, logReminder, now });
+                              sendWhatsAppReminder(friend, myId, expenses, settlements, settings, { openLink, askSent, logReminder, now });
                             }
                           }}
                         >
@@ -165,32 +131,8 @@ export default function Friends() {
         </div>
       )}
 
-      <Dialog open={dialogOpen} onOpenChange={(open) => {
-        if (!open) {
-          setDialogOpen(false);
-          if (resolvePromiseRef.current) {
-            resolvePromiseRef.current(false);
-            resolvePromiseRef.current = undefined;
-          }
-        }
-      }}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Did you send the reminder?</DialogTitle>
-            <DialogDescription>Marking it as sent will update the 'Last reminded' timestamp.</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => {
-              setDialogOpen(false);
-              if (resolvePromiseRef.current) resolvePromiseRef.current(false);
-            }}>No</Button>
-            <Button onClick={() => {
-              setDialogOpen(false);
-              if (resolvePromiseRef.current) resolvePromiseRef.current(true);
-            }}>Yes, I sent it</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+
+      {addFriendOpen && <AddFriendModal onClose={() => setAddFriendOpen(false)} />}
     </div>
   );
 }

@@ -1,15 +1,31 @@
 import { useState, useEffect } from 'react';
 import { db } from '../db/db';
+import { resetDatabase } from '../db/repositories';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Save, Download, Upload, HardDrive } from 'lucide-react';
+import { Save, Download, Upload, HardDrive, MessageCircle, Trash2, RefreshCw } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
+import ImportBackupModal from '@/components/ImportBackupModal';
+import CategoriesManager from '@/components/CategoriesManager';
 
 export default function SettingsPage() {
   const settings = useLiveQuery(() => db.settings.get('user_settings'));
   const [storageInfo, setStorageInfo] = useState<{ quota: number; usage: number; persisted: boolean } | null>(null);
+  const [localWhatsappTemplate, setLocalWhatsappTemplate] = useState<string | null>(null);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [isResetting, setIsResetting] = useState(false);
+
+  const displayTemplate = localWhatsappTemplate !== null 
+    ? localWhatsappTemplate 
+    : (settings?.whatsappTemplate || 'Hi {name}, here is your pending balance:\n\n{breakdown}\n\nTotal pending: {amount}');
+
+  const savePreferences = async () => {
+    if (!settings) return;
+    await db.settings.update('user_settings', { whatsappTemplate: displayTemplate });
+    toast.success('Preferences saved');
+  };
 
   useEffect(() => {
     async function checkStorage() {
@@ -41,7 +57,7 @@ export default function SettingsPage() {
   const handleExport = async () => {
     try {
       const exportData = {
-        version: 1,
+        schemaVersion: 1,
         timestamp: new Date().toISOString(),
         data: {
           people: await db.people.toArray(),
@@ -65,7 +81,7 @@ export default function SettingsPage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `splitlocal_backup_${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `splitlocal-backup-${new Date().toISOString().split('T')[0]}.json`;
       a.click();
       URL.revokeObjectURL(url);
 
@@ -82,66 +98,40 @@ export default function SettingsPage() {
 
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      try {
-        const text = event.target?.result as string;
-        const parsed = JSON.parse(text);
-
-        if (parsed.version !== 1) {
-          throw new Error('Unsupported backup version');
-        }
-
-        const dataStr = JSON.stringify(parsed.data);
-        const checksum = dataStr.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
-        
-        if (checksum !== parsed.checksum) {
-          throw new Error('Backup file is corrupted (checksum mismatch)');
-        }
-
-        if (confirm('This will replace ALL existing data. Are you sure?')) {
-          await db.transaction('rw', [db.people, db.groups, db.categories, db.expenses, db.settlements, db.reminders, db.settings, db.receipts], async () => {
-            await db.people.clear();
-            await db.people.bulkAdd(parsed.data.people);
-            
-            await db.groups.clear();
-            await db.groups.bulkAdd(parsed.data.groups);
-            
-            await db.categories.clear();
-            await db.categories.bulkAdd(parsed.data.categories);
-            
-            await db.expenses.clear();
-            await db.expenses.bulkAdd(parsed.data.expenses);
-            
-            await db.settlements.clear();
-            await db.settlements.bulkAdd(parsed.data.settlements);
-            
-            await db.reminders.clear();
-            await db.reminders.bulkAdd(parsed.data.reminders);
-            
-            await db.settings.clear();
-            await db.settings.bulkAdd(parsed.data.settings);
-
-            await db.receipts.clear();
-            if (parsed.data.receipts) {
-              await db.receipts.bulkAdd(parsed.data.receipts);
-            }
-          });
-          toast.success('Backup restored successfully');
-          setTimeout(() => window.location.reload(), 1000);
-        }
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          toast.error(`Import failed: ${err.message}`);
-        } else {
-          toast.error('Import failed due to an unknown error');
-        }
-      }
-    };
-    reader.readAsText(file);
+    if (file) {
+      setImportFile(file);
+    }
     e.target.value = '';
+  };
+
+  const handleFreshReset = async () => {
+    if (!window.confirm('Are you sure you want to delete ALL data and start completely fresh? This cannot be undone.')) {
+      return;
+    }
+    try {
+      setIsResetting(true);
+      await resetDatabase({ withSampleData: false });
+      toast.success('All data wiped! Fresh empty database ready.');
+    } catch {
+      toast.error('Failed to reset database');
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
+  const handleSampleReset = async () => {
+    if (!window.confirm('Reset all data and load fresh sample demo data with friends and transactions?')) {
+      return;
+    }
+    try {
+      setIsResetting(true);
+      await resetDatabase({ withSampleData: true });
+      toast.success('Reset completed with fresh demo test data!');
+    } catch {
+      toast.error('Failed to reset database');
+    } finally {
+      setIsResetting(false);
+    }
   };
 
   const formatBytes = (bytes: number) => {
@@ -193,15 +183,36 @@ export default function SettingsPage() {
 
       <Card>
         <CardHeader>
+          <CardTitle className="flex items-center gap-2"><MessageCircle className="h-5 w-5" /> Preferences</CardTitle>
+          <CardDescription>Customize your app experience</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">WhatsApp Reminder Template</label>
+            <p className="text-xs text-muted-foreground">Available variables: {'{name}, {amount}, {breakdown}'}</p>
+            <Input 
+              value={displayTemplate} 
+              onChange={e => setLocalWhatsappTemplate(e.target.value)} 
+              placeholder="Hey {name}..."
+            />
+          </div>
+          <Button onClick={savePreferences} className="w-full">
+            Save Preferences
+          </Button>
+        </CardContent>
+      </Card>
+
+      <CategoriesManager />
+
+      <Card>
+        <CardHeader>
           <CardTitle className="flex items-center gap-2"><Save className="h-5 w-5" /> Backup & Restore</CardTitle>
           <CardDescription>All data lives only on this device. Back it up regularly.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {settings?.lastBackupAt ? (
-            <p className="text-sm text-muted-foreground mb-4">Last backup: {new Date(settings.lastBackupAt).toLocaleString()}</p>
-          ) : (
-            <p className="text-sm text-orange-600 mb-4 font-medium">You have never backed up your data!</p>
-          )}
+          <p className="text-sm text-muted-foreground mb-4">
+            Last backup: {settings?.lastBackupAt ? new Date(settings.lastBackupAt).toLocaleString() : 'never'}
+          </p>
 
           <div className="grid grid-cols-2 gap-4">
             <Button onClick={handleExport} className="w-full h-12" variant="default">
@@ -222,6 +233,51 @@ export default function SettingsPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Danger Zone: Testing & Reset Data */}
+      <Card className="border-destructive/30 bg-destructive/5">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-destructive">
+            <Trash2 className="h-5 w-5" /> Fresh Testing & Reset Data
+          </CardTitle>
+          <CardDescription>
+            Clear all data to test freshly on Android or in the browser anytime
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Use this whenever you want to test from scratch. It wipes all expenses, payments, and added contacts, resetting to a clean slate.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button
+              variant="destructive"
+              className="flex-1 gap-2 h-11"
+              onClick={handleFreshReset}
+              disabled={isResetting}
+            >
+              <Trash2 className="h-4 w-4" />
+              {isResetting ? 'Resetting...' : 'Wipe Clean (Empty App)'}
+            </Button>
+            <Button
+              variant="outline"
+              className="flex-1 gap-2 h-11 border-destructive/30 hover:bg-destructive/10 text-destructive dark:text-red-400"
+              onClick={handleSampleReset}
+              disabled={isResetting}
+            >
+              <RefreshCw className="h-4 w-4" />
+              {isResetting ? 'Resetting...' : 'Reset with Demo Data'}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {importFile && (
+        <ImportBackupModal 
+          file={importFile} 
+          onClose={() => setImportFile(null)} 
+        />
+      )}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { computeBalances, simplifyDebts } from '../ledger';
+import { computeBalances, simplifyDebts, computePairwiseBalance } from '../ledger';
 import type { Expense, Settlement } from '../types';
 import { calculateShares } from '../allocation';
 
@@ -247,6 +247,63 @@ describe('ledger', () => {
       
       const sum = balances.reduce((acc, b) => acc + b.netAmountMinor, 0);
       expect(sum).toBe(0);
+    });
+  });
+
+  describe('computePairwiseBalance', () => {
+    it('computes correct balance when A pays for B', () => {
+      const exp: Expense = {
+        id: 'e1', groupId: null, description: 'Lunch', amountMinor: 1000, currency: 'INR',
+        date: '2026-01-01', categoryId: 'c1', notes: '', splitType: 'equal',
+        payers: [{ personId: 'A', amountMinor: 1000 }],
+        shares: [{ personId: 'A', amountMinor: 500 }, { personId: 'B', amountMinor: 500 }],
+        participantIds: ['A', 'B'], createdAt: '', updatedAt: '', deletedAt: null
+      };
+
+      // B owes A 500
+      expect(computePairwiseBalance([exp], [], 'A', 'B', 'INR')).toBe(500);
+      // A owes B -500
+      expect(computePairwiseBalance([exp], [], 'B', 'A', 'INR')).toBe(-500);
+    });
+
+    it('settlement settles the pairwise balance', () => {
+      const exp: Expense = {
+        id: 'e1', groupId: null, description: 'Lunch', amountMinor: 1000, currency: 'INR',
+        date: '2026-01-01', categoryId: 'c1', notes: '', splitType: 'equal',
+        payers: [{ personId: 'A', amountMinor: 1000 }],
+        shares: [{ personId: 'A', amountMinor: 500 }, { personId: 'B', amountMinor: 500 }],
+        participantIds: ['A', 'B'], createdAt: '', updatedAt: '', deletedAt: null
+      };
+      const st: Settlement = {
+        id: 's1', groupId: null, fromId: 'B', toId: 'A', amountMinor: 500, currency: 'INR',
+        date: '2026-01-02', method: 'upi', notes: '', createdAt: '', updatedAt: '', deletedAt: null
+      };
+
+      expect(computePairwiseBalance([exp], [st], 'A', 'B', 'INR')).toBe(0);
+    });
+
+    it('does not get affected by unrelated third-party expenses', () => {
+      // A and B have dinner: A pays 2000 for A (1000) and B (1000)
+      const exp1: Expense = {
+        id: 'e1', groupId: null, description: 'Dinner', amountMinor: 2000, currency: 'INR',
+        date: '2026-01-01', categoryId: 'c1', notes: '', splitType: 'equal',
+        payers: [{ personId: 'A', amountMinor: 2000 }],
+        shares: [{ personId: 'A', amountMinor: 1000 }, { personId: 'B', amountMinor: 1000 }],
+        participantIds: ['A', 'B'], createdAt: '', updatedAt: '', deletedAt: null
+      };
+      // C and D have movie: C pays 1000 for C and D
+      const exp2: Expense = {
+        id: 'e2', groupId: null, description: 'Movie', amountMinor: 1000, currency: 'INR',
+        date: '2026-01-01', categoryId: 'c1', notes: '', splitType: 'equal',
+        payers: [{ personId: 'C', amountMinor: 1000 }],
+        shares: [{ personId: 'C', amountMinor: 500 }, { personId: 'D', amountMinor: 500 }],
+        participantIds: ['C', 'D'], createdAt: '', updatedAt: '', deletedAt: null
+      };
+
+      // B still owes A 1000, unaffected by C and D
+      expect(computePairwiseBalance([exp1, exp2], [], 'A', 'B', 'INR')).toBe(1000);
+      // D owes A 0
+      expect(computePairwiseBalance([exp1, exp2], [], 'A', 'D', 'INR')).toBe(0);
     });
   });
 });

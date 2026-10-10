@@ -27,13 +27,14 @@ export interface Category {
   id: string;
   name: string;
   icon: string;
+  color: string;
   isDefault: boolean;
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
 }
 
-export interface ExpensePayer {
+interface ExpensePayer {
   personId: string;
   amountMinor: number;
 }
@@ -62,6 +63,8 @@ export interface Expense {
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
+  refundOfId?: string | null;
+  isRefund?: boolean;
 }
 
 export interface Settlement {
@@ -77,6 +80,8 @@ export interface Settlement {
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
+  expenseId?: string | null;
+  refundOfId?: string | null;
 }
 
 export interface Reminder {

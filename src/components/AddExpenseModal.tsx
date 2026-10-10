@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { parseDecimalToMinor } from '../lib/money';
 import { db } from '../db/db';
 import { createExpense } from '../db/repositories';
+import { generateId } from '../lib/utils';
 import type { SplitType } from '../domain/types';
 import { calculateShares } from '../domain/allocation';
 import { Button } from '@/components/ui/button';
@@ -30,14 +31,31 @@ export default function AddExpenseModal({ onClose }: Props) {
     return `${d.getDate().toString().padStart(2, '0')}-${(d.getMonth()+1).toString().padStart(2, '0')}-${d.getFullYear()}`;
   });
   const [payerId, setPayerId] = useState<string>('');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
   const [splitType] = useState<SplitType>('equal');
-  const [selectedParticipants, setSelectedParticipants] = useState<Set<string>>(new Set());
+  const [selectedParticipants, setSelectedParticipants] = useState<Set<string>>(() => {
+    const s = new Set<string>();
+    if (me) s.add(me.id);
+    return s;
+  });
+
+  const sortedPeople = [...people].sort((a, b) => {
+    if (a.isMe) return -1;
+    if (b.isMe) return 1;
+    return a.name.localeCompare(b.name);
+  });
 
   useEffect(() => {
     if (me && !payerId) {
       setTimeout(() => setPayerId(me.id), 0);
     }
   }, [me, payerId]);
+
+  useEffect(() => {
+    if (categories.length > 0 && !selectedCategoryId) {
+      setTimeout(() => setSelectedCategoryId(categories[0].id), 0);
+    }
+  }, [categories, selectedCategoryId]);
 
   const toggleParticipant = (id: string) => {
     const next = new Set(selectedParticipants);
@@ -48,7 +66,7 @@ export default function AddExpenseModal({ onClose }: Props) {
 
   const selectAll = () => setSelectedParticipants(new Set(people.map(p => p.id)));
   
-  const handleSave = async () => {
+  const handleSave = async (keepOpen = false) => {
     try {
       if (!description.trim()) return toast.error('Description required');
       const amountMinor = parseDecimalToMinor(amount);
@@ -60,15 +78,14 @@ export default function AddExpenseModal({ onClose }: Props) {
       const shares = calculateShares(amountMinor, splitType, participantArr);
       const participantIds = Array.from(selectedParticipants);
       
-      // Pick the first category as default for now if none exists
-      // Wait, we need categories seeded.
-      let categoryId = categories.length > 0 ? categories[0].id : '';
+      let categoryId = selectedCategoryId || (categories.length > 0 ? categories[0].id : '');
       if (!categoryId) {
-        categoryId = crypto.randomUUID();
+        categoryId = generateId();
         await db.categories.add({
           id: categoryId,
           name: 'General',
           icon: 'receipt',
+          color: '#3b82f6',
           isDefault: true,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
@@ -77,7 +94,7 @@ export default function AddExpenseModal({ onClose }: Props) {
       }
 
       await createExpense({
-        id: crypto.randomUUID(),
+        id: generateId(),
         groupId: null,
         description,
         amountMinor,
@@ -91,8 +108,14 @@ export default function AddExpenseModal({ onClose }: Props) {
         splitType
       });
 
-      toast.success('Expense added');
-      onClose();
+      if (keepOpen) {
+        toast.success('Expense added! Ready for next transaction.');
+        setDescription('');
+        setAmount('');
+      } else {
+        toast.success('Expense added');
+        onClose();
+      }
     } catch (err: unknown) {
       console.error(err);
       if (err instanceof Error) {
@@ -104,8 +127,8 @@ export default function AddExpenseModal({ onClose }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/50 p-0 md:p-4 animate-in fade-in duration-200">
-      <div className="bg-background w-full max-w-lg md:rounded-xl rounded-t-xl h-[90vh] md:h-auto md:max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in slide-in-from-bottom-10 md:slide-in-from-bottom-4 duration-300">
+    <div className="fixed inset-0 z-[var(--z-sheet)] flex items-end md:items-center justify-center bg-black/50 p-0 md:p-4 animate-in fade-in duration-200">
+      <div className="bg-background w-full max-w-lg md:rounded-xl rounded-t-xl h-[90dvh] md:h-auto md:max-h-[90dvh] flex flex-col shadow-2xl overflow-hidden animate-in slide-in-from-bottom-10 md:slide-in-from-bottom-4 duration-300">
         
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b shrink-0">
@@ -126,6 +149,27 @@ export default function AddExpenseModal({ onClose }: Props) {
               autoFocus
               className="text-lg py-6"
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Category</Label>
+            <div className="flex flex-wrap gap-2 p-2 border rounded-lg bg-muted/20 max-h-36 overflow-y-auto">
+              {categories.map(c => (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => setSelectedCategoryId(c.id)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                    selectedCategoryId === c.id
+                      ? 'bg-primary text-primary-foreground border-primary shadow-sm scale-105'
+                      : 'bg-card text-foreground hover:bg-muted border-border'
+                  }`}
+                >
+                  <span className="text-base">{c.icon}</span>
+                  <span>{c.name}</span>
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -153,7 +197,7 @@ export default function AddExpenseModal({ onClose }: Props) {
           <div className="space-y-2">
             <Label>Who Paid?</Label>
             <div className="flex flex-wrap gap-2">
-              {people.map(p => (
+              {sortedPeople.map(p => (
                 <Button 
                   key={p.id}
                   variant={payerId === p.id ? 'default' : 'outline'}
@@ -174,7 +218,7 @@ export default function AddExpenseModal({ onClose }: Props) {
               </Button>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {people.map(p => (
+              {sortedPeople.map(p => (
                 <div 
                   key={p.id} 
                   onClick={() => toggleParticipant(p.id)}
@@ -192,8 +236,20 @@ export default function AddExpenseModal({ onClose }: Props) {
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t bg-muted/20 shrink-0">
-          <Button onClick={handleSave} className="w-full h-12 text-lg">
+        <div className="p-4 border-t bg-muted/20 shrink-0 flex gap-3">
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={() => handleSave(true)} 
+            className="flex-1 h-12 text-sm sm:text-base font-medium"
+          >
+            + Add Another
+          </Button>
+          <Button 
+            type="button" 
+            onClick={() => handleSave(false)} 
+            className="flex-1 h-12 text-sm sm:text-base font-semibold"
+          >
             Save Expense
           </Button>
         </div>

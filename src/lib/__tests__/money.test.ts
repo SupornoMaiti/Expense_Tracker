@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { formatMoney } from '../money';
 import { getWhatsAppLink } from '../whatsapp';
-import type { Person, Settings } from '../../domain/types';
+import type { Person } from '../../domain/types';
 
 describe('formatMoney', () => {
   it('formats exactly 0', () => {
@@ -50,16 +50,7 @@ describe('formatMoney', () => {
       deletedAt: null
     };
     
-    const settings: Settings = {
-      id: 'default',
-      defaultCurrency: 'INR',
-      defaultCountryCode: 'IN',
-      whatsappTemplate: 'You owe {amount}',
-      theme: 'system',
-      lastBackupAt: null
-    };
-    
-    const url = getWhatsAppLink(person, 50000, 'INR', settings);
+    const url = getWhatsAppLink(formatted, person.phone);
     expect(url).toContain(encodeURIComponent(formatted));
   });
 });

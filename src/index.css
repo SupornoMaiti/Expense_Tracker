@@ -33,6 +33,13 @@
     --ring: 221.2 83.2% 53.3%;
 
     --radius: 0.5rem;
+
+    --nav-height: 4rem;
+    --fab-clearance: 5rem;
+    --z-nav: 40;
+    --z-fab: 50;
+    --z-sheet: 60;
+    --z-toast: 100;
   }
 
   .dark {
@@ -95,4 +102,26 @@
 .px-safe {
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
+}
+
+/* Toaster position: center-aligned at bottom, sitting cleanly just above the bottom nav bar on mobile */
+[data-sonner-toaster] {
+  z-index: var(--z-toast, 100) !important;
+  margin: 0 !important;
+}
+
+[data-sonner-toaster][data-y-position='bottom'] {
+  bottom: calc(var(--nav-height) + 12px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+[data-sonner-toaster][data-x-position='center'] {
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+}
+
+@media (min-width: 768px) {
+  [data-sonner-toaster][data-y-position='bottom'] {
+    bottom: 24px !important;
+  }
 }

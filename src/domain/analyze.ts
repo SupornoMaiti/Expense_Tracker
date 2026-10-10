@@ -1,0 +1,60 @@
+import type { Expense } from './types';
+
+interface CategorySpend {
+  categoryId: string;
+  amountMinor: number;
+}
+
+interface DailySpend {
+  date: string;
+  amountMinor: number;
+}
+
+export interface AnalyzeResult {
+  totalSpendMinor: number;
+  expenseCount: number;
+  categories: CategorySpend[];
+  dailySpend: DailySpend[];
+}
+
+export function computeAnalyze(
+  expenses: Expense[],
+  myId: string,
+  currency: string,
+  yearMonth: string | 'all'
+): AnalyzeResult {
+  let totalSpendMinor = 0;
+  let expenseCount = 0;
+  const catMap = new Map<string, number>();
+  const dailyMap = new Map<string, number>();
+
+  for (const exp of expenses) {
+    if (exp.deletedAt) continue;
+    if (exp.currency !== currency) continue;
+    
+    // YYYY-MM string prefix match
+    if (yearMonth !== 'all' && !exp.date.startsWith(yearMonth)) continue;
+
+    const myShare = exp.shares.find((s) => s.personId === myId);
+    if (!myShare || myShare.amountMinor <= 0) continue;
+
+    totalSpendMinor += myShare.amountMinor;
+    expenseCount += 1;
+    
+    const catId = exp.categoryId || 'Uncategorized';
+    const current = catMap.get(catId) || 0;
+    catMap.set(catId, current + myShare.amountMinor);
+    const currentDaily = dailyMap.get(exp.date) || 0;
+    dailyMap.set(exp.date, currentDaily + myShare.amountMinor);
+  }
+
+  const categories = Array.from(catMap.entries())
+    .map(([categoryId, amountMinor]) => ({ categoryId, amountMinor }))
+    .sort((a, b) => b.amountMinor - a.amountMinor);
+
+  const dailySpend = Array.from(dailyMap.entries())
+    .map(([date, amountMinor]) => ({ date, amountMinor }))
+    .sort((a, b) => a.date.localeCompare(b.date)); // chronological
+
+  return { totalSpendMinor, expenseCount, categories, dailySpend };
+}
