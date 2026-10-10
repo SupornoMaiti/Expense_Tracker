@@ -19,7 +19,7 @@ export default function AddRefundModal({ expense, onClose, onSuccess }: Props) {
   const [amount, setAmount] = useState(defaultAmountMajor);
   const [date, setDate] = useState(() => {
     const d = new Date();
-    return `${d.getDate().toString().padStart(2, '0')}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getFullYear()}`;
+    return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
   });
   const [notes, setNotes] = useState(`Refund for "${expense.description}"`);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -107,12 +107,11 @@ export default function AddRefundModal({ expense, onClose, onSuccess }: Props) {
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-xs font-semibold">Date (DD-MM-YYYY)</Label>
+            <Label className="text-xs font-semibold">Date</Label>
             <Input
-              type="text"
+              type="date"
               value={date}
               onChange={e => setDate(e.target.value)}
-              placeholder="DD-MM-YYYY"
               className="h-9 text-sm"
             />
           </div>

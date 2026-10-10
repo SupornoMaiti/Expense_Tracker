@@ -36,13 +36,11 @@ export default function Activity() {
 
   const allItems = [
     ...expenses.map(e => ({ type: 'expense' as const, data: e, time: new Date(e.createdAt).getTime(), dateLabel: new Date(e.createdAt).toLocaleString() })),
-    ...settlements.map(s => ({ type: 'settlement' as const, data: s, time: new Date(s.createdAt).getTime(), dateLabel: new Date(s.createdAt).toLocaleString() })),
-    ...reminders.map(r => ({ type: 'reminder' as const, data: r, time: new Date(r.sentAt).getTime(), dateLabel: new Date(r.sentAt).toLocaleString() }))
+    ...settlements.map(s => ({ type: 'settlement' as const, data: s, time: new Date(s.createdAt).getTime(), dateLabel: new Date(s.createdAt).toLocaleString() }))
   ].sort((a, b) => b.time - a.time);
 
   const expenseCount = expenses.length;
   const settlementCount = settlements.length;
-  const reminderCount = reminders.length;
   const totalCount = allItems.length;
 
   let activityItems = allItems;
@@ -57,7 +55,6 @@ export default function Activity() {
       const d = a.data as any;
       if (a.type === 'expense') return d.participantIds.includes(filterPersonId);
       if (a.type === 'settlement') return d.fromId === filterPersonId || d.toId === filterPersonId;
-      if (a.type === 'reminder') return d.personId === filterPersonId;
       return false;
     });
   }
@@ -75,10 +72,6 @@ export default function Activity() {
         const fromName = people.find(p => p.id === d.fromId)?.name || '';
         const toName = people.find(p => p.id === d.toId)?.name || '';
         return fromName.toLowerCase().includes(q) || toName.toLowerCase().includes(q) || (d.notes || '').toLowerCase().includes(q);
-      }
-      if (a.type === 'reminder') {
-        const pName = people.find(p => p.id === d.personId)?.name || '';
-        return pName.toLowerCase().includes(q) || (d.messageSnapshot || '').toLowerCase().includes(q);
       }
       return false;
     });
@@ -144,8 +137,7 @@ export default function Activity() {
         {[
           { id: 'all', label: 'All Types', count: totalCount },
           { id: 'expense', label: 'Expenses', count: expenseCount },
-          { id: 'settlement', label: 'Settlements', count: settlementCount },
-          { id: 'reminder', label: 'Reminders', count: reminderCount },
+          { id: 'settlement', label: 'Settlements', count: settlementCount }
         ].map(t => (
           <Button
             key={t.id}
@@ -192,24 +184,7 @@ export default function Activity() {
           </div>
         ) : (
           activityItems.map((item) => {
-            if (item.type === 'reminder') {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const reminder = item.data as any;
-              const person = people.find(p => p.id === reminder.personId);
-              return (
-                <div key={reminder.id} className="flex items-center justify-between p-4 bg-card rounded-lg border shadow-sm">
-                  <div className="flex items-center gap-4">
-                    <div className="p-2 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30">
-                      <MessageCircle className="h-4 w-4" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-medium truncate">Reminder sent to {person?.name || 'Unknown'}</p>
-                      <p className="text-xs text-muted-foreground">{item.dateLabel}</p>
-                    </div>
-                  </div>
-                </div>
-              );
-            }
+
 
             if (item.type === 'settlement') {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any

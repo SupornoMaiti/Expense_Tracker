@@ -38,8 +38,7 @@ export default function Dashboard() {
   ).slice(0, 5);
 
   const now = new Date();
-  const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-  const analyzeResult = myId ? computeAnalyze(expenses, myId, 'INR', currentMonth) : null;
+  const analyzeResult = myId ? computeAnalyze(expenses, myId, 'INR', 'all') : null;
   const totalSpendThisMonth = analyzeResult ? analyzeResult.totalSpendMinor : 0;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -92,7 +91,7 @@ export default function Dashboard() {
               {formatMoney(totalSpendThisMonth)}
             </div>
             <p className="text-xs text-muted-foreground">
-              This month&apos;s spending
+              All-time spending
             </p>
           </CardContent>
         </Card>

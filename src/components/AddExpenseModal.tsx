@@ -28,7 +28,7 @@ export default function AddExpenseModal({ onClose }: Props) {
   const [amount, setAmount] = useState(''); // major units string
   const [date, setDate] = useState(() => {
     const d = new Date();
-    return `${d.getDate().toString().padStart(2, '0')}-${(d.getMonth()+1).toString().padStart(2, '0')}-${d.getFullYear()}`;
+    return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
   });
   const [payerId, setPayerId] = useState<string>('');
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
@@ -185,8 +185,9 @@ export default function AddExpenseModal({ onClose }: Props) {
               />
             </div>
             <div className="space-y-2">
-              <Label>Date (DD-MM-YYYY)</Label>
+              <Label>Date</Label>
               <Input 
+                type="date"
                 value={date}
                 onChange={e => setDate(e.target.value)}
                 className="text-lg py-6"

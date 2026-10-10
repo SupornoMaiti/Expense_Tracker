@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { db } from '../db/db';
-import { ensureMe, ensureDefaultCategories, seedSampleData } from '../db/repositories';
+import { ensureMe, ensureDefaultCategories } from '../db/repositories';
 
 export function useDBInit() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -24,10 +24,10 @@ export function useDBInit() {
           });
         }
 
-        const friendCount = await db.people.filter(p => !p.isMe && !p.deletedAt).count();
-        if (friendCount === 0) {
-          await seedSampleData();
-        }
+        // const friendCount = await db.people.filter(p => !p.isMe && !p.deletedAt).count();
+        // if (friendCount === 0) {
+        //   await seedSampleData();
+        // }
 
         setIsInitialized(true);
       } catch (err) {
