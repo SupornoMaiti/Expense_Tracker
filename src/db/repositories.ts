@@ -1,5 +1,5 @@
 import { db } from './db';
-import type { Expense, Settlement, Person } from '../domain/types';
+import type { Expense, Settlement, Person, Reminder } from '../domain/types';
 import { ExpenseSchema, SettlementSchema } from '../domain/schemas';
 import { generateId } from '../lib/utils';
 
@@ -62,7 +62,7 @@ export async function softDeleteExpense(id: string): Promise<{ deletedExpenseId:
 
     // 1. Cascade soft-delete child refund expenses
     const refundExpenses = await db.expenses
-      .filter(e => !e.deletedAt && (e.refundOfId === id || (e as any).parentExpenseId === id))
+      .filter(e => !e.deletedAt && e.refundOfId === id)
       .toArray();
 
     for (const re of refundExpenses) {
@@ -87,11 +87,22 @@ export async function softDeleteExpense(id: string): Promise<{ deletedExpenseId:
 export async function restoreExpense(id: string): Promise<void> {
   const now = new Date().toISOString();
   await db.transaction('rw', [db.expenses, db.settlements], async () => {
+    const expense = await db.expenses.get(id);
+    if (!expense) return;
+
+    // Verify parent is not deleted before restoring a child refund
+    if (expense.refundOfId) {
+      const parent = await db.expenses.get(expense.refundOfId);
+      if (parent && parent.deletedAt) {
+        throw new Error('Cannot restore a refund whose original expense is deleted');
+      }
+    }
+
     await db.expenses.update(id, { deletedAt: null, updatedAt: now });
 
     // Also restore linked refund expenses
     const refundExpenses = await db.expenses
-      .filter(e => e.refundOfId === id || (e as any).parentExpenseId === id)
+      .filter(e => e.refundOfId === id)
       .toArray();
 
     for (const re of refundExpenses) {
@@ -164,8 +175,8 @@ export async function createRefundForExpense(params: {
     currency: original.currency,
     date,
     categoryId: original.categoryId,
-    payers: refundShares,
-    shares: refundPayers,
+    payers: refundPayers,
+    shares: refundShares,
     participantIds: original.participantIds,
     notes: params.notes || `Refund for "${original.description}"`,
     splitType: original.splitType,
@@ -182,11 +193,11 @@ export async function createRefundForExpense(params: {
 }
 
 export async function getActiveExpenses(): Promise<Expense[]> {
-  return db.expenses.filter(e => e.deletedAt === null).toArray();
+  return db.expenses.filter(e => !e.deletedAt).toArray();
 }
 
 export async function getActiveExpensesByGroupId(groupId: string): Promise<Expense[]> {
-  return db.expenses.where({ groupId }).filter(e => e.deletedAt === null).toArray();
+  return db.expenses.where('groupId').equals(groupId).filter(e => !e.deletedAt).toArray();
 }
 
 // --- SETTLEMENT REPOSITORY ---
@@ -290,11 +301,11 @@ export async function restoreSettlement(id: string): Promise<void> {
 }
 
 export async function getActiveSettlements(): Promise<Settlement[]> {
-  return db.settlements.filter(s => s.deletedAt === null).toArray();
+  return db.settlements.filter(s => !s.deletedAt).toArray();
 }
 
 export async function getActiveSettlementsByGroupId(groupId: string): Promise<Settlement[]> {
-  return db.settlements.where({ groupId }).filter(s => s.deletedAt === null).toArray();
+  return db.settlements.where('groupId').equals(groupId).filter(s => !s.deletedAt).toArray();
 }
 
 // --- PERSON REPOSITORY ---
@@ -305,11 +316,11 @@ export async function createPerson(person: Person): Promise<string> {
 }
 
 export async function getPersonByPhone(phone: string): Promise<Person | undefined> {
-  return db.people.where({ phone }).first();
+  return db.people.where('phone').equals(phone).first();
 }
 
 export async function getActivePeople(): Promise<Person[]> {
-  return db.people.filter(p => p.deletedAt === null && p.archivedAt === null).toArray();
+  return db.people.filter(p => !p.deletedAt && !p.archivedAt).toArray();
 }
 
 export async function ensureMe(): Promise<void> {
@@ -344,70 +355,83 @@ export async function ensureMe(): Promise<void> {
       meRecords.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
       const primaryMe = meRecords[0];
       const dupes = meRecords.slice(1);
-      
-      for (const dupe of dupes) {
-        // Repoint expenses (payers and shares)
-        const expenses = await db.expenses.toArray();
-        for (const exp of expenses) {
-          let changed = false;
-          
-          if (exp.participantIds.includes(dupe.id)) {
-            exp.participantIds = exp.participantIds.filter(id => id !== dupe.id);
-            if (!exp.participantIds.includes(primaryMe.id)) exp.participantIds.push(primaryMe.id);
+      const dupeIds = new Set(dupes.map(d => d.id));
+
+      // Batch repoint expenses (payers and shares)
+      const expenses = await db.expenses.toArray();
+      const changedExpenses: Expense[] = [];
+      for (const exp of expenses) {
+        let changed = false;
+
+        if (exp.participantIds.some(id => dupeIds.has(id))) {
+          exp.participantIds = exp.participantIds.filter(id => !dupeIds.has(id));
+          if (!exp.participantIds.includes(primaryMe.id)) exp.participantIds.push(primaryMe.id);
+          changed = true;
+        }
+
+        for (const payer of exp.payers) {
+          if (dupeIds.has(payer.personId)) {
+            payer.personId = primaryMe.id;
             changed = true;
           }
-          
-          for (const payer of exp.payers) {
-            if (payer.personId === dupe.id) {
-              payer.personId = primaryMe.id;
-              changed = true;
-            }
-          }
-          for (const share of exp.shares) {
-            if (share.personId === dupe.id) {
-              share.personId = primaryMe.id;
-              changed = true;
-            }
-          }
-          
-          // Merge identical personIds in payers/shares
-          if (changed) {
-            const mergedPayers: Record<string, typeof exp.payers[0]> = {};
-            for (const p of exp.payers) {
-              if (mergedPayers[p.personId]) mergedPayers[p.personId].amountMinor += p.amountMinor;
-              else mergedPayers[p.personId] = { ...p };
-            }
-            exp.payers = Object.values(mergedPayers);
-            
-            const mergedShares: Record<string, typeof exp.shares[0]> = {};
-            for (const s of exp.shares) {
-              if (mergedShares[s.personId]) mergedShares[s.personId].amountMinor += s.amountMinor;
-              else mergedShares[s.personId] = { ...s };
-            }
-            exp.shares = Object.values(mergedShares);
-            
-            await db.expenses.put(exp);
+        }
+        for (const share of exp.shares) {
+          if (dupeIds.has(share.personId)) {
+            share.personId = primaryMe.id;
+            changed = true;
           }
         }
-        
-        // Repoint settlements
-        const settlements = await db.settlements.toArray();
-        for (const set of settlements) {
-          let changed = false;
-          if (set.fromId === dupe.id) { set.fromId = primaryMe.id; changed = true; }
-          if (set.toId === dupe.id) { set.toId = primaryMe.id; changed = true; }
-          if (changed) await db.settlements.put(set);
-        }
-        
-        // Repoint reminders
-        const reminders = await db.reminders.toArray();
-        for (const rem of reminders) {
-          if (rem.personId === dupe.id) {
-            rem.personId = primaryMe.id;
-            await db.reminders.put(rem);
+
+        // Merge identical personIds in payers/shares
+        if (changed) {
+          const mergedPayers: Record<string, typeof exp.payers[0]> = {};
+          for (const p of exp.payers) {
+            if (mergedPayers[p.personId]) mergedPayers[p.personId].amountMinor += p.amountMinor;
+            else mergedPayers[p.personId] = { ...p };
           }
+          exp.payers = Object.values(mergedPayers);
+
+          const mergedShares: Record<string, typeof exp.shares[0]> = {};
+          for (const s of exp.shares) {
+            if (mergedShares[s.personId]) mergedShares[s.personId].amountMinor += s.amountMinor;
+            else mergedShares[s.personId] = { ...s };
+          }
+          exp.shares = Object.values(mergedShares);
+
+          changedExpenses.push(exp);
         }
-        
+      }
+      if (changedExpenses.length > 0) {
+        await db.expenses.bulkPut(changedExpenses);
+      }
+
+      // Batch repoint settlements
+      const settlements = await db.settlements.toArray();
+      const changedSettlements: Settlement[] = [];
+      for (const set of settlements) {
+        let changed = false;
+        if (dupeIds.has(set.fromId)) { set.fromId = primaryMe.id; changed = true; }
+        if (dupeIds.has(set.toId)) { set.toId = primaryMe.id; changed = true; }
+        if (changed) changedSettlements.push(set);
+      }
+      if (changedSettlements.length > 0) {
+        await db.settlements.bulkPut(changedSettlements);
+      }
+
+      // Batch repoint reminders
+      const reminders = await db.reminders.toArray();
+      const changedReminders: Reminder[] = [];
+      for (const rem of reminders) {
+        if (dupeIds.has(rem.personId)) {
+          rem.personId = primaryMe.id;
+          changedReminders.push(rem);
+        }
+      }
+      if (changedReminders.length > 0) {
+        await db.reminders.bulkPut(changedReminders);
+      }
+
+      for (const dupe of dupes) {
         await db.people.delete(dupe.id);
       }
     }

@@ -16,6 +16,8 @@ import SettleUp from './pages/SettleUp';
 import { useDBInit } from './hooks/useDBInit';
 import AddExpenseModal from './components/AddExpenseModal';
 import WelcomeModal from './components/WelcomeModal';
+import ErrorBoundary from './components/ErrorBoundary';
+import { Button } from '@/components/ui/button';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
@@ -38,7 +40,21 @@ function ScrollToTop() {
 function AppShell() {
   const [showAdd, setShowAdd] = useState(false);
   const location = useLocation();
-  const isInitialized = useDBInit();
+  const dbInit = useDBInit();
+  const isInitialized = typeof dbInit === 'boolean' ? dbInit : dbInit.isInitialized;
+  const initError = typeof dbInit === 'object' && dbInit !== null ? dbInit.error : null;
+
+  if (initError) {
+    return (
+      <div className="fixed inset-0 flex flex-col items-center justify-center bg-background p-6 text-center gap-4">
+        <div className="text-destructive font-semibold text-lg">Failed to initialize database</div>
+        <p className="text-muted-foreground text-sm max-w-md">{initError.message}</p>
+        <Button onClick={() => window.location.reload()} variant="outline">
+          Retry
+        </Button>
+      </div>
+    );
+  }
 
   if (!isInitialized) {
     return (
@@ -129,21 +145,23 @@ function AppShell() {
       <main id="main-scroll-area" className="flex-1 overflow-y-auto relative pb-[calc(var(--nav-height)+var(--fab-clearance)+env(safe-area-inset-bottom))] md:pb-0 scroll-smooth">
         <ScrollToTop />
         <div className="mx-auto max-w-5xl p-4 md:p-8 lg:p-10">
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/friends" element={<Friends />} />
-            <Route path="/friends/:id" element={<PersonDetail />} />
-            <Route path="/activity" element={<Activity />} />
-            <Route path="/analyze" element={<Analyze />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/settle" element={<SettleUp />} />
-            <Route path="*" element={
-              <div className="flex flex-col items-center justify-center py-24 text-center">
-                <div className="text-4xl font-bold text-muted-foreground/20 mb-4">404</div>
-                <p className="text-muted-foreground">This page doesn't exist.</p>
-              </div>
-            } />
-          </Routes>
+          <ErrorBoundary>
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/friends" element={<Friends />} />
+              <Route path="/friends/:id" element={<PersonDetail />} />
+              <Route path="/activity" element={<Activity />} />
+              <Route path="/analyze" element={<Analyze />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/settle" element={<SettleUp />} />
+              <Route path="*" element={
+                <div className="flex flex-col items-center justify-center py-24 text-center">
+                  <div className="text-4xl font-bold text-muted-foreground/20 mb-4">404</div>
+                  <p className="text-muted-foreground">This page doesn't exist.</p>
+                </div>
+              } />
+            </Routes>
+          </ErrorBoundary>
         </div>
       </main>
 

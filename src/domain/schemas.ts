@@ -6,33 +6,33 @@ const CurrencySchema = z.string().min(1).max(5).toUpperCase();
 const DateSchema = z.string().regex(/^(\d{2}-\d{2}-\d{4}|\d{4}-\d{2}-\d{2})$/, 'Date must be DD-MM-YYYY or YYYY-MM-DD');
 
 const ExpensePayerSchema = z.object({
-  personId: z.string().uuid(),
+  personId: z.string().min(1),
   amountMinor: AmountMinorSchema,
 });
 
 const ExpenseShareSchema = z.object({
-  personId: z.string().uuid(),
+  personId: z.string().min(1),
   amountMinor: AmountMinorSchema,
   rawValue: z.number().optional(),
 });
 
 export const ExpenseSchema = z.object({
-  id: z.string().uuid(),
-  groupId: z.string().uuid().nullable(),
+  id: z.string().min(1),
+  groupId: z.string().min(1).nullable(),
   description: z.string().min(1, 'Description is required').max(255),
   amountMinor: AmountMinorSchema.refine(val => val > 0, 'Expense amount must be greater than 0'),
   currency: CurrencySchema,
   date: DateSchema,
-  categoryId: z.string().uuid(),
+  categoryId: z.string().min(1),
   payers: z.array(ExpensePayerSchema).min(1, 'At least one payer is required'),
   shares: z.array(ExpenseShareSchema).min(1, 'At least one share is required'),
-  participantIds: z.array(z.string().uuid()),
+  participantIds: z.array(z.string().min(1)),
   notes: z.string().max(1000),
   splitType: z.enum(['equal', 'exact', 'percentage', 'shares'] as const),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-  deletedAt: z.string().datetime().nullable(),
-  refundOfId: z.string().uuid().nullable().optional(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  deletedAt: z.string().nullable(),
+  refundOfId: z.string().min(1).nullable().optional(),
   isRefund: z.boolean().optional(),
 }).superRefine((data, ctx) => {
   const sumPayers = data.payers.reduce((acc, p) => acc + p.amountMinor, 0);
@@ -55,20 +55,20 @@ export const ExpenseSchema = z.object({
 });
 
 export const SettlementSchema = z.object({
-  id: z.string().uuid(),
-  groupId: z.string().uuid().nullable(),
-  fromId: z.string().uuid(),
-  toId: z.string().uuid(),
+  id: z.string().min(1),
+  groupId: z.string().min(1).nullable(),
+  fromId: z.string().min(1),
+  toId: z.string().min(1),
   amountMinor: AmountMinorSchema.refine(val => val > 0, 'Settlement amount must be greater than 0'),
   currency: CurrencySchema,
   date: DateSchema,
   method: z.enum(['cash', 'upi', 'bank', 'other'] as const),
   notes: z.string().max(1000),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-  deletedAt: z.string().datetime().nullable(),
-  expenseId: z.string().uuid().nullable().optional(),
-  refundOfId: z.string().uuid().nullable().optional(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  deletedAt: z.string().nullable(),
+  expenseId: z.string().min(1).nullable().optional(),
+  refundOfId: z.string().min(1).nullable().optional(),
 }).superRefine((data, ctx) => {
   if (data.fromId === data.toId) {
     ctx.addIssue({

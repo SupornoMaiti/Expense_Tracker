@@ -294,4 +294,107 @@ describe('repositories', () => {
     const categories = await db.categories.toArray();
     expect(categories.length).toBeGreaterThan(0);
   });
+
+  it('createRefundForExpense correctly assigns payers and shares summing to amountMinor (C1)', async () => {
+    const parentId = crypto.randomUUID();
+    const alice = crypto.randomUUID();
+    const bob = crypto.randomUUID();
+    const catId = crypto.randomUUID();
+
+    // Alice paid 600, split equally between Alice (300) and Bob (300)
+    await createExpense({
+      id: parentId,
+      groupId: null,
+      description: 'Dinner Party',
+      amountMinor: 600,
+      currency: 'USD',
+      date: '01-01-2026',
+      categoryId: catId,
+      payers: [{ personId: alice, amountMinor: 600 }],
+      shares: [{ personId: alice, amountMinor: 300 }, { personId: bob, amountMinor: 300 }],
+      participantIds: [alice, bob],
+      notes: '',
+      splitType: 'equal'
+    });
+
+    // Create partial refund of 300
+    const refundId = await createRefundForExpense({
+      originalExpenseId: parentId,
+      amountMinor: 300
+    });
+
+    const refund = await db.expenses.get(refundId);
+    expect(refund).toBeDefined();
+    expect(refund?.isRefund).toBe(true);
+    expect(refund?.refundOfId).toBe(parentId);
+
+    // Payers must be derived from original payers (Alice), shares from original shares (Alice & Bob)
+    const sumPayers = refund!.payers.reduce((sum, p) => sum + p.amountMinor, 0);
+    const sumShares = refund!.shares.reduce((sum, s) => sum + s.amountMinor, 0);
+
+    expect(sumPayers).toBe(300);
+    expect(sumShares).toBe(300);
+
+    // Alice was original payer, so Alice is in refund.payers
+    expect(refund!.payers[0].personId).toBe(alice);
+    expect(refund!.payers[0].amountMinor).toBe(300);
+
+    // Shares reflect the recipients of the original expense
+    expect(refund!.shares).toHaveLength(2);
+    expect(refund!.shares.find(s => s.personId === alice)?.amountMinor).toBe(150);
+    expect(refund!.shares.find(s => s.personId === bob)?.amountMinor).toBe(150);
+  });
+
+  it('getActiveExpenses excludes soft-deleted items (H3)', async () => {
+    const id = crypto.randomUUID();
+    const p1 = crypto.randomUUID();
+    await createExpense({
+      id,
+      groupId: null,
+      description: 'Active Check',
+      amountMinor: 100,
+      currency: 'USD',
+      date: '01-01-2026',
+      categoryId: crypto.randomUUID(),
+      payers: [{ personId: p1, amountMinor: 100 }],
+      shares: [{ personId: p1, amountMinor: 100 }],
+      participantIds: [p1],
+      notes: '',
+      splitType: 'equal'
+    });
+
+    expect(await getActiveExpenses()).toHaveLength(1);
+    await softDeleteExpense(id);
+    expect(await getActiveExpenses()).toHaveLength(0);
+  });
+
+  it('restoreExpense throws when trying to restore child refund whose parent is deleted (M4)', async () => {
+    const parentId = crypto.randomUUID();
+    const p1 = crypto.randomUUID();
+    await createExpense({
+      id: parentId,
+      groupId: null,
+      description: 'Parent Expense',
+      amountMinor: 200,
+      currency: 'USD',
+      date: '01-01-2026',
+      categoryId: crypto.randomUUID(),
+      payers: [{ personId: p1, amountMinor: 200 }],
+      shares: [{ personId: p1, amountMinor: 200 }],
+      participantIds: [p1],
+      notes: '',
+      splitType: 'equal'
+    });
+
+    const refundId = await createRefundForExpense({
+      originalExpenseId: parentId,
+      amountMinor: 100
+    });
+
+    // Soft delete both
+    await softDeleteExpense(parentId);
+
+    // Attempting to restore child directly while parent is deleted should fail
+    await expect(restoreExpense(refundId)).rejects.toThrow('Cannot restore a refund whose original expense is deleted');
+  });
 });

@@ -11,6 +11,7 @@ import { Save, Download, Upload, HardDrive, MessageCircle, Trash2, RefreshCw } f
 import { useLiveQuery } from 'dexie-react-hooks';
 import ImportBackupModal from '@/components/ImportBackupModal';
 import CategoriesManager from '@/components/CategoriesManager';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 export default function SettingsPage() {
   const settings = useLiveQuery(() => db.settings.get('user_settings'));
@@ -18,6 +19,8 @@ export default function SettingsPage() {
   const [localWhatsappTemplate, setLocalWhatsappTemplate] = useState<string | null>(null);
   const [importFile, setImportFile] = useState<File | null>(null);
   const [isResetting, setIsResetting] = useState(false);
+  const [showConfirmFresh, setShowConfirmFresh] = useState(false);
+  const [showConfirmSample, setShowConfirmSample] = useState(false);
 
   const displayTemplate = localWhatsappTemplate !== null 
     ? localWhatsappTemplate 
@@ -107,9 +110,6 @@ export default function SettingsPage() {
   };
 
   const handleFreshReset = async () => {
-    if (!window.confirm('Are you sure you want to delete ALL data and start completely fresh? This cannot be undone.')) {
-      return;
-    }
     try {
       setIsResetting(true);
       await resetDatabase({ withSampleData: false });
@@ -122,9 +122,6 @@ export default function SettingsPage() {
   };
 
   const handleSampleReset = async () => {
-    if (!window.confirm('Reset all data and load fresh sample demo data with friends and transactions?')) {
-      return;
-    }
     try {
       setIsResetting(true);
       await resetDatabase({ withSampleData: true });
@@ -257,7 +254,7 @@ export default function SettingsPage() {
             <Button
               variant="destructive"
               className="flex-1 gap-2 h-11"
-              onClick={handleFreshReset}
+              onClick={() => setShowConfirmFresh(true)}
               disabled={isResetting}
             >
               <Trash2 className="h-4 w-4" />
@@ -266,7 +263,7 @@ export default function SettingsPage() {
             <Button
               variant="outline"
               className="flex-1 gap-2 h-11 border-destructive/30 hover:bg-destructive/10 text-destructive dark:text-red-400"
-              onClick={handleSampleReset}
+              onClick={() => setShowConfirmSample(true)}
               disabled={isResetting}
             >
               <RefreshCw className="h-4 w-4" />
@@ -275,6 +272,28 @@ export default function SettingsPage() {
           </div>
         </CardContent>
       </Card>
+
+      <ConfirmDialog
+        open={showConfirmFresh}
+        onOpenChange={setShowConfirmFresh}
+        title="Wipe Clean (Empty App)"
+        description="Are you sure you want to delete ALL data and start completely fresh? This cannot be undone."
+        confirmText="Delete All Data"
+        variant="destructive"
+        onConfirm={handleFreshReset}
+        isLoading={isResetting}
+      />
+
+      <ConfirmDialog
+        open={showConfirmSample}
+        onOpenChange={setShowConfirmSample}
+        title="Reset with Demo Data"
+        description="Reset all data and load fresh sample demo data with friends and transactions?"
+        confirmText="Reset with Demo Data"
+        variant="destructive"
+        onConfirm={handleSampleReset}
+        isLoading={isResetting}
+      />
 
       {importFile && (
         <ImportBackupModal 

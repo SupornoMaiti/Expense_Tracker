@@ -4,6 +4,7 @@ import { ensureMe, ensureDefaultCategories } from '../db/repositories';
 
 export function useDBInit() {
   const [isInitialized, setIsInitialized] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     async function init() {
@@ -24,20 +25,15 @@ export function useDBInit() {
           });
         }
 
-        // const friendCount = await db.people.filter(p => !p.isMe && !p.deletedAt).count();
-        // if (friendCount === 0) {
-        //   await seedSampleData();
-        // }
-
         setIsInitialized(true);
       } catch (err) {
         console.error('Failed to initialize local DB:', err);
-        setIsInitialized(true); 
+        setError(err instanceof Error ? err : new Error(String(err)));
       }
     }
     
     init();
   }, []);
 
-  return isInitialized;
+  return { isInitialized, error };
 }

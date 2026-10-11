@@ -48,12 +48,20 @@ describe("Backup Import/Export", () => {
       expenses: [
         {
           id: "e1",
+          groupId: null,
           description: "Tea",
           amountMinor: 50,
           currency: "INR",
-          payers: [],
-          shares: [],
-          participantIds: [],
+          date: "01-01-2026",
+          categoryId: "c1",
+          payers: [{ personId: "p1", amountMinor: 50 }],
+          shares: [{ personId: "p1", amountMinor: 50 }],
+          participantIds: ["p1"],
+          notes: "",
+          splitType: "equal",
+          createdAt: "2026-01-01T00:00:00Z",
+          updatedAt: "2026-01-01T00:00:00Z",
+          deletedAt: null,
         },
       ],
       settlements: [],
@@ -248,8 +256,9 @@ describe("Backup Import/Export", () => {
     render(<ImportBackupModal file={file} onClose={() => {}} />);
     await screen.findByText("Backup Valid");
 
-    vi.spyOn(window, "confirm").mockReturnValue(true);
     fireEvent.click(screen.getByText("Replace All Data"));
+    const confirmBtn = await screen.findByText("Replace Everything");
+    fireEvent.click(confirmBtn);
 
     await new Promise((r) => setTimeout(r, 200));
 

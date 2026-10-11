@@ -1,35 +1,36 @@
 # Graph Report - Finance Tracker  (2026-10-12)
 
 ## Corpus Check
-- cluster-only mode — file stats not available
+- 128 files · ~61,634 words
+- Verdict: corpus is large enough that graph structure adds value.
+- Unclassified: 6 file(s) not represented in the graph (top: (none) 4, .example 1, .css 1)
 
 ## Summary
-- 523 nodes · 1372 edges · 28 communities (20 shown, 8 thin omitted)
-- Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
+- 670 nodes · 1624 edges · 52 communities (43 shown, 9 thin omitted)
+- Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 4 edges (avg confidence: 0.95)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `0c5c88ee`
+- Built from commit: `7ac855bb`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- PersonDetail.tsx
+- repositories.ts
 - db.ts
-- AddFriendModal.tsx
-- react
+- Button
 - App.tsx
 - package.json
 - devDependencies
-- repositories.ts
+- schemas.ts
 - components.json
 - dependencies
 - compilerOptions
 - compilerOptions
 - drawer.tsx
 - chart.tsx
-- dropdown-menu.tsx
-- sheet.tsx
+- PersonDetail.tsx
+- AddExpenseModal.tsx
 - navigation-menu.tsx
 - notifications.test.mjs
 - scripts
@@ -40,55 +41,74 @@
 - final_check.sh
 - final_check2.sh
 - vercel.json
+- SplitLocal Release Checklist
+- Deployment Guide
+- SplitLocal
+- 13192bc19f0d056b2e66bfc262a518f3f6faf52d.md
+- 1ed0fe24fa9a77afb5e6456b91c8fb749cd3bd8c.md
+- 2d2a74d3f3efa7a52b9a25cf81046a9c4d3da270.md
+- 396f3b1f68f1a9a15f72fbef9cc3afc4f266bb0b.md
+- 7e97f9149152ebbc438e96f9b9e16d29d892d405.md
+- 7eda87c2b3dd3549d3213be8044418f1ff50f47a.md
+- 8e8edaa46fb609a4fa0ab278f60be96f66dd63da.md
+- bad59519a4560ea9322e19b8a1bd375c8f5794a3.md
+- d6e502dbc93ef0e7953d2ac6277b7b96ce4c5dec.md
+- da62474d527da4cc42e8242085a66fa80171f899.md
+- responsive-Responsive-over-0a13e-route-activity-for-overlaps-chromium/error-context.md
+- responsive-Responsive-over-2d9be--route-friends-for-overlaps-chromium/error-context.md
+- responsive-Responsive-over-2f9fb-route-activity-for-overlaps-chromium/error-context.md
+- responsive-Responsive-over-51d73-0-checks-route-for-overlaps-chromium/error-context.md
+- responsive-Responsive-over-8786b-route-insights-for-overlaps-chromium/error-context.md
+- responsive-Responsive-over-b1a87-2-checks-route-for-overlaps-chromium/error-context.md
+- responsive-Responsive-over-bf02e-route-settings-for-overlaps-chromium/error-context.md
+- responsive-Responsive-over-d1af3-route-settings-for-overlaps-chromium/error-context.md
+- responsive-Responsive-over-dcb70--route-friends-for-overlaps-chromium/error-context.md
+- responsive-Responsive-over-eebee-route-insights-for-overlaps-chromium/error-context.md
 
 ## God Nodes (most connected - your core abstractions)
-1. `Button()` - 39 edges
-2. `react` - 33 edges
-3. `PersonDetail()` - 25 edges
-4. `cn` - 24 edges
-5. `lucide-react` - 24 edges
-6. `db` - 23 edges
-7. `Analyze()` - 21 edges
-8. `SettleUp()` - 21 edges
-9. `Dashboard()` - 19 edges
-10. `vitest` - 19 edges
+1. `Button()` - 51 edges
+2. `react` - 36 edges
+3. `lucide-react` - 29 edges
+4. `db` - 27 edges
+5. `cn` - 24 edges
+6. `Expense` - 23 edges
+7. `vitest` - 21 edges
+8. `Analyze()` - 21 edges
+9. `Dashboard()` - 21 edges
+10. `SettleUp()` - 21 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `Phase 1: Money Logic Audit` --references--> `parseDecimalToMinor()`  [INFERRED]
+  AUDIT_REPORT.md → src/lib/money.ts
+- `2. Solution Plan` --references--> `computePairwiseBalance()`  [INFERRED]
+  src/scratchpad.md → src/domain/ledger.ts
+- `A. Settle Logic Issues` --references--> `simplifyDebts()`  [INFERRED]
+  src/scratchpad.md → src/domain/ledger.ts
 - `run()` --calls--> `ensureMe()`  [EXTRACTED]
   test_ensureme.ts → src/db/repositories.ts
-- `bench()` --calls--> `calculateShares()`  [EXTRACTED]
-  bench.ts → src/domain/allocation.ts
-- `bench()` --calls--> `computeBalances()`  [EXTRACTED]
-  bench.ts → src/domain/ledger.ts
-- `seedAndMeasure()` --calls--> `calculateShares()`  [EXTRACTED]
-  seed-measure.ts → src/domain/allocation.ts
-- `seedAndMeasure()` --calls--> `computeBalances()`  [EXTRACTED]
-  seed-measure.ts → src/domain/ledger.ts
+- `A. Settle Logic Issues` --references--> `PersonDetail()`  [INFERRED]
+  src/scratchpad.md → src/pages/PersonDetail.tsx
 
 ## Import Cycles
 - None detected.
 
-## Communities (28 total, 8 thin omitted)
+## Communities (52 total, 9 thin omitted)
 
-### Community 0 - "PersonDetail.tsx"
-Cohesion: 0.10
-Nodes (52): dexie-react-hooks, react-router-dom, sonner, AddExpenseModal(), Props, AddRefundModal(), Alert(), AlertDescription() (+44 more)
+### Community 0 - "repositories.ts"
+Cohesion: 0.09
+Nodes (54): dexie-react-hooks, fake-indexeddb, lucide-react, react, react-router-dom, sonner, CategoriesManager(), COLOR_PRESETS (+46 more)
 
 ### Community 1 - "db.ts"
-Cohesion: 0.08
-Nodes (36): bench(), fake-indexeddb, @testing-library/react, vitest, seedAndMeasure(), Props, db, exportBackup() (+28 more)
+Cohesion: 0.09
+Nodes (35): bench(), @testing-library/react, vitest, seedAndMeasure(), PersonActivityFeedProps, PersonBalanceSummaryProps, exportBackup(), importBackup() (+27 more)
 
-### Community 2 - "AddFriendModal.tsx"
-Cohesion: 0.08
-Nodes (29): @base-ui/react, class-variance-authority, cn, AddFriendModal(), COLORS, EditFriendModal(), ImportBackupModal(), ImportBackupModalProps (+21 more)
-
-### Community 3 - "react"
-Cohesion: 0.15
-Nodes (12): react, CategoriesManager(), COLOR_PRESETS, EMOJI_PRESETS, Card(), CardContent(), CardDescription(), CardHeader() (+4 more)
+### Community 2 - "Button"
+Cohesion: 0.10
+Nodes (36): @base-ui/react, class-variance-authority, cn, AddFriendModal(), COLORS, EditFriendModal(), ImportBackupModal(), ImportBackupModalProps (+28 more)
 
 ### Community 4 - "App.tsx"
-Cohesion: 0.12
-Nodes (16): lucide-react, react-dom, App(), AppShell(), NAV_ITEMS, ScrollToTop(), initialState, Theme (+8 more)
+Cohesion: 0.09
+Nodes (18): react-dom, App(), AppShell(), NAV_ITEMS, ScrollToTop(), ErrorBoundary, Props, State (+10 more)
 
 ### Community 5 - "package.json"
 Cohesion: 0.08
@@ -98,9 +118,9 @@ Nodes (25): name, private, type, version, autoprefixer, clsx, date-fns, dexie (+
 Cohesion: 0.08
 Nodes (26): devDependencies, autoprefixer, clsx, eslint, @eslint/js, eslint-plugin-react-hooks, eslint-plugin-react-refresh, fake-indexeddb (+18 more)
 
-### Community 7 - "repositories.ts"
-Cohesion: 0.14
-Nodes (18): zod, createRefundForSettlement(), DEFAULT_CATEGORIES, ensureDefaultCategories(), ensureMe(), resetDatabase(), seedSampleData(), AmountMinorSchema (+10 more)
+### Community 7 - "schemas.ts"
+Cohesion: 0.22
+Nodes (8): zod, AmountMinorSchema, CurrencySchema, DateSchema, ExpensePayerSchema, ExpenseSchema, ExpenseShareSchema, SettlementSchema
 
 ### Community 8 - "components.json"
 Cohesion: 0.09
@@ -126,9 +146,13 @@ Nodes (7): DrawerContent(), DrawerContext, DrawerContextProps, DrawerOverlay(), 
 Cohesion: 0.20
 Nodes (13): recharts, ChartConfig, ChartContainer(), ChartContext, ChartContextProps, ChartLegendContent(), ChartStyle(), ChartTooltipContent() (+5 more)
 
-### Community 15 - "sheet.tsx"
-Cohesion: 0.22
-Nodes (3): SheetContent(), SheetOverlay(), SheetPortal()
+### Community 14 - "PersonDetail.tsx"
+Cohesion: 0.09
+Nodes (18): PersonBalanceSummary(), PersonHeader(), PersonHeaderProps, Alert(), AlertDescription(), AlertTitle(), alertVariants, DropdownMenu() (+10 more)
+
+### Community 15 - "AddExpenseModal.tsx"
+Cohesion: 0.09
+Nodes (28): Phase 0: Baseline & Dependencies, Phase 1: Money Logic Audit, Phase 2: Database Audit, Phase 3: Import / Export Audit, Phase 4: WhatsApp Reminder Audit, Phase 5: PWA / Offline Audit, SplitLocal Pre-release Audit Report, Summary Table (+20 more)
 
 ### Community 16 - "navigation-menu.tsx"
 Cohesion: 0.24
@@ -150,25 +174,117 @@ Nodes (3): @playwright/test, ROUTES, VIEWPORTS
 Cohesion: 0.40
 Nodes (3): vite, vite-plugin-pwa, @vitejs/plugin-react
 
+### Community 28 - "SplitLocal Release Checklist"
+Cohesion: 0.22
+Nodes (8): 1. Installation & PWA Manifest Check, 2. Airplane Mode (Offline) Test, 3. Contact Import Test, 4. WhatsApp Reminder Test, 5. Export / Restore Backup Flow, 6. Edge Case and Crash Recovery, SplitLocal Release Checklist, Verdict
+
+### Community 29 - "Deployment Guide"
+Cohesion: 0.29
+Nodes (6): 1. Build, 2. Hosting, 3. WARNING: Domain Changes and IndexedDB, 4. Service Worker Updates, Deployment Guide, HTTP Rules (Required)
+
+### Community 31 - "SplitLocal"
+Cohesion: 0.33
+Nodes (5): Architecture, Development, Features, Known Limitations, SplitLocal
+
+### Community 32 - "13192bc19f0d056b2e66bfc262a518f3f6faf52d.md"
+Cohesion: 0.50
+Nodes (3): Error details, Instructions, Test info
+
+### Community 33 - "1ed0fe24fa9a77afb5e6456b91c8fb749cd3bd8c.md"
+Cohesion: 0.50
+Nodes (3): Error details, Instructions, Test info
+
+### Community 34 - "2d2a74d3f3efa7a52b9a25cf81046a9c4d3da270.md"
+Cohesion: 0.50
+Nodes (3): Error details, Instructions, Test info
+
+### Community 35 - "396f3b1f68f1a9a15f72fbef9cc3afc4f266bb0b.md"
+Cohesion: 0.50
+Nodes (3): Error details, Instructions, Test info
+
+### Community 36 - "7e97f9149152ebbc438e96f9b9e16d29d892d405.md"
+Cohesion: 0.50
+Nodes (3): Error details, Instructions, Test info
+
+### Community 37 - "7eda87c2b3dd3549d3213be8044418f1ff50f47a.md"
+Cohesion: 0.50
+Nodes (3): Error details, Instructions, Test info
+
+### Community 38 - "8e8edaa46fb609a4fa0ab278f60be96f66dd63da.md"
+Cohesion: 0.50
+Nodes (3): Error details, Instructions, Test info
+
+### Community 39 - "bad59519a4560ea9322e19b8a1bd375c8f5794a3.md"
+Cohesion: 0.50
+Nodes (3): Error details, Instructions, Test info
+
+### Community 40 - "d6e502dbc93ef0e7953d2ac6277b7b96ce4c5dec.md"
+Cohesion: 0.50
+Nodes (3): Error details, Instructions, Test info
+
+### Community 41 - "da62474d527da4cc42e8242085a66fa80171f899.md"
+Cohesion: 0.50
+Nodes (3): Error details, Instructions, Test info
+
+### Community 42 - "responsive-Responsive-over-0a13e-route-activity-for-overlaps-chromium/error-context.md"
+Cohesion: 0.50
+Nodes (3): Error details, Instructions, Test info
+
+### Community 43 - "responsive-Responsive-over-2d9be--route-friends-for-overlaps-chromium/error-context.md"
+Cohesion: 0.50
+Nodes (3): Error details, Instructions, Test info
+
+### Community 44 - "responsive-Responsive-over-2f9fb-route-activity-for-overlaps-chromium/error-context.md"
+Cohesion: 0.50
+Nodes (3): Error details, Instructions, Test info
+
+### Community 45 - "responsive-Responsive-over-51d73-0-checks-route-for-overlaps-chromium/error-context.md"
+Cohesion: 0.50
+Nodes (3): Error details, Instructions, Test info
+
+### Community 46 - "responsive-Responsive-over-8786b-route-insights-for-overlaps-chromium/error-context.md"
+Cohesion: 0.50
+Nodes (3): Error details, Instructions, Test info
+
+### Community 47 - "responsive-Responsive-over-b1a87-2-checks-route-for-overlaps-chromium/error-context.md"
+Cohesion: 0.50
+Nodes (3): Error details, Instructions, Test info
+
+### Community 48 - "responsive-Responsive-over-bf02e-route-settings-for-overlaps-chromium/error-context.md"
+Cohesion: 0.50
+Nodes (3): Error details, Instructions, Test info
+
+### Community 49 - "responsive-Responsive-over-d1af3-route-settings-for-overlaps-chromium/error-context.md"
+Cohesion: 0.50
+Nodes (3): Error details, Instructions, Test info
+
+### Community 50 - "responsive-Responsive-over-dcb70--route-friends-for-overlaps-chromium/error-context.md"
+Cohesion: 0.50
+Nodes (3): Error details, Instructions, Test info
+
+### Community 51 - "responsive-Responsive-over-eebee-route-insights-for-overlaps-chromium/error-context.md"
+Cohesion: 0.50
+Nodes (3): Error details, Instructions, Test info
+
 ## Knowledge Gaps
-- **18 isolated node(s):** `autoprefixer`, `clsx`, `date-fns`, `framer-motion`, `@hookform/resolvers` (+13 more)
-  These have ≤1 connection - possible missing edges. (Counts symbols only; 257 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **8 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **18 isolated node(s):** `@hookform/resolvers`, `date-fns`, `framer-motion`, `react-hook-form`, `shadcn` (+13 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 354 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **9 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `react` connect `react` to `PersonDetail.tsx`, `AddFriendModal.tsx`, `App.tsx`, `package.json`, `repositories.ts`, `drawer.tsx`, `chart.tsx`, `dropdown-menu.tsx`, `sheet.tsx`?**
-  _High betweenness centrality (0.144) - this node is a cross-community bridge._
-- **What connects `autoprefixer`, `clsx`, `date-fns` to the rest of the system?**
+- **Why does `react` connect `repositories.ts` to `Button`, `table.tsx`, `App.tsx`, `package.json`, `drawer.tsx`, `chart.tsx`, `PersonDetail.tsx`, `AddExpenseModal.tsx`, `avatar.tsx`?**
+  _High betweenness centrality (0.106) - this node is a cross-community bridge._
+- **What connects `@hookform/resolvers`, `date-fns`, `framer-motion` to the rest of the system?**
   _18 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `PersonDetail.tsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.10491228070175439 - nodes in this community are weakly interconnected._
+- **Should `repositories.ts` be split into smaller, more focused modules?**
+  _Cohesion score 0.09195402298850575 - nodes in this community are weakly interconnected._
 - **Why does `devDependencies` connect `devDependencies` to `package.json`?**
-  _High betweenness centrality (0.079) - this node is a cross-community bridge._
+  _High betweenness centrality (0.053) - this node is a cross-community bridge._
 - **Should `db.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.08005427408412483 - nodes in this community are weakly interconnected._
-- **Why does `cn` connect `AddFriendModal.tsx` to `PersonDetail.tsx`, `react`, `App.tsx`, `package.json`, `drawer.tsx`, `chart.tsx`, `dropdown-menu.tsx`, `sheet.tsx`, `navigation-menu.tsx`?**
-  _High betweenness centrality (0.076) - this node is a cross-community bridge._
-- **Should `AddFriendModal.tsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.08315863032844165 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08671328671328671 - nodes in this community are weakly interconnected._
+- **Why does `lucide-react` connect `repositories.ts` to `db.ts`, `Button`, `App.tsx`, `package.json`, `PersonDetail.tsx`, `AddExpenseModal.tsx`, `navigation-menu.tsx`?**
+  _High betweenness centrality (0.053) - this node is a cross-community bridge._
+- **Should `Button` be split into smaller, more focused modules?**
+  _Cohesion score 0.09585037989479836 - nodes in this community are weakly interconnected._

@@ -2,18 +2,19 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/db';
 import { formatMoney } from '../lib/money';
 import { formatDisplayDate } from '../lib/date';
-import { Clock, Users, IndianRupee, Undo2, Search, Trash2, RotateCcw } from 'lucide-react';
+import { Clock, Users, Undo2, Search, Trash2, RotateCcw } from 'lucide-react';
+import CurrencyIcon from '@/components/ui/CurrencyIcon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { restoreExpense, softDeleteExpense, softDeleteSettlement, restoreSettlement } from '../db/repositories';
+import { getActiveExpenses, getActiveSettlements, restoreExpense, softDeleteExpense, softDeleteSettlement, restoreSettlement } from '../db/repositories';
 import AddRefundModal from '../components/AddRefundModal';
 
 export default function Activity() {
-  const expenses = useLiveQuery(() => db.expenses.toArray());
-  const settlements = useLiveQuery(() => db.settlements.toArray());
+  const expenses = useLiveQuery(() => getActiveExpenses());
+  const settlements = useLiveQuery(() => getActiveSettlements());
   const reminders = useLiveQuery(() => db.reminders.toArray());
   const people = useLiveQuery(() => db.people.toArray());
   const settings = useLiveQuery(() => db.settings.get('user_settings'));
@@ -204,7 +205,7 @@ export default function Activity() {
                 <div key={settlement.id} className={`flex items-center justify-between p-4 bg-card rounded-lg border shadow-sm ${isDeleted ? 'opacity-50' : ''}`}>
                   <div className="flex items-center gap-4 min-w-0 flex-1 mr-3">
                     <div className="p-2 rounded-full bg-green-100 text-green-600 dark:bg-green-900/30 shrink-0">
-                      <IndianRupee className="h-4 w-4" />
+                      <CurrencyIcon currency={settlement.currency || settings?.defaultCurrency} className="h-4 w-4" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className={`font-medium truncate ${isDeleted ? 'line-through text-muted-foreground' : ''}`}>

@@ -305,5 +305,63 @@ describe('ledger', () => {
       // D owes A 0
       expect(computePairwiseBalance([exp1, exp2], [], 'A', 'D', 'INR')).toBe(0);
     });
+
+    it('computeBalances does not throw on imbalanced data and logs a warning (C2)', async () => {
+      const { vi } = await import('vitest');
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const badExpense: Expense = {
+        id: 'bad1',
+        groupId: null,
+        description: 'Imbalanced',
+        amountMinor: 100,
+        currency: 'EUR',
+        date: '2026-01-01',
+        categoryId: 'c1',
+        payers: [{ personId: 'A', amountMinor: 100 }],
+        shares: [{ personId: 'B', amountMinor: 90 }], // 10 minor units drift
+        participantIds: ['A', 'B'],
+        notes: '',
+        splitType: 'exact',
+        createdAt: '',
+        updatedAt: '',
+        deletedAt: null
+      };
+
+      expect(() => computeBalances([badExpense], [])).not.toThrow();
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Invariant warning'));
+      warnSpy.mockRestore();
+    });
+
+    it('getExpensePairwiseImpact distributes shares without rounding artifacts using largest remainder (L1)', async () => {
+      const { getExpensePairwiseImpact } = await import('../ledger');
+      // 1000 minor units split 3 ways: 334, 333, 333
+      const exp: Expense = {
+        id: 'e1',
+        groupId: null,
+        description: 'Dinner',
+        amountMinor: 1000,
+        currency: 'USD',
+        date: '2026-01-01',
+        categoryId: 'c1',
+        payers: [{ personId: 'A', amountMinor: 1000 }],
+        shares: [
+          { personId: 'A', amountMinor: 334 },
+          { personId: 'B', amountMinor: 333 },
+          { personId: 'C', amountMinor: 333 }
+        ],
+        participantIds: ['A', 'B', 'C'],
+        notes: '',
+        splitType: 'equal',
+        createdAt: '',
+        updatedAt: '',
+        deletedAt: null
+      };
+
+      const impactB = getExpensePairwiseImpact(exp, 'A', 'B');
+      const impactC = getExpensePairwiseImpact(exp, 'A', 'C');
+      expect(impactB).toBe(333);
+      expect(impactC).toBe(333);
+      expect(impactB + impactC + 334).toBe(1000);
+    });
   });
 });

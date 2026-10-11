@@ -1,4 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks';
+import { db } from '../db/db';
 import { getActiveExpenses, getActiveSettlements, getActivePeople, softDeleteExpense, softDeleteSettlement, restoreExpense, restoreSettlement } from '../db/repositories';
 import { computePairwiseBalance } from '../domain/ledger';
 import { formatMoney } from '../lib/money';
@@ -6,11 +7,15 @@ import { computeAnalyze } from '../domain/analyze';
 import { formatDisplayDate } from '../lib/date';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { IndianRupee, ArrowDownLeft, ArrowUpRight, Clock, Users, ArrowRight, Trash2 } from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight, Clock, Users, ArrowRight, Trash2 } from 'lucide-react';
+import CurrencyIcon from '@/components/ui/CurrencyIcon';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
 export default function Dashboard() {
+  const settingsArray = useLiveQuery(() => db.settings.toArray()) || [];
+  const currency = settingsArray[0]?.defaultCurrency || 'INR';
+
   const expenses = useLiveQuery(() => getActiveExpenses()) || [];
   const settlements = useLiveQuery(() => getActiveSettlements()) || [];
   const people = useLiveQuery(() => getActivePeople()) || [];
@@ -24,7 +29,7 @@ export default function Dashboard() {
   if (myId) {
     const friends = people.filter(p => !p.isMe);
     for (const friend of friends) {
-      const bal = computePairwiseBalance(expenses, settlements, myId, friend.id, 'INR');
+      const bal = computePairwiseBalance(expenses, settlements, myId, friend.id, currency);
       if (bal > 0) totalOwedToMe += bal;
       if (bal < 0) totalIOwe += Math.abs(bal);
     }
@@ -39,7 +44,7 @@ export default function Dashboard() {
   ).slice(0, 5);
 
 
-  const analyzeResult = myId ? computeAnalyze(expenses, myId, 'INR', 'all') : null;
+  const analyzeResult = myId ? computeAnalyze(expenses, myId, currency, 'all') : null;
   const totalSpendThisMonth = analyzeResult ? analyzeResult.totalSpendMinor : 0;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -84,12 +89,12 @@ export default function Dashboard() {
               Total Expense
             </CardTitle>
             <div className="p-2 rounded-xl bg-primary/10 text-primary">
-              <IndianRupee className="h-4 w-4" />
+              <CurrencyIcon currency={currency} className="h-4 w-4" />
             </div>
           </CardHeader>
           <CardContent className="space-y-0.5 pt-1">
             <div className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground truncate">
-              {formatMoney(totalSpendThisMonth)}
+              {formatMoney(totalSpendThisMonth, currency)}
             </div>
             <p className="text-xs text-muted-foreground">
               All-time spending
@@ -109,7 +114,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent className="space-y-0.5 pt-1">
             <div className="text-2xl sm:text-3xl font-extrabold tracking-tight text-emerald-600 dark:text-emerald-400 truncate">
-              {formatMoney(totalOwedToMe)}
+              {formatMoney(totalOwedToMe, currency)}
             </div>
             <p className="text-xs text-muted-foreground">
               {totalOwedToMe > 0 ? 'Friends owe you' : 'All debts settled'}
@@ -129,7 +134,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent className="space-y-0.5 pt-1">
             <div className="text-2xl sm:text-3xl font-extrabold tracking-tight text-rose-600 dark:text-rose-400 truncate">
-              {formatMoney(totalIOwe)}
+              {formatMoney(totalIOwe, currency)}
             </div>
             <p className="text-xs text-muted-foreground">
               {totalIOwe > 0 ? 'You need to settle' : 'You have 0 debts'}
@@ -160,7 +165,7 @@ export default function Dashboard() {
               <div key={item.id} className="flex items-center justify-between p-4 bg-card rounded-lg border shadow-sm">
                 <div className="flex items-center gap-4 min-w-0 flex-1 mr-3">
                   <div className={`p-2 rounded-full shrink-0 ${'description' in item ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30' : 'bg-green-100 text-green-600 dark:bg-green-900/30'}`}>
-                    {'description' in item ? <Users className="h-4 w-4" /> : <IndianRupee className="h-4 w-4" />}
+                    {'description' in item ? <Users className="h-4 w-4" /> : <CurrencyIcon currency={item.currency || currency} className="h-4 w-4" />}
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="font-medium truncate">
@@ -173,7 +178,7 @@ export default function Dashboard() {
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
                   <div className="font-semibold text-right">
-                    {formatMoney(item.amountMinor)}
+                    {formatMoney(item.amountMinor, item.currency || currency)}
                   </div>
                   <Button
                     variant="ghost"

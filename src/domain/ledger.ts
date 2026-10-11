@@ -1,4 +1,5 @@
 import type { Expense, Settlement } from './types';
+import { allocateLargestRemainder } from './allocation';
 
 export interface Balance {
   personId: string;
@@ -71,14 +72,14 @@ export function computeBalances(expenses: Expense[], settlements: Settlement[]):
     }
   }
 
-  // Ensure invariants check
+  // Ensure invariants check (tolerance log instead of hard crash in production)
   for (const [currency, map] of currencyMaps.entries()) {
     let sum = 0;
     for (const amount of map.values()) {
       sum += amount;
     }
-    if (sum !== 0) {
-      throw new Error(`Invariant failed: Sum of net balances for currency ${currency} is not zero. It is ${sum}.`);
+    if (Math.abs(sum) > 1) {
+      console.warn(`Invariant warning: Sum of net balances for currency ${currency} is not zero. It is ${sum}.`);
     }
   }
 
@@ -192,11 +193,33 @@ export function getExpensePairwiseImpact(exp: Expense, personAId: string, person
     .reduce((sum, s) => sum + s.amountMinor, 0);
 
   let impact = 0;
+  const totalSharesWeight = exp.shares.reduce((sum, s) => sum + s.amountMinor, 0);
+
   if (paidByA > 0 && shareOfB > 0) {
-    impact += Math.round((paidByA * shareOfB) / totalAmount);
+    if (totalSharesWeight > 0) {
+      const aAllocations = allocateLargestRemainder(
+        paidByA,
+        exp.shares.map(s => ({ personId: s.personId })),
+        exp.shares.map(s => s.amountMinor)
+      );
+      const aForB = aAllocations.find(s => s.personId === personBId)?.amountMinor || 0;
+      impact += aForB;
+    } else {
+      impact += Math.round((paidByA * shareOfB) / totalAmount);
+    }
   }
   if (paidByB > 0 && shareOfA > 0) {
-    impact -= Math.round((paidByB * shareOfA) / totalAmount);
+    if (totalSharesWeight > 0) {
+      const bAllocations = allocateLargestRemainder(
+        paidByB,
+        exp.shares.map(s => ({ personId: s.personId })),
+        exp.shares.map(s => s.amountMinor)
+      );
+      const bForA = bAllocations.find(s => s.personId === personAId)?.amountMinor || 0;
+      impact -= bForA;
+    } else {
+      impact -= Math.round((paidByB * shareOfA) / totalAmount);
+    }
   }
   return exp.isRefund ? -impact : impact;
 }

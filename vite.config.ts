@@ -12,6 +12,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.png', 'icons/*.png'],
       manifest: {
+        id: '/',
+        scope: '/',
+        display_override: ['window-controls-overlay', 'standalone'],
         name: 'SplitLocal',
         short_name: 'SplitLocal',
         description: 'Offline-first personal expense & debt tracker',
@@ -41,6 +44,8 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,ttf}'],
+        navigateFallback: 'index.html',
+        navigateFallbackDenylist: [/^\/api\//],
       },
     }),
   ],

@@ -6,6 +6,8 @@ import { db } from '../db/db';
 import { ensureMe } from '../db/repositories';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import { formatDisplayDate } from '../lib/date';
+import { ExpenseSchema, SettlementSchema } from '../domain/schemas';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 interface ImportBackupModalProps {
   file: File | null;
@@ -23,6 +25,7 @@ export default function ImportBackupModal({ file, onClose }: ImportBackupModalPr
   const [error, setError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasValidated, setHasValidated] = useState(false);
+  const [showConfirmReplace, setShowConfirmReplace] = useState(false);
 
   useEffect(() => {
     if (!file) return;
@@ -55,6 +58,14 @@ export default function ImportBackupModal({ file, onClose }: ImportBackupModalPr
         const pd = parsed.data;
         if (!Array.isArray(pd.people) || !Array.isArray(pd.expenses) || !Array.isArray(pd.settlements)) {
           throw new Error('Missing required arrays (people, expenses, settlements)');
+        }
+
+        // Schema validation for critical records
+        for (const exp of pd.expenses) {
+          ExpenseSchema.parse(exp);
+        }
+        for (const set of pd.settlements) {
+          SettlementSchema.parse(set);
         }
 
         // Deduplicate logic for summary
@@ -130,9 +141,8 @@ export default function ImportBackupModal({ file, onClose }: ImportBackupModalPr
     }
   };
 
-  const doReplace = async () => {
+  const executeReplace = async () => {
     if (!summary?.parsedData) return;
-    if (!window.confirm('This will wipe all existing data and replace it entirely. Are you sure?')) return;
     setIsProcessing(true);
     try {
       const pd = summary.parsedData;
@@ -233,7 +243,7 @@ export default function ImportBackupModal({ file, onClose }: ImportBackupModalPr
           <Button variant="outline" onClick={onClose} disabled={isProcessing}>Cancel</Button>
           {summary && !error && (
             <>
-              <Button variant="destructive" onClick={doReplace} disabled={isProcessing}>
+              <Button variant="destructive" onClick={() => setShowConfirmReplace(true)} disabled={isProcessing}>
                 Replace All Data
               </Button>
               <Button variant="default" onClick={doMerge} disabled={isProcessing}>
@@ -243,6 +253,17 @@ export default function ImportBackupModal({ file, onClose }: ImportBackupModalPr
           )}
         </DialogFooter>
       </DialogContent>
+
+      <ConfirmDialog
+        open={showConfirmReplace}
+        onOpenChange={setShowConfirmReplace}
+        title="Replace All Data"
+        description="This will wipe all existing data and replace it entirely with the backup file. Are you sure you want to proceed?"
+        confirmText="Replace Everything"
+        variant="destructive"
+        onConfirm={executeReplace}
+        isLoading={isProcessing}
+      />
     </Dialog>
   );
 }
