@@ -18,7 +18,7 @@ export function useDBInit() {
             id: 'user_settings',
             defaultCurrency: 'INR',
             defaultCountryCode: '+91',
-            whatsappTemplate: 'Hi {name}, here is your pending balance:\n\n{breakdown}\n\nTotal pending: {amount}',
+            whatsappTemplate: 'Hi {name}, here is our balance breakdown:\n\n{breakdown}\n\nTotal: {amount}',
             theme: 'system',
             lastBackupAt: null
           });

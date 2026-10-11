@@ -3,6 +3,40 @@ import { formatMoney } from './money';
 import { getExpensePairwiseImpact } from '../domain/ledger';
 import { generateId } from './utils';
 
+export function formatWhatsAppDate(dateStr: string): string {
+  if (!dateStr) return '';
+  const parts = dateStr.split('-');
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  let year = '';
+  let month = '';
+  let day = '';
+
+  if (parts.length === 3) {
+    if (parts[0].length === 4) {
+      // YYYY-MM-DD
+      year = parts[0];
+      month = parts[1];
+      day = parts[2];
+    } else if (parts[2].length === 4) {
+      // DD-MM-YYYY
+      day = parts[0];
+      month = parts[1];
+      year = parts[2];
+    }
+  }
+
+  if (year && month && day) {
+    const mIdx = parseInt(month, 10) - 1;
+    const mName = months[mIdx] || month;
+    const dNum = parseInt(day, 10);
+    const yShort = year.slice(-2);
+    return `${dNum} ${mName} ${yShort}`;
+  }
+
+  return dateStr;
+}
+
 export function buildReminderMessage(
   friend: Person,
   myId: string,
@@ -69,13 +103,6 @@ export function buildReminderMessage(
   }
 
   const finalOwed = oldOwed;
-  const formatDate = (dateStr: string) => {
-    const parts = dateStr.split('-');
-    if (parts.length === 3 && parts[0].length === 4) {
-      return `${parts[2]}-${parts[1]}-${parts[0]}`;
-    }
-    return dateStr;
-  };
 
   const groups = new Map<string, typeof activeLines>();
   for (const line of activeLines) {
@@ -93,9 +120,11 @@ export function buildReminderMessage(
     const d = dateKeys[i];
     const lines = groups.get(d)!;
     
-    let block = `---${formatDate(d)}---`;
+    let block = `---${formatWhatsAppDate(d)}---`;
     for (const l of lines) {
-      block += `\n${l.desc} - ${formatMoney(l.amountMinor, currency)}`;
+      const sign = l.amountMinor > 0 ? '+' : '-';
+      const formattedAmt = formatMoney(Math.abs(l.amountMinor), currency);
+      block += `\n${sign}${formattedAmt} [${l.desc}]`;
     }
     
     if (currentLength + block.length > 1300 && blocks.length > 0) {
@@ -113,11 +142,24 @@ export function buildReminderMessage(
   }
   breakdown += blocks.join('\n').trim();
 
-  const tmpl = settings.whatsappTemplate || 'Hi {name}, here is your pending balance:\n\n{breakdown}\n\nTotal pending: {amount}';
-  const amountStr = formatMoney(finalOwed, currency);
+  let totalSummary = '';
+  if (finalOwed > 0) {
+    totalSummary = `You owe me ${formatMoney(finalOwed, currency)}`;
+  } else if (finalOwed < 0) {
+    totalSummary = `I owe you ${formatMoney(Math.abs(finalOwed), currency)}`;
+  } else {
+    totalSummary = `All settled up (${formatMoney(0, currency)})`;
+  }
+
+  let tmpl = settings.whatsappTemplate || 'Hi {name}, here is our balance breakdown:\n\n{breakdown}\n\nTotal: {amount}';
+  tmpl = tmpl.replace('Total pending: {amount}', 'Total: {amount}');
+
   let message = tmpl
     .replace('{name}', friend.name)
-    .replace('{amount}', amountStr)
+    .replace('{amount}', totalSummary)
+    .replace('{total}', totalSummary)
+    .replace('{status}', totalSummary)
+    .replace('{net_total}', totalSummary)
     .replace('{currency}', currency)
     .replace('{breakdown}', breakdown);
     
