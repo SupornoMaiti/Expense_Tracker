@@ -12,6 +12,7 @@ import {
 } from '../db/repositories';
 import { computePairwiseBalance, getExpensePairwiseImpact } from '../domain/ledger';
 import { formatMoney } from '../lib/money';
+import { formatDisplayDate } from '../lib/date';
 import { sendWhatsAppReminder } from '../lib/whatsapp';
 import type { Reminder, Expense, Settlement } from '../domain/types';
 import { Button } from '@/components/ui/button';
@@ -454,7 +455,7 @@ export default function PersonDetail() {
                           )}
                         </div>
                         <p className="text-xs text-muted-foreground mt-0.5">
-                          {payerSummary} • {expense.date}
+                          {payerSummary} • {formatDisplayDate(expense.date)}
                         </p>
                         {expense.notes && (
                           <p className="text-[11px] text-muted-foreground/80 italic mt-0.5 truncate">
@@ -545,7 +546,7 @@ export default function PersonDetail() {
                         </span>
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        {settlement.method ? settlement.method.toUpperCase() : 'Payment'} • {settlement.date}
+                        {settlement.method ? settlement.method.toUpperCase() : 'Payment'} • {formatDisplayDate(settlement.date)}
                       </p>
                       {settlement.notes && (
                         <p className="text-[11px] text-muted-foreground/80 italic mt-0.5 truncate">

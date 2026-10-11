@@ -3,7 +3,9 @@ import { db } from '../db/db';
 import { resetDatabase } from '../db/repositories';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { formatDisplayDate } from '../lib/date';
 import { toast } from 'sonner';
 import { Save, Download, Upload, HardDrive, MessageCircle, Trash2, RefreshCw } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -170,7 +172,7 @@ export default function SettingsPage() {
                 )}
               </div>
               {!storageInfo.persisted && (
-                <Button variant="outline" size="sm" className="w-full mt-2" onClick={requestPersist}>
+                <Button variant="outline" className="w-full mt-2 rounded-xl h-10 font-medium" onClick={requestPersist}>
                   Request Permanent Storage
                 </Button>
               )}
@@ -190,10 +192,12 @@ export default function SettingsPage() {
           <div className="space-y-2">
             <label className="text-sm font-medium">WhatsApp Reminder Template</label>
             <p className="text-xs text-muted-foreground">Available variables: {'{name}, {amount}, {breakdown}'}</p>
-            <Input 
+            <Textarea 
               value={displayTemplate} 
               onChange={e => setLocalWhatsappTemplate(e.target.value)} 
-              placeholder="Hey {name}..."
+              placeholder="Hi {name}, here is your pending balance:&#10;&#10;{breakdown}&#10;&#10;Total pending: {amount}"
+              rows={4}
+              className="font-mono text-xs sm:text-sm rounded-xl leading-relaxed"
             />
           </div>
           <Button onClick={savePreferences} className="w-full">
@@ -211,7 +215,7 @@ export default function SettingsPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground mb-4">
-            Last backup: {settings?.lastBackupAt ? new Date(settings.lastBackupAt).toLocaleString() : 'never'}
+            Last backup: {settings?.lastBackupAt ? `${formatDisplayDate(settings.lastBackupAt)} ${new Date(settings.lastBackupAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : 'never'}
           </p>
 
           <div className="grid grid-cols-2 gap-4">

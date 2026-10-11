@@ -2,6 +2,8 @@ import { useState } from 'react';
 import type { Expense } from '../domain/types';
 import { parseDecimalToMinor, formatMoney } from '../lib/money';
 import { createRefundForExpense } from '../db/repositories';
+import { DatePicker } from './ui/DatePicker';
+import { formatDisplayDate } from '../lib/date';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -78,7 +80,7 @@ export default function AddRefundModal({ expense, onClose, onSuccess }: Props) {
             <div className="text-xs space-y-0.5 min-w-0">
               <p className="font-medium text-foreground truncate">Original: {expense.description}</p>
               <p className="text-muted-foreground">
-                Total {formatMoney(expense.amountMinor, expense.currency)} • Date: {expense.date}
+                Total {formatMoney(expense.amountMinor, expense.currency)} • Date: {formatDisplayDate(expense.date)}
               </p>
             </div>
           </div>
@@ -108,11 +110,10 @@ export default function AddRefundModal({ expense, onClose, onSuccess }: Props) {
 
           <div className="space-y-1.5">
             <Label className="text-xs font-semibold">Date</Label>
-            <Input
-              type="date"
+            <DatePicker
               value={date}
-              onChange={e => setDate(e.target.value)}
-              className="h-9 text-sm"
+              onChange={setDate}
+              className="h-10 text-sm"
             />
           </div>
 

@@ -15,6 +15,7 @@ import PersonDetail from './pages/PersonDetail';
 import SettleUp from './pages/SettleUp';
 import { useDBInit } from './hooks/useDBInit';
 import AddExpenseModal from './components/AddExpenseModal';
+import WelcomeModal from './components/WelcomeModal';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
@@ -190,6 +191,7 @@ function AppShell() {
       </div>
 
       {showAdd && <AddExpenseModal onClose={() => setShowAdd(false)} />}
+      <WelcomeModal />
     </div>
   );
 }

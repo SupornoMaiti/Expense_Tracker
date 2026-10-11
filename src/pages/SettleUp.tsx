@@ -11,6 +11,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { DatePicker } from '@/components/ui/DatePicker';
 import { formatMoney, parseDecimalToMinor } from '../lib/money';
 import { toast } from 'sonner';
 
@@ -280,12 +281,11 @@ export default function SettleUp() {
         {/* Date */}
         <div className="space-y-2">
           <Label htmlFor="settle-date" className="text-sm font-medium">Date</Label>
-          <Input
+          <DatePicker
             id="settle-date"
-            type="date"
             value={dateStr}
-            onChange={e => setDateStr(e.target.value)}
-            className="h-10"
+            onChange={setDateStr}
+            className="h-10 text-sm font-medium"
           />
         </div>
 

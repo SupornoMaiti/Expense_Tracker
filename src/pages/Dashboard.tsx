@@ -3,6 +3,7 @@ import { getActiveExpenses, getActiveSettlements, getActivePeople, softDeleteExp
 import { computePairwiseBalance } from '../domain/ledger';
 import { formatMoney } from '../lib/money';
 import { computeAnalyze } from '../domain/analyze';
+import { formatDisplayDate } from '../lib/date';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { IndianRupee, ArrowDownLeft, ArrowUpRight, Clock, Users, ArrowRight, Trash2 } from 'lucide-react';
@@ -166,7 +167,7 @@ export default function Dashboard() {
                       {'description' in item ? item.description : 'Payment'}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {item.date}
+                      {formatDisplayDate(item.date)}
                     </p>
                   </div>
                 </div>

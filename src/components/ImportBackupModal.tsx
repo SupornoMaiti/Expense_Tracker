@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { db } from '../db/db';
 import { ensureMe } from '../db/repositories';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { formatDisplayDate } from '../lib/date';
 
 interface ImportBackupModalProps {
   file: File | null;
@@ -78,7 +79,7 @@ export default function ImportBackupModal({ file, onClose }: ImportBackupModalPr
         });
 
         const dateRange = oldest !== Infinity && newest !== -Infinity
-          ? `${new Date(oldest).toLocaleDateString()} to ${new Date(newest).toLocaleDateString()}`
+          ? `${formatDisplayDate(new Date(oldest).toISOString().split('T')[0])} to ${formatDisplayDate(new Date(newest).toISOString().split('T')[0])}`
           : 'No dates found';
 
         setSummary({

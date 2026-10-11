@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/db';
 import { formatMoney } from '../lib/money';
+import { formatDisplayDate } from '../lib/date';
 import { Clock, Users, IndianRupee, Undo2, Search, Trash2, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -35,8 +36,8 @@ export default function Activity() {
   }
 
   const allItems = [
-    ...expenses.map(e => ({ type: 'expense' as const, data: e, time: new Date(e.createdAt).getTime(), dateLabel: new Date(e.createdAt).toLocaleString() })),
-    ...settlements.map(s => ({ type: 'settlement' as const, data: s, time: new Date(s.createdAt).getTime(), dateLabel: new Date(s.createdAt).toLocaleString() }))
+    ...expenses.map(e => ({ type: 'expense' as const, data: e, time: new Date(e.createdAt).getTime(), dateLabel: formatDisplayDate(e.date || e.createdAt) })),
+    ...settlements.map(s => ({ type: 'settlement' as const, data: s, time: new Date(s.createdAt).getTime(), dateLabel: formatDisplayDate(s.date || s.createdAt) }))
   ].sort((a, b) => b.time - a.time);
 
   const expenseCount = expenses.length;

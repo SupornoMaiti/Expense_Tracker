@@ -3,6 +3,7 @@ import { parseDecimalToMinor } from '../lib/money';
 import { db } from '../db/db';
 import { createExpense } from '../db/repositories';
 import { generateId } from '../lib/utils';
+import { DatePicker } from './ui/DatePicker';
 import type { SplitType } from '../domain/types';
 import { calculateShares } from '../domain/allocation';
 import { Button } from '@/components/ui/button';
@@ -186,11 +187,10 @@ export default function AddExpenseModal({ onClose }: Props) {
             </div>
             <div className="space-y-2">
               <Label>Date</Label>
-              <Input 
-                type="date"
+              <DatePicker 
                 value={date}
-                onChange={e => setDate(e.target.value)}
-                className="text-lg py-6"
+                onChange={setDate}
+                className="h-12 text-sm font-medium"
               />
             </div>
           </div>
