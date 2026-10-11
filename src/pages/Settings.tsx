@@ -19,7 +19,7 @@ export default function SettingsPage() {
 
   const displayTemplate = localWhatsappTemplate !== null 
     ? localWhatsappTemplate 
-    : (settings?.whatsappTemplate || 'Hi {name}, here is your pending balance:\n\n{breakdown}\n\nTotal pending: {amount}');
+    : (settings?.whatsappTemplate || 'Hi {name}, here is our balance breakdown:\n\n{breakdown}\n\nTotal: {amount}');
 
   const savePreferences = async () => {
     if (!settings) return;

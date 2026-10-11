@@ -20,7 +20,7 @@ describe('whatsapp url building', () => {
     id: 'default',
     defaultCurrency: 'INR',
     defaultCountryCode: 'IN',
-    whatsappTemplate: 'Hi {name}, here is your pending balance:\n\n{breakdown}\n\nTotal pending: {amount}',
+    whatsappTemplate: 'Hi {name}, here is our balance breakdown:\n\n{breakdown}\n\nTotal: {amount}',
     theme: 'system',
     lastBackupAt: null
   };
@@ -53,19 +53,19 @@ describe('whatsapp url building', () => {
     const result = buildReminderMessage(person, 'myId', expenses, [], settings, 'INR');
     expect(result?.totalPending).toBe(50000);
     expect(result?.message).toBe(
-`Hi John, here is your pending balance:
+`Hi John, here is our balance breakdown:
 
----05-01-2026---
-Pizza & drinks - ₹250.00
-Movie tickets - ₹150.00
----06-01-2026---
-Breakfast - ₹100.00
+---5 Jan 26---
++₹250.00 [Pizza & drinks]
++₹150.00 [Movie tickets]
+---6 Jan 26---
++₹100.00 [Breakfast]
 
-Total pending: ₹500.00`
+Total: You owe me ₹500.00`
     );
   });
 
-  it('Date conversion: 2026-01-05 becomes 05-01-2026, with no off-by-one in UTC-8 or UTC+14', () => {
+  it('Date conversion: 2026-01-05 becomes 5 Jan 26, with no off-by-one in UTC-8 or UTC+14', () => {
     const expenses: Expense[] = [
       {
         id: 'e1', groupId: null, description: 'Test date', amountMinor: 50000, currency: 'INR',
@@ -76,7 +76,7 @@ Total pending: ₹500.00`
       }
     ];
     const result = buildReminderMessage(person, 'myId', expenses, [], settings, 'INR');
-    expect(result?.message).toContain('---05-01-2026---');
+    expect(result?.message).toContain('---5 Jan 26---');
   });
 
   it('Entries before a zero balance point are excluded', () => {
@@ -130,9 +130,9 @@ Total pending: ₹500.00`
     ];
     const result = buildReminderMessage(person, 'myId', expenses, settlements, settings, 'INR');
     expect(result?.totalPending).toBe(15000);
-    expect(result?.message).toContain('Lunch - ₹250.00');
-    expect(result?.message).toContain('Payment received - -₹100.00');
-    expect(result?.message).toContain('Total pending: ₹150.00');
+    expect(result?.message).toContain('+₹250.00 [Lunch]');
+    expect(result?.message).toContain('-₹100.00 [Payment received]');
+    expect(result?.message).toContain('Total: You owe me ₹150.00');
   });
 
   it('When a transaction ties the balance to zero, that tying transaction is included in the message', () => {
@@ -154,9 +154,9 @@ Total pending: ₹500.00`
     const result = buildReminderMessage(person, 'myId', expenses, settlements, settings, 'INR');
     expect(result).not.toBeNull();
     expect(result?.totalPending).toBe(0);
-    expect(result?.message).toContain('Lunch - ₹250.00');
-    expect(result?.message).toContain('Payment received - -₹250.00');
-    expect(result?.message).toContain('Total pending: ₹0.00');
+    expect(result?.message).toContain('+₹250.00 [Lunch]');
+    expect(result?.message).toContain('-₹250.00 [Payment received]');
+    expect(result?.message).toContain('Total: All settled up (₹0.00)');
   });
 
   it('Zero and negative balance builds correctly', () => {
@@ -172,6 +172,8 @@ Total pending: ₹500.00`
     const result = buildReminderMessage(person, 'myId', expenses, [], settings, 'INR');
     expect(result).not.toBeNull();
     expect(result?.totalPending).toBe(-25000);
+    expect(result?.message).toContain('-₹250.00 [Lunch]');
+    expect(result?.message).toContain('Total: I owe you ₹250.00');
   });
 
   it('Long list truncates, keeps the newest dates, and the total still covers everything', () => {
@@ -190,9 +192,9 @@ Total pending: ₹500.00`
     // Verify truncation text
     expect(result?.message).toContain('earlier entries');
     // Verify it kept the newest
-    expect(result?.message).toContain('---28-01-2026---');
+    expect(result?.message).toContain('---28 Jan 26---');
     // Verify total covers everything
-    expect(result?.message).toContain('Total pending: ₹10,000.00');
+    expect(result?.message).toContain('Total: You owe me ₹10,000.00');
   });
 
   it('Unknown template variables do not leak raw placeholders', () => {
@@ -209,6 +211,32 @@ Total pending: ₹500.00`
     const result = buildReminderMessage(person, 'myId', expenses, [], customSettings, 'INR');
     expect(result?.message).not.toContain('{unknown}');
     expect(result?.message).toContain('Hi John ,');
+  });
+
+  it('Formats 11 Oct 26 date, +/- amounts with [what for], and directional totals', () => {
+    const expenses: Expense[] = [
+      {
+        id: 'e1', groupId: null, description: 'Dinner buffet', amountMinor: 200000, currency: 'INR',
+        date: '2026-10-11', categoryId: 'c1', notes: '', splitType: 'equal',
+        payers: [{ personId: 'myId', amountMinor: 200000 }],
+        shares: [{ personId: 'myId', amountMinor: 100000 }, { personId: 'p1', amountMinor: 100000 }],
+        participantIds: ['myId', 'p1'], createdAt: '2026-10-11T19:00:00Z', updatedAt: '', deletedAt: null
+      },
+      {
+        id: 'e2', groupId: null, description: 'Uber ride', amountMinor: 60000, currency: 'INR',
+        date: '2026-10-11', categoryId: 'c1', notes: '', splitType: 'equal',
+        payers: [{ personId: 'p1', amountMinor: 60000 }],
+        shares: [{ personId: 'myId', amountMinor: 30000 }, { personId: 'p1', amountMinor: 30000 }],
+        participantIds: ['myId', 'p1'], createdAt: '2026-10-11T20:00:00Z', updatedAt: '', deletedAt: null
+      }
+    ];
+
+    const result = buildReminderMessage(person, 'myId', expenses, [], settings, 'INR');
+    expect(result?.totalPending).toBe(70000); // 1000 - 300 = 700 INR
+    expect(result?.message).toContain('---11 Oct 26---');
+    expect(result?.message).toContain('+₹1,000.00 [Dinner buffet]');
+    expect(result?.message).toContain('-₹300.00 [Uber ride]');
+    expect(result?.message).toContain('Total: You owe me ₹700.00');
   });
 
   it('Emoji, "&", "#" and newlines in descriptions survive URL encoding in buildWhatsAppUrl', () => {
