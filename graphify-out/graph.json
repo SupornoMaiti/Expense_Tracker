@@ -325,7 +325,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 14,
-      "community_name": "PersonDetail.tsx",
+      "community_name": "PersonHeader.tsx",
       "file_type": "code",
       "norm_label": "personheaderprops",
       "source_file": "src/components/person/PersonHeader.tsx",
@@ -536,6 +536,66 @@
       "norm_label": "personactivityfeed()",
       "source_file": "src/components/person/PersonActivityFeed.tsx",
       "source_location": "L22"
+    },
+    {
+      "id": "src_components_person_personbalancesummary_personbalancesummary",
+      "label": "PersonBalanceSummary()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "repositories.ts",
+      "file_type": "code",
+      "norm_label": "personbalancesummary()",
+      "source_file": "src/components/person/PersonBalanceSummary.tsx",
+      "source_location": "L29"
+    },
+    {
+      "id": "src_components_ui_alert_alert",
+      "label": "Alert()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "repositories.ts",
+      "file_type": "code",
+      "norm_label": "alert()",
+      "source_file": "src/components/ui/alert.tsx",
+      "source_location": "L21"
+    },
+    {
+      "id": "src_components_ui_alert_alertaction",
+      "label": "AlertAction()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "repositories.ts",
+      "file_type": "code",
+      "norm_label": "alertaction()",
+      "source_file": "src/components/ui/alert.tsx",
+      "source_location": "L65"
+    },
+    {
+      "id": "src_components_ui_alert_alertdescription",
+      "label": "AlertDescription()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "repositories.ts",
+      "file_type": "code",
+      "norm_label": "alertdescription()",
+      "source_file": "src/components/ui/alert.tsx",
+      "source_location": "L49"
+    },
+    {
+      "id": "src_components_ui_alert_alerttitle",
+      "label": "AlertTitle()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "repositories.ts",
+      "file_type": "code",
+      "norm_label": "alerttitle()",
+      "source_file": "src/components/ui/alert.tsx",
+      "source_location": "L36"
     },
     {
       "id": "src_components_ui_card_card",
@@ -802,30 +862,6 @@
       "source_location": "L204"
     },
     {
-      "id": "src_db_repositories_ensuredefaultcategories",
-      "label": "ensureDefaultCategories()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "repositories.ts",
-      "file_type": "code",
-      "norm_label": "ensuredefaultcategories()",
-      "source_file": "src/db/repositories.ts",
-      "source_location": "L452"
-    },
-    {
-      "id": "src_db_repositories_ensureme",
-      "label": "ensureMe()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "repositories.ts",
-      "file_type": "code",
-      "norm_label": "ensureme()",
-      "source_file": "src/db/repositories.ts",
-      "source_location": "L326"
-    },
-    {
       "id": "src_db_repositories_getactiveexpenses",
       "label": "getActiveExpenses()",
       "_callable": true,
@@ -898,18 +934,6 @@
       "source_location": "L318"
     },
     {
-      "id": "src_db_repositories_resetdatabase",
-      "label": "resetDatabase()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "repositories.ts",
-      "file_type": "code",
-      "norm_label": "resetdatabase()",
-      "source_file": "src/db/repositories.ts",
-      "source_location": "L627"
-    },
-    {
       "id": "src_db_repositories_restoreexpense",
       "label": "restoreExpense()",
       "_callable": true,
@@ -932,18 +956,6 @@
       "norm_label": "restoresettlement()",
       "source_file": "src/db/repositories.ts",
       "source_location": "L280"
-    },
-    {
-      "id": "src_db_repositories_seedsampledata",
-      "label": "seedSampleData()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "repositories.ts",
-      "file_type": "code",
-      "norm_label": "seedsampledata()",
-      "source_file": "src/db/repositories.ts",
-      "source_location": "L470"
     },
     {
       "id": "src_db_repositories_softdeleteexpense",
@@ -992,30 +1004,6 @@
       "norm_label": "computepairwisebalance()",
       "source_file": "src/domain/ledger.ts",
       "source_location": "L138"
-    },
-    {
-      "id": "src_hooks_usedbinit_usedbinit",
-      "label": "useDBInit()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "repositories.ts",
-      "file_type": "code",
-      "norm_label": "usedbinit()",
-      "source_file": "src/hooks/useDBInit.ts",
-      "source_location": "L5"
-    },
-    {
-      "id": "src_hooks_usedbinit_usedbinit_init",
-      "label": "init()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "repositories.ts",
-      "file_type": "code",
-      "norm_label": "init()",
-      "source_file": "src/hooks/useDBInit.ts",
-      "source_location": "L10"
     },
     {
       "id": "src_hooks_usepersondetaildata_usepersondetaildata",
@@ -1102,6 +1090,18 @@
       "source_location": "L15"
     },
     {
+      "id": "src_pages_persondetail_persondetail",
+      "label": "PersonDetail()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "repositories.ts",
+      "file_type": "code",
+      "norm_label": "persondetail()",
+      "source_file": "src/pages/PersonDetail.tsx",
+      "source_location": "L14"
+    },
+    {
       "id": "src_pages_settings_settingspage",
       "label": "SettingsPage()",
       "_callable": true,
@@ -1136,18 +1136,6 @@
       "norm_label": "settleup()",
       "source_file": "src/pages/SettleUp.tsx",
       "source_location": "L18"
-    },
-    {
-      "id": "test_ensureme_run",
-      "label": "run()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "repositories.ts",
-      "file_type": "code",
-      "norm_label": "run()",
-      "source_file": "test_ensureme.ts",
-      "source_location": "L5"
     },
     {
       "id": "bench_bench",
@@ -1606,76 +1594,16 @@
       "source_location": "L29"
     },
     {
-      "id": "src_components_person_personbalancesummary_personbalancesummary",
-      "label": "PersonBalanceSummary()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "PersonDetail.tsx",
-      "file_type": "code",
-      "norm_label": "personbalancesummary()",
-      "source_file": "src/components/person/PersonBalanceSummary.tsx",
-      "source_location": "L29"
-    },
-    {
       "id": "src_components_person_personheader_personheader",
       "label": "PersonHeader()",
       "_callable": true,
       "_origin": "ast",
       "community": 14,
-      "community_name": "PersonDetail.tsx",
+      "community_name": "PersonHeader.tsx",
       "file_type": "code",
       "norm_label": "personheader()",
       "source_file": "src/components/person/PersonHeader.tsx",
       "source_location": "L21"
-    },
-    {
-      "id": "src_components_ui_alert_alert",
-      "label": "Alert()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "PersonDetail.tsx",
-      "file_type": "code",
-      "norm_label": "alert()",
-      "source_file": "src/components/ui/alert.tsx",
-      "source_location": "L21"
-    },
-    {
-      "id": "src_components_ui_alert_alertaction",
-      "label": "AlertAction()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "PersonDetail.tsx",
-      "file_type": "code",
-      "norm_label": "alertaction()",
-      "source_file": "src/components/ui/alert.tsx",
-      "source_location": "L65"
-    },
-    {
-      "id": "src_components_ui_alert_alertdescription",
-      "label": "AlertDescription()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "PersonDetail.tsx",
-      "file_type": "code",
-      "norm_label": "alertdescription()",
-      "source_file": "src/components/ui/alert.tsx",
-      "source_location": "L49"
-    },
-    {
-      "id": "src_components_ui_alert_alerttitle",
-      "label": "AlertTitle()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "PersonDetail.tsx",
-      "file_type": "code",
-      "norm_label": "alerttitle()",
-      "source_file": "src/components/ui/alert.tsx",
-      "source_location": "L36"
     },
     {
       "id": "src_components_ui_dropdown_menu_dropdownmenu",
@@ -1683,7 +1611,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 14,
-      "community_name": "PersonDetail.tsx",
+      "community_name": "PersonHeader.tsx",
       "file_type": "code",
       "norm_label": "dropdownmenu()",
       "source_file": "src/components/ui/dropdown-menu.tsx",
@@ -1695,7 +1623,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 14,
-      "community_name": "PersonDetail.tsx",
+      "community_name": "PersonHeader.tsx",
       "file_type": "code",
       "norm_label": "dropdownmenucheckboxitem()",
       "source_file": "src/components/ui/dropdown-menu.tsx",
@@ -1707,7 +1635,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 14,
-      "community_name": "PersonDetail.tsx",
+      "community_name": "PersonHeader.tsx",
       "file_type": "code",
       "norm_label": "dropdownmenucontent()",
       "source_file": "src/components/ui/dropdown-menu.tsx",
@@ -1719,7 +1647,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 14,
-      "community_name": "PersonDetail.tsx",
+      "community_name": "PersonHeader.tsx",
       "file_type": "code",
       "norm_label": "dropdownmenugroup()",
       "source_file": "src/components/ui/dropdown-menu.tsx",
@@ -1731,7 +1659,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 14,
-      "community_name": "PersonDetail.tsx",
+      "community_name": "PersonHeader.tsx",
       "file_type": "code",
       "norm_label": "dropdownmenuitem()",
       "source_file": "src/components/ui/dropdown-menu.tsx",
@@ -1743,7 +1671,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 14,
-      "community_name": "PersonDetail.tsx",
+      "community_name": "PersonHeader.tsx",
       "file_type": "code",
       "norm_label": "dropdownmenulabel()",
       "source_file": "src/components/ui/dropdown-menu.tsx",
@@ -1755,7 +1683,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 14,
-      "community_name": "PersonDetail.tsx",
+      "community_name": "PersonHeader.tsx",
       "file_type": "code",
       "norm_label": "dropdownmenuportal()",
       "source_file": "src/components/ui/dropdown-menu.tsx",
@@ -1767,7 +1695,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 14,
-      "community_name": "PersonDetail.tsx",
+      "community_name": "PersonHeader.tsx",
       "file_type": "code",
       "norm_label": "dropdownmenuradiogroup()",
       "source_file": "src/components/ui/dropdown-menu.tsx",
@@ -1779,7 +1707,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 14,
-      "community_name": "PersonDetail.tsx",
+      "community_name": "PersonHeader.tsx",
       "file_type": "code",
       "norm_label": "dropdownmenuradioitem()",
       "source_file": "src/components/ui/dropdown-menu.tsx",
@@ -1791,7 +1719,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 14,
-      "community_name": "PersonDetail.tsx",
+      "community_name": "PersonHeader.tsx",
       "file_type": "code",
       "norm_label": "dropdownmenuseparator()",
       "source_file": "src/components/ui/dropdown-menu.tsx",
@@ -1803,7 +1731,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 14,
-      "community_name": "PersonDetail.tsx",
+      "community_name": "PersonHeader.tsx",
       "file_type": "code",
       "norm_label": "dropdownmenushortcut()",
       "source_file": "src/components/ui/dropdown-menu.tsx",
@@ -1815,7 +1743,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 14,
-      "community_name": "PersonDetail.tsx",
+      "community_name": "PersonHeader.tsx",
       "file_type": "code",
       "norm_label": "dropdownmenusub()",
       "source_file": "src/components/ui/dropdown-menu.tsx",
@@ -1827,7 +1755,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 14,
-      "community_name": "PersonDetail.tsx",
+      "community_name": "PersonHeader.tsx",
       "file_type": "code",
       "norm_label": "dropdownmenusubcontent()",
       "source_file": "src/components/ui/dropdown-menu.tsx",
@@ -1839,7 +1767,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 14,
-      "community_name": "PersonDetail.tsx",
+      "community_name": "PersonHeader.tsx",
       "file_type": "code",
       "norm_label": "dropdownmenusubtrigger()",
       "source_file": "src/components/ui/dropdown-menu.tsx",
@@ -1851,23 +1779,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 14,
-      "community_name": "PersonDetail.tsx",
+      "community_name": "PersonHeader.tsx",
       "file_type": "code",
       "norm_label": "dropdownmenutrigger()",
       "source_file": "src/components/ui/dropdown-menu.tsx",
       "source_location": "L16"
-    },
-    {
-      "id": "src_pages_persondetail_persondetail",
-      "label": "PersonDetail()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "PersonDetail.tsx",
-      "file_type": "code",
-      "norm_label": "persondetail()",
-      "source_file": "src/pages/PersonDetail.tsx",
-      "source_location": "L14"
     },
     {
       "id": "src_components_addexpensemodal_addexpensemodal",
@@ -2542,6 +2458,102 @@
       "source_location": "L3"
     },
     {
+      "id": "src_components_ui_table_table",
+      "label": "Table()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Button",
+      "file_type": "code",
+      "norm_label": "table()",
+      "source_file": "src/components/ui/table.tsx",
+      "source_location": "L6"
+    },
+    {
+      "id": "src_components_ui_table_tablebody",
+      "label": "TableBody()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Button",
+      "file_type": "code",
+      "norm_label": "tablebody()",
+      "source_file": "src/components/ui/table.tsx",
+      "source_location": "L31"
+    },
+    {
+      "id": "src_components_ui_table_tablecaption",
+      "label": "TableCaption()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Button",
+      "file_type": "code",
+      "norm_label": "tablecaption()",
+      "source_file": "src/components/ui/table.tsx",
+      "source_location": "L93"
+    },
+    {
+      "id": "src_components_ui_table_tablecell",
+      "label": "TableCell()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Button",
+      "file_type": "code",
+      "norm_label": "tablecell()",
+      "source_file": "src/components/ui/table.tsx",
+      "source_location": "L80"
+    },
+    {
+      "id": "src_components_ui_table_tablefooter",
+      "label": "TableFooter()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Button",
+      "file_type": "code",
+      "norm_label": "tablefooter()",
+      "source_file": "src/components/ui/table.tsx",
+      "source_location": "L41"
+    },
+    {
+      "id": "src_components_ui_table_tablehead",
+      "label": "TableHead()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Button",
+      "file_type": "code",
+      "norm_label": "tablehead()",
+      "source_file": "src/components/ui/table.tsx",
+      "source_location": "L67"
+    },
+    {
+      "id": "src_components_ui_table_tableheader",
+      "label": "TableHeader()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Button",
+      "file_type": "code",
+      "norm_label": "tableheader()",
+      "source_file": "src/components/ui/table.tsx",
+      "source_location": "L21"
+    },
+    {
+      "id": "src_components_ui_table_tablerow",
+      "label": "TableRow()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Button",
+      "file_type": "code",
+      "norm_label": "tablerow()",
+      "source_file": "src/components/ui/table.tsx",
+      "source_location": "L54"
+    },
+    {
       "id": "src_components_ui_tabs_tabs",
       "label": "Tabs()",
       "_callable": true,
@@ -2612,102 +2624,6 @@
       "norm_label": "createperson()",
       "source_file": "src/db/repositories.ts",
       "source_location": "L313"
-    },
-    {
-      "id": "src_components_ui_table_table",
-      "label": "Table()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "table.tsx",
-      "file_type": "code",
-      "norm_label": "table()",
-      "source_file": "src/components/ui/table.tsx",
-      "source_location": "L6"
-    },
-    {
-      "id": "src_components_ui_table_tablebody",
-      "label": "TableBody()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "table.tsx",
-      "file_type": "code",
-      "norm_label": "tablebody()",
-      "source_file": "src/components/ui/table.tsx",
-      "source_location": "L31"
-    },
-    {
-      "id": "src_components_ui_table_tablecaption",
-      "label": "TableCaption()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "table.tsx",
-      "file_type": "code",
-      "norm_label": "tablecaption()",
-      "source_file": "src/components/ui/table.tsx",
-      "source_location": "L93"
-    },
-    {
-      "id": "src_components_ui_table_tablecell",
-      "label": "TableCell()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "table.tsx",
-      "file_type": "code",
-      "norm_label": "tablecell()",
-      "source_file": "src/components/ui/table.tsx",
-      "source_location": "L80"
-    },
-    {
-      "id": "src_components_ui_table_tablefooter",
-      "label": "TableFooter()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "table.tsx",
-      "file_type": "code",
-      "norm_label": "tablefooter()",
-      "source_file": "src/components/ui/table.tsx",
-      "source_location": "L41"
-    },
-    {
-      "id": "src_components_ui_table_tablehead",
-      "label": "TableHead()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "table.tsx",
-      "file_type": "code",
-      "norm_label": "tablehead()",
-      "source_file": "src/components/ui/table.tsx",
-      "source_location": "L67"
-    },
-    {
-      "id": "src_components_ui_table_tableheader",
-      "label": "TableHeader()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "table.tsx",
-      "file_type": "code",
-      "norm_label": "tableheader()",
-      "source_file": "src/components/ui/table.tsx",
-      "source_location": "L21"
-    },
-    {
-      "id": "src_components_ui_table_tablerow",
-      "label": "TableRow()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "table.tsx",
-      "file_type": "code",
-      "norm_label": "tablerow()",
-      "source_file": "src/components/ui/table.tsx",
-      "source_location": "L54"
     },
     {
       "id": "src_components_ui_avatar_avatar",
@@ -2962,6 +2878,78 @@
       "source_location": "L21"
     },
     {
+      "id": "src_db_repositories_ensuredefaultcategories",
+      "label": "ensureDefaultCategories()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "App.tsx",
+      "file_type": "code",
+      "norm_label": "ensuredefaultcategories()",
+      "source_file": "src/db/repositories.ts",
+      "source_location": "L452"
+    },
+    {
+      "id": "src_db_repositories_ensureme",
+      "label": "ensureMe()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "App.tsx",
+      "file_type": "code",
+      "norm_label": "ensureme()",
+      "source_file": "src/db/repositories.ts",
+      "source_location": "L326"
+    },
+    {
+      "id": "src_db_repositories_resetdatabase",
+      "label": "resetDatabase()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "App.tsx",
+      "file_type": "code",
+      "norm_label": "resetdatabase()",
+      "source_file": "src/db/repositories.ts",
+      "source_location": "L627"
+    },
+    {
+      "id": "src_db_repositories_seedsampledata",
+      "label": "seedSampleData()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "App.tsx",
+      "file_type": "code",
+      "norm_label": "seedsampledata()",
+      "source_file": "src/db/repositories.ts",
+      "source_location": "L470"
+    },
+    {
+      "id": "src_hooks_usedbinit_usedbinit",
+      "label": "useDBInit()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "App.tsx",
+      "file_type": "code",
+      "norm_label": "usedbinit()",
+      "source_file": "src/hooks/useDBInit.ts",
+      "source_location": "L5"
+    },
+    {
+      "id": "src_hooks_usedbinit_usedbinit_init",
+      "label": "init()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "App.tsx",
+      "file_type": "code",
+      "norm_label": "init()",
+      "source_file": "src/hooks/useDBInit.ts",
+      "source_location": "L10"
+    },
+    {
       "id": "src_tests_errorboundary_test_problemchild",
       "label": "ProblemChild()",
       "_callable": true,
@@ -2972,6 +2960,18 @@
       "norm_label": "problemchild()",
       "source_file": "src/__tests__/errorBoundary.test.tsx",
       "source_location": "L8"
+    },
+    {
+      "id": "test_ensureme_run",
+      "label": "run()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "App.tsx",
+      "file_type": "code",
+      "norm_label": "run()",
+      "source_file": "test_ensureme.ts",
+      "source_location": "L5"
     },
     {
       "id": "src_components_categoriesmanager",
@@ -3016,6 +3016,28 @@
       "norm_label": "personactivityfeed.tsx",
       "source_file": "src/components/person/PersonActivityFeed.tsx",
       "source_location": "L1"
+    },
+    {
+      "id": "src_components_ui_alert",
+      "label": "alert.tsx",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "repositories.ts",
+      "file_type": "code",
+      "norm_label": "alert.tsx",
+      "source_file": "src/components/ui/alert.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_components_ui_alert_alertvariants",
+      "label": "alertVariants",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "repositories.ts",
+      "file_type": "code",
+      "norm_label": "alertvariants",
+      "source_file": "src/components/ui/alert.tsx",
+      "source_location": "L5"
     },
     {
       "id": "src_components_ui_card",
@@ -3117,17 +3139,6 @@
       "source_location": "L1"
     },
     {
-      "id": "src_hooks_usedbinit",
-      "label": "useDBInit.ts",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "repositories.ts",
-      "file_type": "code",
-      "norm_label": "usedbinit.ts",
-      "source_file": "src/hooks/useDBInit.ts",
-      "source_location": "L1"
-    },
-    {
       "id": "src_hooks_usepersondetaildata",
       "label": "usePersonDetailData.ts",
       "_origin": "ast",
@@ -3202,6 +3213,17 @@
       "file_type": "code",
       "norm_label": "friends.tsx",
       "source_file": "src/pages/Friends.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_pages_persondetail",
+      "label": "PersonDetail.tsx",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "repositories.ts",
+      "file_type": "code",
+      "norm_label": "persondetail.tsx",
+      "source_file": "src/pages/PersonDetail.tsx",
       "source_location": "L1"
     },
     {
@@ -4100,126 +4122,21 @@
       "label": "PersonHeader.tsx",
       "_origin": "ast",
       "community": 14,
-      "community_name": "PersonDetail.tsx",
+      "community_name": "PersonHeader.tsx",
       "file_type": "code",
       "norm_label": "personheader.tsx",
       "source_file": "src/components/person/PersonHeader.tsx",
       "source_location": "L1"
     },
     {
-      "id": "src_components_ui_alert",
-      "label": "alert.tsx",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "PersonDetail.tsx",
-      "file_type": "code",
-      "norm_label": "alert.tsx",
-      "source_file": "src/components/ui/alert.tsx",
-      "source_location": "L1"
-    },
-    {
-      "id": "src_components_ui_alert_alertvariants",
-      "label": "alertVariants",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "PersonDetail.tsx",
-      "file_type": "code",
-      "norm_label": "alertvariants",
-      "source_file": "src/components/ui/alert.tsx",
-      "source_location": "L5"
-    },
-    {
       "id": "src_components_ui_dropdown_menu",
       "label": "dropdown-menu.tsx",
       "_origin": "ast",
       "community": 14,
-      "community_name": "PersonDetail.tsx",
+      "community_name": "PersonHeader.tsx",
       "file_type": "code",
       "norm_label": "dropdown-menu.tsx",
       "source_file": "src/components/ui/dropdown-menu.tsx",
-      "source_location": "L1"
-    },
-    {
-      "id": "src_pages_persondetail",
-      "label": "PersonDetail.tsx",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "PersonDetail.tsx",
-      "file_type": "code",
-      "norm_label": "persondetail.tsx",
-      "source_file": "src/pages/PersonDetail.tsx",
-      "source_location": "L1"
-    },
-    {
-      "id": "src_scratchpad",
-      "label": "scratchpad.md",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "PersonDetail.tsx",
-      "file_type": "document",
-      "node_kind": "page",
-      "norm_label": "scratchpad.md",
-      "source_file": "src/scratchpad.md",
-      "source_location": "L1"
-    },
-    {
-      "id": "src_scratchpad_1_problem_analysis",
-      "label": "1. Problem Analysis",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "PersonDetail.tsx",
-      "file_type": "document",
-      "node_kind": "heading",
-      "norm_label": "1. problem analysis",
-      "source_file": "src/scratchpad.md",
-      "source_location": "L3"
-    },
-    {
-      "id": "src_scratchpad_2_solution_plan",
-      "label": "2. Solution Plan",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "PersonDetail.tsx",
-      "file_type": "document",
-      "node_kind": "heading",
-      "norm_label": "2. solution plan",
-      "source_file": "src/scratchpad.md",
-      "source_location": "L28"
-    },
-    {
-      "id": "src_scratchpad_a_settle_logic_issues",
-      "label": "A. Settle Logic Issues",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "PersonDetail.tsx",
-      "file_type": "document",
-      "node_kind": "heading",
-      "norm_label": "a. settle logic issues",
-      "source_file": "src/scratchpad.md",
-      "source_location": "L5"
-    },
-    {
-      "id": "src_scratchpad_b_notification_alert_placement",
-      "label": "B. Notification / Alert Placement",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "PersonDetail.tsx",
-      "file_type": "document",
-      "node_kind": "heading",
-      "norm_label": "b. notification / alert placement",
-      "source_file": "src/scratchpad.md",
-      "source_location": "L18"
-    },
-    {
-      "id": "src_scratchpad_settle_logic_notification_positioning_investigation_fix_plan",
-      "label": "Settle Logic & Notification Positioning Investigation & Fix Plan",
-      "_origin": "ast",
-      "community": 14,
-      "community_name": "PersonDetail.tsx",
-      "file_type": "document",
-      "node_kind": "heading",
-      "norm_label": "settle logic & notification positioning investigation & fix plan",
-      "source_file": "src/scratchpad.md",
       "source_location": "L1"
     },
     {
@@ -4817,6 +4734,17 @@
       "source_location": "L1"
     },
     {
+      "id": "src_components_ui_table",
+      "label": "table.tsx",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Button",
+      "file_type": "code",
+      "norm_label": "table.tsx",
+      "source_file": "src/components/ui/table.tsx",
+      "source_location": "L1"
+    },
+    {
       "id": "src_components_ui_tabs",
       "label": "tabs.tsx",
       "_origin": "ast",
@@ -5344,14 +5272,75 @@
       "source_location": "L20"
     },
     {
-      "id": "src_components_ui_table",
-      "label": "table.tsx",
+      "id": "src_scratchpad",
+      "label": "scratchpad.md",
       "_origin": "ast",
       "community": 3,
-      "community_name": "table.tsx",
-      "file_type": "code",
-      "norm_label": "table.tsx",
-      "source_file": "src/components/ui/table.tsx",
+      "community_name": "1. Problem Analysis",
+      "file_type": "document",
+      "node_kind": "page",
+      "norm_label": "scratchpad.md",
+      "source_file": "src/scratchpad.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_scratchpad_1_problem_analysis",
+      "label": "1. Problem Analysis",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "1. Problem Analysis",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "1. problem analysis",
+      "source_file": "src/scratchpad.md",
+      "source_location": "L3"
+    },
+    {
+      "id": "src_scratchpad_2_solution_plan",
+      "label": "2. Solution Plan",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "1. Problem Analysis",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "2. solution plan",
+      "source_file": "src/scratchpad.md",
+      "source_location": "L28"
+    },
+    {
+      "id": "src_scratchpad_a_settle_logic_issues",
+      "label": "A. Settle Logic Issues",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "1. Problem Analysis",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "a. settle logic issues",
+      "source_file": "src/scratchpad.md",
+      "source_location": "L5"
+    },
+    {
+      "id": "src_scratchpad_b_notification_alert_placement",
+      "label": "B. Notification / Alert Placement",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "1. Problem Analysis",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "b. notification / alert placement",
+      "source_file": "src/scratchpad.md",
+      "source_location": "L18"
+    },
+    {
+      "id": "src_scratchpad_settle_logic_notification_positioning_investigation_fix_plan",
+      "label": "Settle Logic & Notification Positioning Investigation & Fix Plan",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "1. Problem Analysis",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "settle logic & notification positioning investigation & fix plan",
+      "source_file": "src/scratchpad.md",
       "source_location": "L1"
     },
     {
@@ -5918,6 +5907,17 @@
       "file_type": "code",
       "norm_label": "tooltip.tsx",
       "source_file": "src/components/ui/tooltip.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_hooks_usedbinit",
+      "label": "useDBInit.ts",
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "App.tsx",
+      "file_type": "code",
+      "norm_label": "usedbinit.ts",
+      "source_file": "src/hooks/useDBInit.ts",
       "source_location": "L1"
     },
     {
@@ -12243,18 +12243,6 @@
     },
     {
       "source": "src_app",
-      "target": "src_pages_friends_friends",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "src/App.tsx",
-      "source_location": "L10",
-      "weight": 1.0
-    },
-    {
-      "source": "src_app",
       "target": "src_pages_activity_activity",
       "relation": "imports",
       "_origin": "ast",
@@ -12263,18 +12251,6 @@
       "context": "import",
       "source_file": "src/App.tsx",
       "source_location": "L11",
-      "weight": 1.0
-    },
-    {
-      "source": "src_app",
-      "target": "src_pages_analyze_analyze",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "src/App.tsx",
-      "source_location": "L12",
       "weight": 1.0
     },
     {
@@ -12303,18 +12279,6 @@
     },
     {
       "source": "src_app",
-      "target": "src_pages_settleup_settleup",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "src/App.tsx",
-      "source_location": "L15",
-      "weight": 1.0
-    },
-    {
-      "source": "src_app",
       "target": "src_hooks_usedbinit_usedbinit",
       "relation": "imports",
       "_origin": "ast",
@@ -12323,30 +12287,6 @@
       "context": "import",
       "source_file": "src/App.tsx",
       "source_location": "L16",
-      "weight": 1.0
-    },
-    {
-      "source": "src_app",
-      "target": "src_components_addexpensemodal_addexpensemodal",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "src/App.tsx",
-      "source_location": "L17",
-      "weight": 1.0
-    },
-    {
-      "source": "src_app",
-      "target": "src_components_welcomemodal_welcomemodal",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "src/App.tsx",
-      "source_location": "L18",
       "weight": 1.0
     },
     {
@@ -15099,18 +15039,6 @@
     },
     {
       "source": "src_pages_activity",
-      "target": "src_components_addrefundmodal_addrefundmodal",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "src/pages/Activity.tsx",
-      "source_location": "L13",
-      "weight": 1.0
-    },
-    {
-      "source": "src_pages_activity",
       "target": "src_db_db_db",
       "relation": "imports",
       "_origin": "ast",
@@ -15891,18 +15819,6 @@
     },
     {
       "source": "src_pages_persondetail",
-      "target": "src_components_addrefundmodal_addrefundmodal",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "src/pages/PersonDetail.tsx",
-      "source_location": "L8",
-      "weight": 1.0
-    },
-    {
-      "source": "src_pages_persondetail",
       "target": "src_components_ui_alert_alert",
       "relation": "imports",
       "_origin": "ast",
@@ -15947,18 +15863,6 @@
       "context": "import",
       "source_file": "src/pages/Settings.tsx",
       "source_location": "L12",
-      "weight": 1.0
-    },
-    {
-      "source": "src_pages_settings",
-      "target": "src_components_categoriesmanager_categoriesmanager",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "src/pages/Settings.tsx",
-      "source_location": "L13",
       "weight": 1.0
     },
     {
@@ -26833,5 +26737,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "7ac855bbb31762ba08e081a6fc859b3f5341048b"
+  "built_at_commit": "3929d65aca078c36a3a522354834409631b7afde"
 }

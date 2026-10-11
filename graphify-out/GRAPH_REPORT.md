@@ -6,12 +6,12 @@
 - Unclassified: 6 file(s) not represented in the graph (top: (none) 4, .example 1, .css 1)
 
 ## Summary
-- 670 nodes · 1624 edges · 52 communities (43 shown, 9 thin omitted)
+- 670 nodes · 1616 edges · 52 communities (44 shown, 8 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 4 edges (avg confidence: 0.95)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `7ac855bb`
+- Built from commit: `3929d65a`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -19,6 +19,7 @@
 - repositories.ts
 - db.ts
 - Button
+- 1. Problem Analysis
 - App.tsx
 - package.json
 - devDependencies
@@ -29,7 +30,7 @@
 - compilerOptions
 - drawer.tsx
 - chart.tsx
-- PersonDetail.tsx
+- PersonHeader.tsx
 - AddExpenseModal.tsx
 - navigation-menu.tsx
 - notifications.test.mjs
@@ -72,10 +73,10 @@
 4. `db` - 27 edges
 5. `cn` - 24 edges
 6. `Expense` - 23 edges
-7. `vitest` - 21 edges
-8. `Analyze()` - 21 edges
-9. `Dashboard()` - 21 edges
-10. `SettleUp()` - 21 edges
+7. `Dashboard()` - 21 edges
+8. `vitest` - 21 edges
+9. `formatMoney()` - 20 edges
+10. `Analyze()` - 20 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Phase 1: Money Logic Audit` --references--> `parseDecimalToMinor()`  [INFERRED]
@@ -84,31 +85,35 @@
   src/scratchpad.md → src/domain/ledger.ts
 - `A. Settle Logic Issues` --references--> `simplifyDebts()`  [INFERRED]
   src/scratchpad.md → src/domain/ledger.ts
-- `run()` --calls--> `ensureMe()`  [EXTRACTED]
-  test_ensureme.ts → src/db/repositories.ts
 - `A. Settle Logic Issues` --references--> `PersonDetail()`  [INFERRED]
   src/scratchpad.md → src/pages/PersonDetail.tsx
+- `run()` --calls--> `ensureMe()`  [EXTRACTED]
+  test_ensureme.ts → src/db/repositories.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (52 total, 9 thin omitted)
+## Communities (52 total, 8 thin omitted)
 
 ### Community 0 - "repositories.ts"
 Cohesion: 0.09
-Nodes (54): dexie-react-hooks, fake-indexeddb, lucide-react, react, react-router-dom, sonner, CategoriesManager(), COLOR_PRESETS (+46 more)
+Nodes (53): dexie-react-hooks, fake-indexeddb, lucide-react, react, react-router-dom, sonner, CategoriesManager(), COLOR_PRESETS (+45 more)
 
 ### Community 1 - "db.ts"
 Cohesion: 0.09
 Nodes (35): bench(), @testing-library/react, vitest, seedAndMeasure(), PersonActivityFeedProps, PersonBalanceSummaryProps, exportBackup(), importBackup() (+27 more)
 
 ### Community 2 - "Button"
-Cohesion: 0.10
+Cohesion: 0.08
 Nodes (36): @base-ui/react, class-variance-authority, cn, AddFriendModal(), COLORS, EditFriendModal(), ImportBackupModal(), ImportBackupModalProps (+28 more)
 
+### Community 3 - "1. Problem Analysis"
+Cohesion: 0.33
+Nodes (5): 1. Problem Analysis, 2. Solution Plan, A. Settle Logic Issues, B. Notification / Alert Placement, Settle Logic & Notification Positioning Investigation & Fix Plan
+
 ### Community 4 - "App.tsx"
-Cohesion: 0.09
-Nodes (18): react-dom, App(), AppShell(), NAV_ITEMS, ScrollToTop(), ErrorBoundary, Props, State (+10 more)
+Cohesion: 0.08
+Nodes (25): react-dom, App(), AppShell(), NAV_ITEMS, ScrollToTop(), ErrorBoundary, Props, State (+17 more)
 
 ### Community 5 - "package.json"
 Cohesion: 0.08
@@ -146,9 +151,9 @@ Nodes (7): DrawerContent(), DrawerContext, DrawerContextProps, DrawerOverlay(), 
 Cohesion: 0.20
 Nodes (13): recharts, ChartConfig, ChartContainer(), ChartContext, ChartContextProps, ChartLegendContent(), ChartStyle(), ChartTooltipContent() (+5 more)
 
-### Community 14 - "PersonDetail.tsx"
-Cohesion: 0.09
-Nodes (18): PersonBalanceSummary(), PersonHeader(), PersonHeaderProps, Alert(), AlertDescription(), AlertTitle(), alertVariants, DropdownMenu() (+10 more)
+### Community 14 - "PersonHeader.tsx"
+Cohesion: 0.16
+Nodes (7): PersonHeader(), PersonHeaderProps, DropdownMenu(), DropdownMenuContent(), DropdownMenuItem(), DropdownMenuSubContent(), DropdownMenuTrigger()
 
 ### Community 15 - "AddExpenseModal.tsx"
 Cohesion: 0.09
@@ -267,24 +272,24 @@ Cohesion: 0.50
 Nodes (3): Error details, Instructions, Test info
 
 ## Knowledge Gaps
-- **18 isolated node(s):** `@hookform/resolvers`, `date-fns`, `framer-motion`, `react-hook-form`, `shadcn` (+13 more)
+- **18 isolated node(s):** `autoprefixer`, `clsx`, `date-fns`, `framer-motion`, `@hookform/resolvers` (+13 more)
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 354 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **9 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **8 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `react` connect `repositories.ts` to `Button`, `table.tsx`, `App.tsx`, `package.json`, `drawer.tsx`, `chart.tsx`, `PersonDetail.tsx`, `AddExpenseModal.tsx`, `avatar.tsx`?**
+- **Why does `react` connect `repositories.ts` to `Button`, `App.tsx`, `package.json`, `drawer.tsx`, `chart.tsx`, `PersonHeader.tsx`, `AddExpenseModal.tsx`, `avatar.tsx`?**
   _High betweenness centrality (0.106) - this node is a cross-community bridge._
-- **What connects `@hookform/resolvers`, `date-fns`, `framer-motion` to the rest of the system?**
+- **What connects `autoprefixer`, `clsx`, `date-fns` to the rest of the system?**
   _18 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `repositories.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.09195402298850575 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09269662921348315 - nodes in this community are weakly interconnected._
 - **Why does `devDependencies` connect `devDependencies` to `package.json`?**
   _High betweenness centrality (0.053) - this node is a cross-community bridge._
 - **Should `db.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.08671328671328671 - nodes in this community are weakly interconnected._
-- **Why does `lucide-react` connect `repositories.ts` to `db.ts`, `Button`, `App.tsx`, `package.json`, `PersonDetail.tsx`, `AddExpenseModal.tsx`, `navigation-menu.tsx`?**
+- **Why does `lucide-react` connect `repositories.ts` to `db.ts`, `Button`, `App.tsx`, `package.json`, `PersonHeader.tsx`, `AddExpenseModal.tsx`, `navigation-menu.tsx`?**
   _High betweenness centrality (0.053) - this node is a cross-community bridge._
 - **Should `Button` be split into smaller, more focused modules?**
-  _Cohesion score 0.09585037989479836 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07594381035996488 - nodes in this community are weakly interconnected._

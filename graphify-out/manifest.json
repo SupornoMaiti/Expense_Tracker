@@ -802,5 +802,11 @@
     "seen": 1791748884.8234227,
     "ast_hash": "3cc15740507059044057de50af5cb975",
     "semantic_hash": ""
+  },
+  "supabase-schema.sql": {
+    "mtime": 1791179243.6589963,
+    "seen": 1791748947.4202063,
+    "ast_hash": "f6b175c38afd3096c3f4c20cc99bd49b",
+    "semantic_hash": ""
   }
 }
