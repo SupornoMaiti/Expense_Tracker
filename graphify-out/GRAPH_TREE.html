@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>/ — graphify tree viewer</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f9f9f9;
+      color: #333;
+    }
+    h1 {
+      margin: 20px 0 0 24px;
+      font-size: 2.2rem;
+      font-weight: bold;
+      color: #1e3a56;
+    }
+    .controls {
+      margin: 20px 0 15px 24px;
+    }
+    button {
+      margin-right: 10px;
+      padding: 8px 18px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s ease-in-out;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    button:active {
+      background: #004085;
+    }
+    #tree-container {
+      width: calc(100vw - 48px); /* Adjust for body margin/padding */
+      height: 85vh;
+      overflow: auto;
+      border-radius: 8px;
+      background: #fff;
+      margin-left: 24px;
+      margin-right: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border: 1px solid #ddd;
+    }
+    svg {
+      background: #fff;
+      border-radius: 8px;
+      display: block; /* Important for D3 */
+    }
+    .node circle {
+      stroke-width: 2.5px;
+    }
+    .node text { /* Base style for the <text> container */
+      font: 13px 'Segoe UI', sans-serif;
+      paint-order: stroke fill; /* Ensures text is readable over lines */
+      stroke: #fff; /* White halo */
+      stroke-width: 3px; /* Halo thickness */
+      stroke-linejoin: round;
+      stroke-opacity: 0.85; /* Halo opacity */
+    }
+    .link {
+      fill: none;
+      stroke-opacity: 0.7;
+      stroke-width: 2px;
+    }
+  </style>
+</head>
+<body>
+  <h1>/ — Knowledge Graph</h1>
+  <div class="controls">
+    <button onclick="expandAll()">Expand All</button>
+    <button onclick="collapseAll()">Collapse All</button>
+    <button onclick="resetView()">Reset View</button>
+  </div>
+  <div id="tree-container">
+    <svg id="tree-svg" width="6000" height="8000"></svg>
+  </div>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    const initialJsonData = {"name":"/","total_count":443,"children":[{"name":"bench.ts","total_count":1,"children":[{"name":"bench()","total_count":1,"children":[]}]},{"name":"components.json","total_count":21,"children":[{"name":"$schema","total_count":1,"children":[]},{"name":"aliases","total_count":1,"children":[]},{"name":"baseColor","total_count":1,"children":[]},{"name":"components","total_count":1,"children":[]},{"name":"config","total_count":1,"children":[]},{"name":"css","total_count":1,"children":[]},{"name":"cssVariables","total_count":1,"children":[]},{"name":"hooks","total_count":1,"children":[]},{"name":"iconLibrary","total_count":1,"children":[]},{"name":"lib","total_count":1,"children":[]},{"name":"menuAccent","total_count":1,"children":[]},{"name":"menuColor","total_count":1,"children":[]},{"name":"prefix","total_count":1,"children":[]},{"name":"registries","total_count":1,"children":[]},{"name":"rsc","total_count":1,"children":[]},{"name":"rtl","total_count":1,"children":[]},{"name":"style","total_count":1,"children":[]},{"name":"tailwind","total_count":1,"children":[]},{"name":"tsx","total_count":1,"children":[]},{"name":"ui","total_count":1,"children":[]},{"name":"utils","total_count":1,"children":[]}]},{"name":"final_check.sh","total_count":1,"children":[{"name":"final_check.sh script","total_count":1,"children":[]}]},{"name":"final_check2.sh","total_count":1,"children":[{"name":"final_check2.sh script","total_count":1,"children":[]}]},{"name":"package.json","total_count":104,"children":[{"name":"@base-ui/react","total_count":1,"children":[]},{"name":"@base-ui/react","total_count":1,"children":[]},{"name":"@eslint/js","total_count":1,"children":[]},{"name":"@eslint/js","total_count":1,"children":[]},{"name":"@hookform/resolvers","total_count":1,"children":[]},{"name":"@hookform/resolvers","total_count":1,"children":[]},{"name":"@playwright/test","total_count":1,"children":[]},{"name":"@playwright/test","total_count":1,"children":[]},{"name":"@testing-library/dom","total_count":1,"children":[]},{"name":"@testing-library/dom","total_count":1,"children":[]},{"name":"@testing-library/react","total_count":1,"children":[]},{"name":"@testing-library/react","total_count":1,"children":[]},{"name":"@types/node","total_count":1,"children":[]},{"name":"@types/node","total_count":1,"children":[]},{"name":"@types/react","total_count":1,"children":[]},{"name":"@types/react","total_count":1,"children":[]},{"name":"@types/react-dom","total_count":1,"children":[]},{"name":"@types/react-dom","total_count":1,"children":[]},{"name":"@vitejs/plugin-react","total_count":1,"children":[]},{"name":"@vitejs/plugin-react","total_count":1,"children":[]},{"name":"autoprefixer","total_count":1,"children":[]},{"name":"autoprefixer","total_count":1,"children":[]},{"name":"bench","total_count":1,"children":[]},{"name":"build","total_count":1,"children":[]},{"name":"class-variance-authority","total_count":1,"children":[]},{"name":"class-variance-authority","total_count":1,"children":[]},{"name":"clsx","total_count":1,"children":[]},{"name":"clsx","total_count":1,"children":[]},{"name":"cn","total_count":1,"children":[]},{"name":"cn","total_count":1,"children":[]},{"name":"date-fns","total_count":1,"children":[]},{"name":"date-fns","total_count":1,"children":[]},{"name":"dependencies","total_count":1,"children":[]},{"name":"dev","total_count":1,"children":[]},{"name":"devDependencies","total_count":1,"children":[]},{"name":"dexie","total_count":1,"children":[]},{"name":"dexie","total_count":1,"children":[]},{"name":"dexie-react-hooks","total_count":1,"children":[]},{"name":"dexie-react-hooks","total_count":1,"children":[]},{"name":"eslint","total_count":1,"children":[]},{"name":"eslint","total_count":1,"children":[]},{"name":"eslint-plugin-react-hooks","total_count":1,"children":[]},{"name":"eslint-plugin-react-hooks","total_count":1,"children":[]},{"name":"eslint-plugin-react-refresh","total_count":1,"children":[]},{"name":"eslint-plugin-react-refresh","total_count":1,"children":[]},{"name":"fake-indexeddb","total_count":1,"children":[]},{"name":"fake-indexeddb","total_count":1,"children":[]},{"name":"framer-motion","total_count":1,"children":[]},{"name":"framer-motion","total_count":1,"children":[]},{"name":"globals","total_count":1,"children":[]},{"name":"globals","total_count":1,"children":[]},{"name":"jsdom","total_count":1,"children":[]},{"name":"jsdom","total_count":1,"children":[]},{"name":"libphonenumber-js","total_count":1,"children":[]},{"name":"libphonenumber-js","total_count":1,"children":[]},{"name":"lint","total_count":1,"children":[]},{"name":"lucide-react","total_count":1,"children":[]},{"name":"lucide-react","total_count":1,"children":[]},{"name":"name","total_count":1,"children":[]},{"name":"next-themes","total_count":1,"children":[]},{"name":"next-themes","total_count":1,"children":[]},{"name":"postcss","total_count":1,"children":[]},{"name":"postcss","total_count":1,"children":[]},{"name":"preview","total_count":1,"children":[]},{"name":"private","total_count":1,"children":[]},{"name":"react","total_count":1,"children":[]},{"name":"react","total_count":1,"children":[]},{"name":"react-dom","total_count":1,"children":[]},{"name":"react-dom","total_count":1,"children":[]},{"name":"react-hook-form","total_count":1,"children":[]},{"name":"react-hook-form","total_count":1,"children":[]},{"name":"react-router-dom","total_count":1,"children":[]},{"name":"react-router-dom","total_count":1,"children":[]},{"name":"recharts","total_count":1,"children":[]},{"name":"recharts","total_count":1,"children":[]},{"name":"scripts","total_count":1,"children":[]},{"name":"shadcn","total_count":1,"children":[]},{"name":"shadcn","total_count":1,"children":[]},{"name":"sharp","total_count":1,"children":[]},{"name":"sharp","total_count":1,"children":[]},{"name":"sonner","total_count":1,"children":[]},{"name":"sonner","total_count":1,"children":[]},{"name":"tailwind-merge","total_count":1,"children":[]},{"name":"tailwind-merge","total_count":1,"children":[]},{"name":"tailwindcss","total_count":1,"children":[]},{"name":"tailwindcss","total_count":1,"children":[]},{"name":"tailwindcss-animate","total_count":1,"children":[]},{"name":"tailwindcss-animate","total_count":1,"children":[]},{"name":"test","total_count":1,"children":[]},{"name":"type","total_count":1,"children":[]},{"name":"typecheck","total_count":1,"children":[]},{"name":"typescript","total_count":1,"children":[]},{"name":"typescript","total_count":1,"children":[]},{"name":"typescript-eslint","total_count":1,"children":[]},{"name":"typescript-eslint","total_count":1,"children":[]},{"name":"version","total_count":1,"children":[]},{"name":"vite","total_count":1,"children":[]},{"name":"vite","total_count":1,"children":[]},{"name":"vite-plugin-pwa","total_count":1,"children":[]},{"name":"vite-plugin-pwa","total_count":1,"children":[]},{"name":"vitest","total_count":1,"children":[]},{"name":"vitest","total_count":1,"children":[]},{"name":"zod","total_count":1,"children":[]},{"name":"zod","total_count":1,"children":[]}]},{"name":"seed-measure.ts","total_count":1,"children":[{"name":"seedAndMeasure()","total_count":1,"children":[]}]},{"name":"src","total_count":258,"children":[{"name":"__tests__","total_count":4,"children":[{"name":"backup.test.tsx","total_count":1,"children":[{"name":"readAsText()","total_count":1,"children":[]}]},{"name":"ensureMe.test.tsx","total_count":1,"children":[]},{"name":"layout.test.tsx","total_count":1,"children":[]},{"name":"no-stubs.test.ts","total_count":1,"children":[]}]},{"name":"App.tsx","total_count":4,"children":[{"name":"App()","total_count":1,"children":[]},{"name":"AppShell()","total_count":1,"children":[]},{"name":"NAV_ITEMS","total_count":1,"children":[]},{"name":"ScrollToTop()","total_count":1,"children":[]}]},{"name":"components","total_count":156,"children":[{"name":"AddExpenseModal.tsx","total_count":2,"children":[{"name":"AddExpenseModal()","total_count":1,"children":[]},{"name":"Props","total_count":1,"children":[]}]},{"name":"AddFriendModal.tsx","total_count":2,"children":[{"name":"AddFriendModal()","total_count":1,"children":[]},{"name":"COLORS","total_count":1,"children":[]}]},{"name":"AddRefundModal.tsx","total_count":2,"children":[{"name":"AddRefundModal()","total_count":1,"children":[]},{"name":"Props","total_count":1,"children":[]}]},{"name":"CategoriesManager.tsx","total_count":3,"children":[{"name":"CategoriesManager()","total_count":1,"children":[]},{"name":"COLOR_PRESETS","total_count":1,"children":[]},{"name":"EMOJI_PRESETS","total_count":1,"children":[]}]},{"name":"EditFriendModal.tsx","total_count":1,"children":[{"name":"EditFriendModal()","total_count":1,"children":[]}]},{"name":"ImportBackupModal.tsx","total_count":2,"children":[{"name":"ImportBackupModal()","total_count":1,"children":[]},{"name":"ImportBackupModalProps","total_count":1,"children":[]}]},{"name":"theme-provider.tsx","total_count":7,"children":[{"name":"initialState","total_count":1,"children":[]},{"name":"Theme","total_count":1,"children":[]},{"name":"ThemeProvider()","total_count":1,"children":[]},{"name":"ThemeProviderContext","total_count":1,"children":[]},{"name":"ThemeProviderProps","total_count":1,"children":[]},{"name":"ThemeProviderState","total_count":1,"children":[]},{"name":"useTheme()","total_count":1,"children":[]}]},{"name":"ThemeToggle.tsx","total_count":1,"children":[{"name":"ThemeToggle()","total_count":1,"children":[]}]},{"name":"ui","total_count":134,"children":[{"name":"alert.tsx","total_count":5,"children":[{"name":"Alert()","total_count":1,"children":[]},{"name":"AlertAction()","total_count":1,"children":[]},{"name":"AlertDescription()","total_count":1,"children":[]},{"name":"AlertTitle()","total_count":1,"children":[]},{"name":"alertVariants","total_count":1,"children":[]}]},{"name":"avatar.tsx","total_count":6,"children":[{"name":"Avatar()","total_count":1,"children":[]},{"name":"AvatarBadge()","total_count":1,"children":[]},{"name":"AvatarFallback()","total_count":1,"children":[]},{"name":"AvatarGroup()","total_count":1,"children":[]},{"name":"AvatarGroupCount()","total_count":1,"children":[]},{"name":"AvatarImage()","total_count":1,"children":[]}]},{"name":"badge.tsx","total_count":2,"children":[{"name":"Badge()","total_count":1,"children":[]},{"name":"badgeVariants","total_count":1,"children":[]}]},{"name":"button.tsx","total_count":2,"children":[{"name":"Button()","total_count":1,"children":[]},{"name":"buttonVariants","total_count":1,"children":[]}]},{"name":"card.tsx","total_count":7,"children":[{"name":"Card()","total_count":1,"children":[]},{"name":"CardAction()","total_count":1,"children":[]},{"name":"CardContent()","total_count":1,"children":[]},{"name":"CardDescription()","total_count":1,"children":[]},{"name":"CardFooter()","total_count":1,"children":[]},{"name":"CardHeader()","total_count":1,"children":[]},{"name":"CardTitle()","total_count":1,"children":[]}]},{"name":"chart.tsx","total_count":12,"children":[{"name":"ChartConfig","total_count":1,"children":[]},{"name":"ChartContainer()","total_count":1,"children":[]},{"name":"ChartContext","total_count":1,"children":[]},{"name":"ChartContextProps","total_count":1,"children":[]},{"name":"ChartLegendContent()","total_count":1,"children":[]},{"name":"ChartStyle()","total_count":1,"children":[]},{"name":"ChartTooltipContent()","total_count":1,"children":[]},{"name":"getPayloadConfigFromPayload()","total_count":1,"children":[]},{"name":"INITIAL_DIMENSION","total_count":1,"children":[]},{"name":"THEMES","total_count":1,"children":[]},{"name":"TooltipNameType","total_count":1,"children":[]},{"name":"useChart()","total_count":1,"children":[]}]},{"name":"checkbox.tsx","total_count":1,"children":[{"name":"Checkbox()","total_count":1,"children":[]}]},{"name":"DatePicker.tsx","total_count":2,"children":[{"name":"DatePicker()","total_count":1,"children":[]},{"name":"DatePickerProps","total_count":1,"children":[]}]},{"name":"dialog.tsx","total_count":10,"children":[{"name":"Dialog()","total_count":1,"children":[]},{"name":"DialogClose()","total_count":1,"children":[]},{"name":"DialogContent()","total_count":1,"children":[]},{"name":"DialogDescription()","total_count":1,"children":[]},{"name":"DialogFooter()","total_count":1,"children":[]},{"name":"DialogHeader()","total_count":1,"children":[]},{"name":"DialogOverlay()","total_count":1,"children":[]},{"name":"DialogPortal()","total_count":1,"children":[]},{"name":"DialogTitle()","total_count":1,"children":[]},{"name":"DialogTrigger()","total_count":1,"children":[]}]},{"name":"drawer.tsx","total_count":14,"children":[{"name":"Drawer()","total_count":1,"children":[]},{"name":"DrawerClose()","total_count":1,"children":[]},{"name":"DrawerContent()","total_count":1,"children":[]},{"name":"DrawerContext","total_count":1,"children":[]},{"name":"DrawerContextProps","total_count":1,"children":[]},{"name":"DrawerDescription()","total_count":1,"children":[]},{"name":"DrawerFooter()","total_count":1,"children":[]},{"name":"DrawerHeader()","total_count":1,"children":[]},{"name":"DrawerOverlay()","total_count":1,"children":[]},{"name":"DrawerPortal()","total_count":1,"children":[]},{"name":"DrawerSwipeHandle()","total_count":1,"children":[]},{"name":"DrawerTitle()","total_count":1,"children":[]},{"name":"DrawerTrigger()","total_count":1,"children":[]},{"name":"useDrawer()","total_count":1,"children":[]}]},{"name":"dropdown-menu.tsx","total_count":15,"children":[{"name":"DropdownMenu()","total_count":1,"children":[]},{"name":"DropdownMenuCheckboxItem()","total_count":1,"children":[]},{"name":"DropdownMenuContent()","total_count":1,"children":[]},{"name":"DropdownMenuGroup()","total_count":1,"children":[]},{"name":"DropdownMenuItem()","total_count":1,"children":[]},{"name":"DropdownMenuLabel()","total_count":1,"children":[]},{"name":"DropdownMenuPortal()","total_count":1,"children":[]},{"name":"DropdownMenuRadioGroup()","total_count":1,"children":[]},{"name":"DropdownMenuRadioItem()","total_count":1,"children":[]},{"name":"DropdownMenuSeparator()","total_count":1,"children":[]},{"name":"DropdownMenuShortcut()","total_count":1,"children":[]},{"name":"DropdownMenuSub()","total_count":1,"children":[]},{"name":"DropdownMenuSubContent()","total_count":1,"children":[]},{"name":"DropdownMenuSubTrigger()","total_count":1,"children":[]},{"name":"DropdownMenuTrigger()","total_count":1,"children":[]}]},{"name":"input.tsx","total_count":1,"children":[{"name":"Input()","total_count":1,"children":[]}]},{"name":"label.tsx","total_count":1,"children":[{"name":"Label()","total_count":1,"children":[]}]},{"name":"navigation-menu.tsx","total_count":9,"children":[{"name":"NavigationMenu()","total_count":1,"children":[]},{"name":"NavigationMenuContent()","total_count":1,"children":[]},{"name":"NavigationMenuIndicator()","total_count":1,"children":[]},{"name":"NavigationMenuItem()","total_count":1,"children":[]},{"name":"NavigationMenuLink()","total_count":1,"children":[]},{"name":"NavigationMenuList()","total_count":1,"children":[]},{"name":"NavigationMenuPositioner()","total_count":1,"children":[]},{"name":"NavigationMenuTrigger()","total_count":1,"children":[]},{"name":"navigationMenuTriggerStyle","total_count":1,"children":[]}]},{"name":"popover.tsx","total_count":6,"children":[{"name":"Popover()","total_count":1,"children":[]},{"name":"PopoverContent()","total_count":1,"children":[]},{"name":"PopoverDescription()","total_count":1,"children":[]},{"name":"PopoverHeader()","total_count":1,"children":[]},{"name":"PopoverTitle()","total_count":1,"children":[]},{"name":"PopoverTrigger()","total_count":1,"children":[]}]},{"name":"scroll-area.tsx","total_count":2,"children":[{"name":"ScrollArea()","total_count":1,"children":[]},{"name":"ScrollBar()","total_count":1,"children":[]}]},{"name":"select.tsx","total_count":9,"children":[{"name":"SelectContent()","total_count":1,"children":[]},{"name":"SelectGroup()","total_count":1,"children":[]},{"name":"SelectItem()","total_count":1,"children":[]},{"name":"SelectLabel()","total_count":1,"children":[]},{"name":"SelectScrollDownButton()","total_count":1,"children":[]},{"name":"SelectScrollUpButton()","total_count":1,"children":[]},{"name":"SelectSeparator()","total_count":1,"children":[]},{"name":"SelectTrigger()","total_count":1,"children":[]},{"name":"SelectValue()","total_count":1,"children":[]}]},{"name":"sheet.tsx","total_count":10,"children":[{"name":"Sheet()","total_count":1,"children":[]},{"name":"SheetClose()","total_count":1,"children":[]},{"name":"SheetContent()","total_count":1,"children":[]},{"name":"SheetDescription()","total_count":1,"children":[]},{"name":"SheetFooter()","total_count":1,"children":[]},{"name":"SheetHeader()","total_count":1,"children":[]},{"name":"SheetOverlay()","total_count":1,"children":[]},{"name":"SheetPortal()","total_count":1,"children":[]},{"name":"SheetTitle()","total_count":1,"children":[]},{"name":"SheetTrigger()","total_count":1,"children":[]}]},{"name":"skeleton.tsx","total_count":1,"children":[{"name":"Skeleton()","total_count":1,"children":[]}]},{"name":"sonner.tsx","total_count":1,"children":[{"name":"Toaster()","total_count":1,"children":[]}]},{"name":"table.tsx","total_count":8,"children":[{"name":"Table()","total_count":1,"children":[]},{"name":"TableBody()","total_count":1,"children":[]},{"name":"TableCaption()","total_count":1,"children":[]},{"name":"TableCell()","total_count":1,"children":[]},{"name":"TableFooter()","total_count":1,"children":[]},{"name":"TableHead()","total_count":1,"children":[]},{"name":"TableHeader()","total_count":1,"children":[]},{"name":"TableRow()","total_count":1,"children":[]}]},{"name":"tabs.tsx","total_count":5,"children":[{"name":"Tabs()","total_count":1,"children":[]},{"name":"TabsContent()","total_count":1,"children":[]},{"name":"TabsList()","total_count":1,"children":[]},{"name":"tabsListVariants","total_count":1,"children":[]},{"name":"TabsTrigger()","total_count":1,"children":[]}]},{"name":"textarea.tsx","total_count":1,"children":[{"name":"Textarea()","total_count":1,"children":[]}]},{"name":"tooltip.tsx","total_count":4,"children":[{"name":"Tooltip()","total_count":1,"children":[]},{"name":"TooltipContent()","total_count":1,"children":[]},{"name":"TooltipProvider()","total_count":1,"children":[]},{"name":"TooltipTrigger()","total_count":1,"children":[]}]}]},{"name":"WelcomeModal.tsx","total_count":2,"children":[{"name":"BeforeInstallPromptEvent","total_count":1,"children":[]},{"name":"WelcomeModal()","total_count":1,"children":[]}]}]},{"name":"db","total_count":30,"children":[{"name":"__tests__","total_count":4,"children":[{"name":"backup.test.ts","total_count":1,"children":[]},{"name":"migration.test.ts","total_count":1,"children":[]},{"name":"repositories.test.ts","total_count":1,"children":[]},{"name":"transactions.test.ts","total_count":1,"children":[]}]},{"name":"db.ts","total_count":5,"children":[{"name":".constructor()","total_count":1,"children":[]},{"name":"db","total_count":1,"children":[]},{"name":"exportBackup()","total_count":1,"children":[]},{"name":"importBackup()","total_count":1,"children":[]},{"name":"SplitLocalDB","total_count":1,"children":[]}]},{"name":"repositories.ts","total_count":21,"children":[{"name":"createExpense()","total_count":1,"children":[]},{"name":"createPerson()","total_count":1,"children":[]},{"name":"createRefundForExpense()","total_count":1,"children":[]},{"name":"createRefundForSettlement()","total_count":1,"children":[]},{"name":"createSettlement()","total_count":1,"children":[]},{"name":"DEFAULT_CATEGORIES","total_count":1,"children":[]},{"name":"ensureDefaultCategories()","total_count":1,"children":[]},{"name":"ensureMe()","total_count":1,"children":[]},{"name":"getActiveExpenses()","total_count":1,"children":[]},{"name":"getActiveExpensesByGroupId()","total_count":1,"children":[]},{"name":"getActivePeople()","total_count":1,"children":[]},{"name":"getActiveSettlements()","total_count":1,"children":[]},{"name":"getActiveSettlementsByGroupId()","total_count":1,"children":[]},{"name":"getPersonByPhone()","total_count":1,"children":[]},{"name":"resetDatabase()","total_count":1,"children":[]},{"name":"restoreExpense()","total_count":1,"children":[]},{"name":"restoreSettlement()","total_count":1,"children":[]},{"name":"seedSampleData()","total_count":1,"children":[]},{"name":"softDeleteExpense()","total_count":1,"children":[]},{"name":"softDeleteSettlement()","total_count":1,"children":[]},{"name":"updateExpense()","total_count":1,"children":[]}]}]},{"name":"domain","total_count":36,"children":[{"name":"__tests__","total_count":5,"children":[{"name":"property.test.ts","total_count":1,"children":[{"name":"mulberry32()","total_count":1,"children":[]}]},{"name":"allocation.test.ts","total_count":1,"children":[]},{"name":"analyze.test.ts","total_count":1,"children":[]},{"name":"date.test.ts","total_count":1,"children":[]},{"name":"ledger.test.ts","total_count":1,"children":[]}]},{"name":"allocation.ts","total_count":3,"children":[{"name":"allocateLargestRemainder()","total_count":1,"children":[]},{"name":"AllocationInput","total_count":1,"children":[]},{"name":"calculateShares()","total_count":1,"children":[]}]},{"name":"analyze.ts","total_count":4,"children":[{"name":"AnalyzeResult","total_count":1,"children":[]},{"name":"CategorySpend","total_count":1,"children":[]},{"name":"computeAnalyze()","total_count":1,"children":[]},{"name":"DailySpend","total_count":1,"children":[]}]},{"name":"ledger.ts","total_count":6,"children":[{"name":"Balance","total_count":1,"children":[]},{"name":"computeBalances()","total_count":1,"children":[]},{"name":"computePairwiseBalance()","total_count":1,"children":[]},{"name":"Debt","total_count":1,"children":[]},{"name":"getExpensePairwiseImpact()","total_count":1,"children":[]},{"name":"simplifyDebts()","total_count":1,"children":[]}]},{"name":"schemas.ts","total_count":7,"children":[{"name":"AmountMinorSchema","total_count":1,"children":[]},{"name":"CurrencySchema","total_count":1,"children":[]},{"name":"DateSchema","total_count":1,"children":[]},{"name":"ExpensePayerSchema","total_count":1,"children":[]},{"name":"ExpenseSchema","total_count":1,"children":[]},{"name":"ExpenseShareSchema","total_count":1,"children":[]},{"name":"SettlementSchema","total_count":1,"children":[]}]},{"name":"types.ts","total_count":11,"children":[{"name":"Category","total_count":1,"children":[]},{"name":"Expense","total_count":1,"children":[]},{"name":"ExpensePayer","total_count":1,"children":[]},{"name":"ExpenseShare","total_count":1,"children":[]},{"name":"Group","total_count":1,"children":[]},{"name":"Person","total_count":1,"children":[]},{"name":"Receipt","total_count":1,"children":[]},{"name":"Reminder","total_count":1,"children":[]},{"name":"Settings","total_count":1,"children":[]},{"name":"Settlement","total_count":1,"children":[]},{"name":"SplitType","total_count":1,"children":[]}]}]},{"name":"hooks","total_count":2,"children":[{"name":"useDBInit.ts","total_count":2,"children":[{"name":"init()","total_count":1,"children":[]},{"name":"useDBInit()","total_count":1,"children":[]}]}]},{"name":"lib","total_count":17,"children":[{"name":"__tests__","total_count":5,"children":[{"name":"import.test.ts","total_count":2,"children":[{"name":"parseCSVLine()","total_count":1,"children":[]},{"name":"preventFormulaInjection()","total_count":1,"children":[]}]},{"name":"phone.test.ts","total_count":1,"children":[{"name":"normalizePhone()","total_count":1,"children":[]}]},{"name":"money.test.ts","total_count":1,"children":[]},{"name":"whatsapp.test.ts","total_count":1,"children":[]}]},{"name":"date.ts","total_count":5,"children":[{"name":"formatDisplayDate()","total_count":1,"children":[]},{"name":"getTodayISODate()","total_count":1,"children":[]},{"name":"MONTH_NAMES","total_count":1,"children":[]},{"name":"MONTH_SHORT","total_count":1,"children":[]},{"name":"toISODate()","total_count":1,"children":[]}]},{"name":"money.ts","total_count":2,"children":[{"name":"formatMoney()","total_count":1,"children":[]},{"name":"parseDecimalToMinor()","total_count":1,"children":[]}]},{"name":"utils.ts","total_count":1,"children":[{"name":"generateId()","total_count":1,"children":[]}]},{"name":"whatsapp.ts","total_count":4,"children":[{"name":"buildReminderMessage()","total_count":1,"children":[]},{"name":"formatWhatsAppDate()","total_count":1,"children":[]},{"name":"getWhatsAppLink()","total_count":1,"children":[]},{"name":"sendWhatsAppReminder()","total_count":1,"children":[]}]}]},{"name":"pages","total_count":8,"children":[{"name":"Activity.tsx","total_count":1,"children":[{"name":"Activity()","total_count":1,"children":[]}]},{"name":"Analyze.tsx","total_count":1,"children":[{"name":"Analyze()","total_count":1,"children":[]}]},{"name":"Dashboard.tsx","total_count":1,"children":[{"name":"Dashboard()","total_count":1,"children":[]}]},{"name":"Friends.tsx","total_count":1,"children":[{"name":"Friends()","total_count":1,"children":[]}]},{"name":"PersonDetail.tsx","total_count":1,"children":[{"name":"PersonDetail()","total_count":1,"children":[]}]},{"name":"Settings.tsx","total_count":2,"children":[{"name":"checkStorage()","total_count":1,"children":[]},{"name":"SettingsPage()","total_count":1,"children":[]}]},{"name":"SettleUp.tsx","total_count":1,"children":[{"name":"SettleUp()","total_count":1,"children":[]}]}]},{"name":"main.tsx","total_count":1,"children":[]}]},{"name":"test_ensureme.ts","total_count":1,"children":[{"name":"run()","total_count":1,"children":[]}]},{"name":"tests","total_count":8,"children":[{"name":"notifications.test.mjs","total_count":5,"children":[{"name":".constructor()","total_count":1,"children":[]},{"name":"calls","total_count":1,"children":[]},{"name":"installBrowserMocks()","total_count":1,"children":[]},{"name":"MockNotification","total_count":1,"children":[]},{"name":"restoreBrowserMocks()","total_count":1,"children":[]}]},{"name":"responsive.spec.ts","total_count":2,"children":[{"name":"ROUTES","total_count":1,"children":[]},{"name":"VIEWPORTS","total_count":1,"children":[]}]},{"name":"offline.spec.ts","total_count":1,"children":[]}]},{"name":"tsconfig.app.json","total_count":19,"children":[{"name":"allowImportingTsExtensions","total_count":1,"children":[]},{"name":"compilerOptions","total_count":1,"children":[]},{"name":"erasableSyntaxOnly","total_count":1,"children":[]},{"name":"include","total_count":1,"children":[]},{"name":"jsx","total_count":1,"children":[]},{"name":"lib","total_count":1,"children":[]},{"name":"module","total_count":1,"children":[]},{"name":"moduleDetection","total_count":1,"children":[]},{"name":"moduleResolution","total_count":1,"children":[]},{"name":"noEmit","total_count":1,"children":[]},{"name":"noFallthroughCasesInSwitch","total_count":1,"children":[]},{"name":"noUnusedLocals","total_count":1,"children":[]},{"name":"noUnusedParameters","total_count":1,"children":[]},{"name":"paths","total_count":1,"children":[]},{"name":"skipLibCheck","total_count":1,"children":[]},{"name":"target","total_count":1,"children":[]},{"name":"tsBuildInfoFile","total_count":1,"children":[]},{"name":"types","total_count":1,"children":[]},{"name":"verbatimModuleSyntax","total_count":1,"children":[]}]},{"name":"tsconfig.json","total_count":2,"children":[{"name":"files","total_count":1,"children":[]},{"name":"references","total_count":1,"children":[]}]},{"name":"tsconfig.node.json","total_count":17,"children":[{"name":"allowImportingTsExtensions","total_count":1,"children":[]},{"name":"compilerOptions","total_count":1,"children":[]},{"name":"erasableSyntaxOnly","total_count":1,"children":[]},{"name":"include","total_count":1,"children":[]},{"name":"lib","total_count":1,"children":[]},{"name":"module","total_count":1,"children":[]},{"name":"moduleDetection","total_count":1,"children":[]},{"name":"moduleResolution","total_count":1,"children":[]},{"name":"noEmit","total_count":1,"children":[]},{"name":"noFallthroughCasesInSwitch","total_count":1,"children":[]},{"name":"noUnusedLocals","total_count":1,"children":[]},{"name":"noUnusedParameters","total_count":1,"children":[]},{"name":"skipLibCheck","total_count":1,"children":[]},{"name":"target","total_count":1,"children":[]},{"name":"tsBuildInfoFile","total_count":1,"children":[]},{"name":"types","total_count":1,"children":[]},{"name":"verbatimModuleSyntax","total_count":1,"children":[]}]},{"name":"vercel.json","total_count":1,"children":[{"name":"rewrites","total_count":1,"children":[]}]},{"name":"eslint.config.js","total_count":1,"children":[]},{"name":"playwright.config.ts","total_count":1,"children":[]},{"name":"postcss.config.js","total_count":1,"children":[]},{"name":"tailwind.config.js","total_count":1,"children":[]},{"name":"tailwindcss","total_count":1,"children":[]},{"name":"vite.config.ts","total_count":1,"children":[]},{"name":"vitest.config.ts","total_count":1,"children":[]},{"name":"vitest.setup.ts","total_count":1,"children":[]}]};
+
+    function transformData(jsonData) {
+        // Helper function to recursively build the children structure
+        function processNode(node, parentL1StageName) {
+            let displayName = node.name;
+            // Append total_count if it exists and is not already in the name
+            if (node.total_count !== undefined) {
+                if (!/\(Total Count: \d+\)$/.test(displayName)) {
+                    displayName += ` (Total Count: ${node.total_count})`;
+                }
+            }
+
+            const newNode = { name: displayName };
+
+            if (parentL1StageName === "Root") {
+                 newNode.originalStageName = node.name;
+            } else {
+                newNode.originalStageName = parentL1StageName;
+            }
+
+            if (node.children && node.children.length > 0) {
+                const stageNameToPass = (parentL1StageName === "Root") ? node.name : parentL1StageName;
+                newNode.children = node.children.map(child => processNode(child, stageNameToPass));
+            }
+
+            return newNode;
+        }
+
+        let rootDisplayName = jsonData.name;
+        if (jsonData.total_count !== undefined && !/\(Total Count: \d+\)$/.test(rootDisplayName)) {
+            rootDisplayName += ` (Total Count: ${jsonData.total_count})`;
+        }
+
+        return {
+            name: rootDisplayName,
+            originalStageName: "Root",
+            children: (jsonData.children || []).map(child => processNode(child, "Root"))
+        };
+    }
+
+    const treeData = transformData(initialJsonData);
+
+    // Auto-populated phaseColors: every depth-1 child of the root gets
+    // a stable colour from a bigger palette so all top-level dirs are
+    // distinguishable.
+    const PALETTE = [
+      ["#3498DB","#2980B9","#AED6F1"], ["#2ECC71","#27AE60","#A9DFBF"],
+      ["#E74C3C","#C0392B","#F5B7B1"], ["#9B59B6","#8E44AD","#D7BDE2"],
+      ["#F39C12","#D68910","#FAD7A0"], ["#1ABC9C","#117864","#A2D9CE"],
+      ["#34495E","#1B2631","#ABB2B9"], ["#E67E22","#BA4A00","#F5CBA7"],
+      ["#16A085","#0E6655","#A2D9CE"], ["#D35400","#A04000","#EDBB99"],
+      ["#7F8C8D","#566573","#D5DBDB"], ["#C0392B","#7B241C","#F5B7B1"],
+      ["#2E86C1","#1B4F72","#A9CCE3"], ["#28B463","#196F3D","#A9DFBF"],
+      ["#AF7AC5","#6C3483","#D2B4DE"],
+    ];
+    const phaseColors = { "Root": { fill: "#4A4A4A", stroke: "#333333", collapsedFill: "#6C757D" },
+                          "Default": { fill: "#BDC3C7", stroke: "#95A5A6", collapsedFill: "#ECF0F1" } };
+    (initialJsonData.children || []).forEach((c, i) => {
+      const pal = PALETTE[i % PALETTE.length];
+      phaseColors[c.name] = { fill: pal[0], stroke: pal[1], collapsedFill: pal[2] };
+    });
+
+    const levelSpecificPalettes = {
+      0: { fill: "#4A4A4A", stroke: "#333333", collapsedFill: "#6C757D" },
+      2: { fill: "#6ab04c", stroke: "#508a38", collapsedFill: "#a3d391" },
+      3: { fill: "#f0932b", stroke: "#d0730f", collapsedFill: "#f6c07e" },
+      4: { fill: "#be2edd", stroke: "#a01cb3", collapsedFill: "#e08bf2" },
+      5: { fill: "#00a8ff", stroke: "#007ac1", collapsedFill: "#74d2ff" },
+      6: { fill: "#e55039", stroke: "#c23620", collapsedFill: "#f09a8d" },
+      default: { fill: "#747d8c", stroke: "#57606f", collapsedFill: "#a4b0be" }
+    };
+
+    const svgElement = d3.select("#tree-svg");
+    const initialSvgWidth = +svgElement.attr("width");
+    const initialSvgHeight = +svgElement.attr("height");
+    const margin = { top: 40, right: 120, bottom: 80, left: 450 };
+    let width = initialSvgWidth - margin.left - margin.right;
+    let height = initialSvgHeight - margin.top - margin.bottom;
+    const duration = 500;
+    let nodeCounter = 0;
+    const g = svgElement.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+    const treemap = d3.tree().nodeSize([40, 0]);
+    let rootNode = d3.hierarchy(treeData, d => d.children);
+    rootNode.x0 = 0;
+    rootNode.y0 = 0;
+
+    if (rootNode.children) {
+      rootNode.children.forEach(d_child => {
+        if (d_child.children) { collapseBranch(d_child); }
+      });
+    }
+    updateTree(rootNode);
+
+    function collapseBranch(d) { if (d.children) { d._children = d.children; d._children.forEach(collapseBranch); d.children = null; } }
+    function expandBranch(d) { if (d._children) { d.children = d._children; d._children = null; } if (d.children) { d.children.forEach(expandBranch); } }
+    window.expandAll = () => { expandBranch(rootNode); updateTree(rootNode); };
+    window.collapseAll = () => { if (rootNode.children) { rootNode.children.forEach(collapseBranch); } updateTree(rootNode); };
+    window.resetView = () => { if (rootNode.children) { rootNode.children.forEach(d_child => { if (d_child.children || d_child._children) { collapseBranch(d_child); } }); } if (rootNode._children && !rootNode.children) { rootNode.children = rootNode._children; rootNode._children = null; } updateTree(rootNode); };
+
+    function updateTree(source) {
+      const treeLayoutData = treemap(rootNode);
+      let nodes = treeLayoutData.descendants();
+      let links = treeLayoutData.descendants().slice(1);
+
+      let minX = 0;
+      let maxX = 0;
+      if (nodes.length > 0) {
+        minX = d3.min(nodes, d => d.x);
+        maxX = d3.max(nodes, d => d.x);
+      }
+
+      let neededHeight = Math.max(initialSvgHeight, maxX - minX + margin.top + margin.bottom + 100);
+      svgElement.transition().duration(duration / 2).attr("height", neededHeight);
+      g.transition().duration(duration / 2).attr("transform", `translate(${margin.left},${margin.top - minX + 40})`);
+
+      nodes.forEach(d => { d.y = d.depth * 400; }); // Adjust horizontal separation if needed
+
+      const node = g.selectAll('g.node').data(nodes, d => d.id || (d.id = ++nodeCounter));
+      const nodeEnter = node.enter().append('g')
+        .attr('class', d => "node" + (d.children || d._children ? " node--internal" : " node--leaf") + (d._children ? " _children" : ""))
+        .attr('transform', d => `translate(${source.y0},${source.x0})`)
+        .on('click', (event, d) => { if (d.children) { d._children = d.children; d.children = null; } else if (d._children) { d.children = d._children; d._children = null; } updateTree(d); })
+        .style('cursor', d => (d.children || d._children) ? 'pointer' : 'default');
+
+      nodeEnter.append('circle').attr('r', 1e-6);
+
+      nodeEnter.append('text')
+        .attr('dy', '.35em')
+        .attr('x', d => d.children || d._children ? -14 : 14)
+        .attr('text-anchor', d => d.children || d._children ? 'end' : 'start')
+        .style("fill-opacity", 1e-6)
+        .call(wrapText, 380);
+
+      const nodeUpdate = nodeEnter.merge(node);
+      nodeUpdate.transition().duration(duration)
+        .attr('transform', d => `translate(${d.y},${d.x})`)
+        .attr('class', d => "node" + (d.children ? " node--internal" : " node--leaf") + (d._children ? " node--internal _children" : ""));
+
+      nodeUpdate.select('circle').attr('r', 8.5)
+        .style('fill', d => {
+            let palette;
+            if (d.depth === 0) {
+                palette = levelSpecificPalettes[0];
+            } else if (d.depth === 1) {
+                palette = phaseColors[d.data.originalStageName] || phaseColors.Default;
+            } else {
+                palette = levelSpecificPalettes[d.depth] || levelSpecificPalettes.default;
+            }
+            if (d._children) return palette.collapsedFill;
+            if (d.children) return palette.fill;
+            return "#fff";
+        })
+        .style('stroke', d => {
+            let palette;
+            if (d.depth === 0) {
+                palette = levelSpecificPalettes[0];
+            } else if (d.depth === 1) {
+                palette = phaseColors[d.data.originalStageName] || phaseColors.Default;
+            } else {
+                palette = levelSpecificPalettes[d.depth] || levelSpecificPalettes.default;
+            }
+            return palette.stroke;
+        });
+      nodeUpdate.select('text').style("fill-opacity", 1).call(wrapText, 380);
+
+      const nodeExit = node.exit().transition().duration(duration).attr('transform', d => `translate(${source.y},${source.x})`).remove();
+      nodeExit.select('circle').attr('r', 1e-6);
+      nodeExit.select('text').style('fill-opacity', 1e-6);
+
+      const link = g.selectAll('path.link').data(links, d => d.id);
+      const linkEnter = link.enter().insert('path', "g").attr('class', 'link').attr('d', d => { const o = { x: source.x0, y: source.y0 }; return diagonal(o, o); });
+
+      linkEnter.merge(link).transition().duration(duration).attr('d', d => diagonal(d, d.parent))
+        .style('stroke', d => {
+            const sourceNode = d.parent;
+            if (!sourceNode) return phaseColors.Default.stroke;
+            const l1AncestorName = sourceNode.data.originalStageName;
+            const colorPalette = phaseColors[l1AncestorName] || phaseColors.Default;
+            return colorPalette.stroke;
+        });
+      link.exit().transition().duration(duration).attr('d', d => { const o = { x: source.x, y: source.y }; return diagonal(o, o); }).remove();
+      nodes.forEach(d => { d.x0 = d.x; d.y0 = d.y; });
+    }
+
+    function diagonal(s, d) { return `M ${s.y} ${s.x} C ${(s.y + d.y) / 2} ${s.x}, ${(s.y + d.y) / 2} ${d.x}, ${d.y} ${d.x}`; }
+
+    function wrapText(textElements, maxWidth) {
+        const textPartColors = {
+            name: '#343a40',
+            count: '#0056b3'
+        };
+        const countRegex = /(\s\(Total Count: \d+\))$/;
+
+        textElements.each(function () {
+            const textD3 = d3.select(this);
+            const originalNodeText = textD3.datum().data.name;
+            const x = parseFloat(textD3.attr("x") || 0);
+            const initialDy = textD3.attr("dy");
+            const textAnchor = textD3.attr("text-anchor");
+            const lineHeight = 1.1;
+
+            textD3.text(null);
+
+            let namePart = originalNodeText;
+            let countPartText = "";
+
+            const countMatch = originalNodeText.match(countRegex);
+            if (countMatch && originalNodeText.endsWith(countMatch[0])) {
+                namePart = originalNodeText.substring(0, originalNodeText.length - countMatch[0].length).trim();
+                countPartText = countMatch[0].trim();
+            }
+
+            const tokens = [];
+            namePart.split(/\s+/).filter(Boolean).forEach(word => {
+                tokens.push({ text: word, type: 'name' });
+            });
+            if (countPartText) {
+                tokens.push({ text: countPartText, type: 'count' });
+            }
+
+            if (tokens.length === 0 && originalNodeText) {
+                tokens.push({ text: originalNodeText, type: 'name' });
+            }
+
+            let currentTspan = textD3.append("tspan").attr("x", x).attr("dy", initialDy);
+            if (textAnchor === "end") currentTspan.attr("text-anchor", "end");
+
+            let lineTokens = [];
+
+            for (let i = 0; i < tokens.length; i++) {
+                const tokenObj = tokens[i];
+
+                lineTokens.push(tokenObj);
+                currentTspan.text(lineTokens.map(t => t.text).join(" "));
+
+                if (currentTspan.node().getComputedTextLength() > maxWidth && lineTokens.length > 1) {
+                    lineTokens.pop();
+
+                    currentTspan.text(null);
+                    lineTokens.forEach((prevToken, idx) => {
+                        currentTspan.append("tspan")
+                            .text((idx > 0 ? " " : "") + prevToken.text)
+                            .style("fill", textPartColors[prevToken.type] || textPartColors.name)
+                            .style("font-weight", prevToken.type === 'count' ? "bold" : "normal");
+                    });
+
+                    lineTokens = [tokenObj];
+                    currentTspan = textD3.append("tspan").attr("x", x).attr("dy", lineHeight + "em");
+                    if (textAnchor === "end") currentTspan.attr("text-anchor", "end");
+                }
+            }
+
+            currentTspan.text(null);
+            lineTokens.forEach((token, idx) => {
+                currentTspan.append("tspan")
+                    .text((idx > 0 ? " " : "") + token.text)
+                    .style("fill", textPartColors[token.type] || textPartColors.name)
+                    .style("font-weight", token.type === 'count' ? "bold" : "normal");
+            });
+
+            if (textD3.selectAll("tspan > tspan").empty() && textD3.select("tspan").text().length === 0 && originalNodeText) {
+                let t = textD3.select("tspan");
+                let displayText = originalNodeText;
+                t.text(displayText).style("fill", textPartColors.name);
+                if (t.node() && t.node().getComputedTextLength() > maxWidth && displayText.length > 20) {
+                    let estimatedChars = Math.floor(maxWidth / (t.node().getComputedTextLength()/displayText.length) );
+                    displayText = displayText.substring(0, Math.max(0, estimatedChars - 3)) + "...";
+                    t.text(displayText);
+                }
+            }
+        });
+    }
+  </script>
+</body>
+</html>
