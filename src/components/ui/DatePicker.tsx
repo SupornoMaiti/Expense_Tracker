@@ -116,18 +116,13 @@ export function DatePicker({ value, onChange, className, id, disabled = false }:
         id={inputId}
         disabled={disabled}
         className={cn(
-          "flex w-full items-center justify-between rounded-xl border border-input bg-background px-3 py-2 text-sm shadow-xs transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 h-10 cursor-pointer",
+          "flex w-full items-center gap-2 rounded-xl border border-input bg-background px-3 py-2 text-sm shadow-xs transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 h-10 cursor-pointer",
           className
         )}
       >
-        <div className="flex items-center gap-2 min-w-0">
-          <CalendarIcon className="h-4 w-4 text-muted-foreground shrink-0" />
-          <span className="font-semibold tracking-wide text-foreground truncate">
-            {displayString || "DD-MM-YYYY"}
-          </span>
-        </div>
-        <span className="text-[10px] font-bold text-muted-foreground/70 bg-muted px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0">
-          DD-MM-YYYY
+        <CalendarIcon className="h-4 w-4 text-muted-foreground shrink-0" />
+        <span className="font-semibold tracking-wide text-foreground truncate">
+          {displayString || "Select date"}
         </span>
       </PopoverTrigger>
 
