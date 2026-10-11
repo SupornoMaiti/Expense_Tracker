@@ -53,7 +53,13 @@ export default function Activity() {
     activityItems = activityItems.filter(a => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const d = a.data as any;
-      if (a.type === 'expense') return d.participantIds.includes(filterPersonId);
+      if (a.type === 'expense') {
+        return (
+          (d.participantIds && d.participantIds.includes(filterPersonId)) ||
+          (d.payers && d.payers.some((p: any) => p.personId === filterPersonId)) ||
+          (d.shares && d.shares.some((s: any) => s.personId === filterPersonId))
+        );
+      }
       if (a.type === 'settlement') return d.fromId === filterPersonId || d.toId === filterPersonId;
       return false;
     });
