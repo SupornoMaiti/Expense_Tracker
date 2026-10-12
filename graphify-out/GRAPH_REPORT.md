@@ -1,17 +1,17 @@
 # Graph Report - Finance Tracker  (2026-10-12)
 
 ## Corpus Check
-- 128 files · ~61,634 words
+- 128 files · ~113,088 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 6 file(s) not represented in the graph (top: (none) 4, .example 1, .css 1)
 
 ## Summary
-- 670 nodes · 1616 edges · 52 communities (44 shown, 8 thin omitted)
+- 670 nodes · 1614 edges · 53 communities (44 shown, 9 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 4 edges (avg confidence: 0.95)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `3929d65a`
+- Built from commit: `00b8d3c9`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -19,7 +19,6 @@
 - repositories.ts
 - db.ts
 - Button
-- 1. Problem Analysis
 - App.tsx
 - package.json
 - devDependencies
@@ -65,6 +64,7 @@
 - responsive-Responsive-over-d1af3-route-settings-for-overlaps-chromium/error-context.md
 - responsive-Responsive-over-dcb70--route-friends-for-overlaps-chromium/error-context.md
 - responsive-Responsive-over-eebee-route-insights-for-overlaps-chromium/error-context.md
+- 1. Problem Analysis
 
 ## God Nodes (most connected - your core abstractions)
 1. `Button()` - 51 edges
@@ -73,10 +73,10 @@
 4. `db` - 27 edges
 5. `cn` - 24 edges
 6. `Expense` - 23 edges
-7. `Dashboard()` - 21 edges
-8. `vitest` - 21 edges
-9. `formatMoney()` - 20 edges
-10. `Analyze()` - 20 edges
+7. `vitest` - 21 edges
+8. `formatMoney()` - 20 edges
+9. `Analyze()` - 20 edges
+10. `Dashboard()` - 20 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Phase 1: Money Logic Audit` --references--> `parseDecimalToMinor()`  [INFERRED]
@@ -93,7 +93,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (52 total, 8 thin omitted)
+## Communities (53 total, 9 thin omitted)
 
 ### Community 0 - "repositories.ts"
 Cohesion: 0.09
@@ -104,20 +104,16 @@ Cohesion: 0.09
 Nodes (35): bench(), @testing-library/react, vitest, seedAndMeasure(), PersonActivityFeedProps, PersonBalanceSummaryProps, exportBackup(), importBackup() (+27 more)
 
 ### Community 2 - "Button"
-Cohesion: 0.08
+Cohesion: 0.10
 Nodes (36): @base-ui/react, class-variance-authority, cn, AddFriendModal(), COLORS, EditFriendModal(), ImportBackupModal(), ImportBackupModalProps (+28 more)
 
-### Community 3 - "1. Problem Analysis"
-Cohesion: 0.33
-Nodes (5): 1. Problem Analysis, 2. Solution Plan, A. Settle Logic Issues, B. Notification / Alert Placement, Settle Logic & Notification Positioning Investigation & Fix Plan
-
 ### Community 4 - "App.tsx"
-Cohesion: 0.08
-Nodes (25): react-dom, App(), AppShell(), NAV_ITEMS, ScrollToTop(), ErrorBoundary, Props, State (+17 more)
+Cohesion: 0.07
+Nodes (26): next-themes, react-dom, App(), AppShell(), NAV_ITEMS, ScrollToTop(), ErrorBoundary, Props (+18 more)
 
 ### Community 5 - "package.json"
 Cohesion: 0.08
-Nodes (25): name, private, type, version, autoprefixer, clsx, date-fns, dexie (+17 more)
+Nodes (24): name, private, type, version, autoprefixer, clsx, date-fns, dexie (+16 more)
 
 ### Community 6 - "devDependencies"
 Cohesion: 0.08
@@ -271,20 +267,24 @@ Nodes (3): Error details, Instructions, Test info
 Cohesion: 0.50
 Nodes (3): Error details, Instructions, Test info
 
+### Community 52 - "1. Problem Analysis"
+Cohesion: 0.33
+Nodes (5): 1. Problem Analysis, 2. Solution Plan, A. Settle Logic Issues, B. Notification / Alert Placement, Settle Logic & Notification Positioning Investigation & Fix Plan
+
 ## Knowledge Gaps
 - **18 isolated node(s):** `autoprefixer`, `clsx`, `date-fns`, `framer-motion`, `@hookform/resolvers` (+13 more)
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 354 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **8 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **9 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `react` connect `repositories.ts` to `Button`, `App.tsx`, `package.json`, `drawer.tsx`, `chart.tsx`, `PersonHeader.tsx`, `AddExpenseModal.tsx`, `avatar.tsx`?**
+- **Why does `react` connect `repositories.ts` to `Button`, `table.tsx`, `App.tsx`, `package.json`, `drawer.tsx`, `chart.tsx`, `PersonHeader.tsx`, `AddExpenseModal.tsx`, `avatar.tsx`?**
   _High betweenness centrality (0.106) - this node is a cross-community bridge._
 - **What connects `autoprefixer`, `clsx`, `date-fns` to the rest of the system?**
   _18 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `repositories.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.09269662921348315 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09295199182839632 - nodes in this community are weakly interconnected._
 - **Why does `devDependencies` connect `devDependencies` to `package.json`?**
   _High betweenness centrality (0.053) - this node is a cross-community bridge._
 - **Should `db.ts` be split into smaller, more focused modules?**
@@ -292,4 +292,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **Why does `lucide-react` connect `repositories.ts` to `db.ts`, `Button`, `App.tsx`, `package.json`, `PersonHeader.tsx`, `AddExpenseModal.tsx`, `navigation-menu.tsx`?**
   _High betweenness centrality (0.053) - this node is a cross-community bridge._
 - **Should `Button` be split into smaller, more focused modules?**
-  _Cohesion score 0.07594381035996488 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09585037989479836 - nodes in this community are weakly interconnected._

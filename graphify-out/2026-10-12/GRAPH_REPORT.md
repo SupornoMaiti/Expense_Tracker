@@ -1,7 +1,7 @@
 # Graph Report - Finance Tracker  (2026-10-12)
 
 ## Corpus Check
-- 128 files · ~61,634 words
+- 128 files · ~113,088 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 6 file(s) not represented in the graph (top: (none) 4, .example 1, .css 1)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `7ac855bb`
+- Built from commit: `a8972774`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 

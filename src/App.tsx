@@ -70,9 +70,22 @@ function AppShell() {
     <div className="flex h-dvh w-full flex-col bg-background md:flex-row overflow-hidden font-sans">
       {/* ── Top bar (Mobile only) ───────────────────────────────── */}
       <header className="flex h-14 shrink-0 items-center justify-between border-b bg-background/80 backdrop-blur-md px-4 md:hidden z-[var(--z-nav)] pt-safe">
-        <div className="flex items-center gap-2 font-semibold text-primary tracking-tight">
-          SplitLocal
-        </div>
+        <NavLink 
+          to="/" 
+          className="flex items-center py-1 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md"
+          aria-label="SplitLocal Home"
+        >
+          <img
+            src="/SplitLocal%20Brush%20Logo.png"
+            alt="SplitLocal"
+            className="h-10 max-h-11 w-auto max-w-[155px] sm:max-w-[170px] object-contain hidden dark:block transition-transform duration-200 group-hover:scale-105"
+          />
+          <img
+            src="/SplitLocal%20Brush%20Logo%20Light.png"
+            alt="SplitLocal"
+            className="h-10 max-h-11 w-auto max-w-[155px] sm:max-w-[170px] object-contain block dark:hidden transition-transform duration-200 group-hover:scale-105"
+          />
+        </NavLink>
         <div className="flex items-center gap-2">
           <ThemeToggle />
           <NavLink 
@@ -87,10 +100,23 @@ function AppShell() {
 
       {/* ── Sidebar (Desktop only) ──────────────────────────────── */}
       <aside className="hidden md:flex w-64 flex-col border-r bg-muted/30 z-[var(--z-nav)]">
-        <div className="flex h-14 items-center justify-between px-6 border-b border-transparent">
-          <div className="flex items-center gap-2 font-bold text-primary tracking-tight">
-            SplitLocal
-          </div>
+        <div className="flex h-14 items-center justify-between px-5 border-b border-border/40">
+          <NavLink 
+            to="/" 
+            className="flex items-center py-1 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md"
+            aria-label="SplitLocal Home"
+          >
+            <img
+              src="/SplitLocal%20Brush%20Logo.png"
+              alt="SplitLocal"
+              className="h-11 max-h-12 w-auto max-w-[175px] object-contain hidden dark:block transition-transform duration-200 group-hover:scale-105"
+            />
+            <img
+              src="/SplitLocal%20Brush%20Logo%20Light.png"
+              alt="SplitLocal"
+              className="h-11 max-h-12 w-auto max-w-[175px] object-contain block dark:hidden transition-transform duration-200 group-hover:scale-105"
+            />
+          </NavLink>
         </div>
         
         <div className="px-4 py-4 flex items-center justify-between">
