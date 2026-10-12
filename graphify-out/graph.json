@@ -429,7 +429,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "code",
       "norm_label": "activityitem",
       "source_file": "src/pages/Activity.tsx",
@@ -721,6 +721,18 @@
       "source_location": "L7"
     },
     {
+      "id": "src_components_ui_input_input",
+      "label": "Input()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "SettleUp.tsx",
+      "file_type": "code",
+      "norm_label": "input()",
+      "source_file": "src/components/ui/input.tsx",
+      "source_location": "L5"
+    },
+    {
       "id": "src_components_ui_select_selectcontent",
       "label": "SelectContent()",
       "_callable": true,
@@ -985,6 +997,30 @@
       "source_location": "L30"
     },
     {
+      "id": "src_lib_money_formatmoney",
+      "label": "formatMoney()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "SettleUp.tsx",
+      "file_type": "code",
+      "norm_label": "formatmoney()",
+      "source_file": "src/lib/money.ts",
+      "source_location": "L66"
+    },
+    {
+      "id": "src_lib_money_getlocaleforcurrency",
+      "label": "getLocaleForCurrency()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "SettleUp.tsx",
+      "file_type": "code",
+      "norm_label": "getlocaleforcurrency()",
+      "source_file": "src/lib/money.ts",
+      "source_location": "L45"
+    },
+    {
       "id": "src_pages_activity_activity",
       "label": "Activity()",
       "_callable": true,
@@ -1141,6 +1177,54 @@
       "source_location": "L25"
     },
     {
+      "id": "src_db_repositories_createrefundforexpense",
+      "label": "createRefundForExpense()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "repositories.ts",
+      "file_type": "code",
+      "norm_label": "createrefundforexpense()",
+      "source_file": "src/db/repositories.ts",
+      "source_location": "L140"
+    },
+    {
+      "id": "src_db_repositories_createrefundforsettlement",
+      "label": "createRefundForSettlement()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "repositories.ts",
+      "file_type": "code",
+      "norm_label": "createrefundforsettlement()",
+      "source_file": "src/db/repositories.ts",
+      "source_location": "L240"
+    },
+    {
+      "id": "src_db_repositories_ensuredefaultcategories",
+      "label": "ensureDefaultCategories()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "repositories.ts",
+      "file_type": "code",
+      "norm_label": "ensuredefaultcategories()",
+      "source_file": "src/db/repositories.ts",
+      "source_location": "L488"
+    },
+    {
+      "id": "src_db_repositories_ensureme",
+      "label": "ensureMe()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "repositories.ts",
+      "file_type": "code",
+      "norm_label": "ensureme()",
+      "source_file": "src/db/repositories.ts",
+      "source_location": "L362"
+    },
+    {
       "id": "src_db_repositories_getactiveexpensesbygroupid",
       "label": "getActiveExpensesByGroupId()",
       "_callable": true,
@@ -1175,6 +1259,30 @@
       "norm_label": "getpersonbyphone()",
       "source_file": "src/db/repositories.ts",
       "source_location": "L354"
+    },
+    {
+      "id": "src_db_repositories_resetdatabase",
+      "label": "resetDatabase()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "repositories.ts",
+      "file_type": "code",
+      "norm_label": "resetdatabase()",
+      "source_file": "src/db/repositories.ts",
+      "source_location": "L663"
+    },
+    {
+      "id": "src_db_repositories_seedsampledata",
+      "label": "seedSampleData()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "repositories.ts",
+      "file_type": "code",
+      "norm_label": "seedsampledata()",
+      "source_file": "src/db/repositories.ts",
+      "source_location": "L506"
     },
     {
       "id": "src_db_repositories_updateexpense",
@@ -1261,28 +1369,28 @@
       "source_location": "L7"
     },
     {
-      "id": "src_lib_money_formatmoney",
-      "label": "formatMoney()",
+      "id": "src_hooks_usedbinit_usedbinit",
+      "label": "useDBInit()",
       "_callable": true,
       "_origin": "ast",
       "community": 1,
       "community_name": "repositories.ts",
       "file_type": "code",
-      "norm_label": "formatmoney()",
-      "source_file": "src/lib/money.ts",
-      "source_location": "L66"
+      "norm_label": "usedbinit()",
+      "source_file": "src/hooks/useDBInit.ts",
+      "source_location": "L5"
     },
     {
-      "id": "src_lib_money_getlocaleforcurrency",
-      "label": "getLocaleForCurrency()",
+      "id": "src_hooks_usedbinit_usedbinit_init",
+      "label": "init()",
       "_callable": true,
       "_origin": "ast",
       "community": 1,
       "community_name": "repositories.ts",
       "file_type": "code",
-      "norm_label": "getlocaleforcurrency()",
-      "source_file": "src/lib/money.ts",
-      "source_location": "L45"
+      "norm_label": "init()",
+      "source_file": "src/hooks/useDBInit.ts",
+      "source_location": "L10"
     },
     {
       "id": "src_lib_tests_phone_test_normalizephone",
@@ -1294,6 +1402,18 @@
       "file_type": "code",
       "norm_label": "normalizephone()",
       "source_file": "src/lib/__tests__/phone.test.ts",
+      "source_location": "L3"
+    },
+    {
+      "id": "src_lib_utils_generateid",
+      "label": "generateId()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "repositories.ts",
+      "file_type": "code",
+      "norm_label": "generateid()",
+      "source_file": "src/lib/utils.ts",
       "source_location": "L3"
     },
     {
@@ -1355,6 +1475,18 @@
       "norm_label": "readastext()",
       "source_file": "src/__tests__/backup.test.tsx",
       "source_location": "L102"
+    },
+    {
+      "id": "test_ensureme_run",
+      "label": "run()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "repositories.ts",
+      "file_type": "code",
+      "norm_label": "run()",
+      "source_file": "test_ensureme.ts",
+      "source_location": "L6"
     },
     {
       "id": "src_components_ui_drawer_drawer",
@@ -2209,18 +2341,6 @@
       "source_location": "L12"
     },
     {
-      "id": "src_components_ui_input_input",
-      "label": "Input()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "Button",
-      "file_type": "code",
-      "norm_label": "input()",
-      "source_file": "src/components/ui/input.tsx",
-      "source_location": "L5"
-    },
-    {
       "id": "src_components_ui_label_label",
       "label": "Label()",
       "_callable": true,
@@ -2473,132 +2593,12 @@
       "source_location": "L14"
     },
     {
-      "id": "src_db_repositories_createrefundforexpense",
-      "label": "createRefundForExpense()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "generateId",
-      "file_type": "code",
-      "norm_label": "createrefundforexpense()",
-      "source_file": "src/db/repositories.ts",
-      "source_location": "L140"
-    },
-    {
-      "id": "src_db_repositories_createrefundforsettlement",
-      "label": "createRefundForSettlement()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "generateId",
-      "file_type": "code",
-      "norm_label": "createrefundforsettlement()",
-      "source_file": "src/db/repositories.ts",
-      "source_location": "L240"
-    },
-    {
-      "id": "src_db_repositories_ensuredefaultcategories",
-      "label": "ensureDefaultCategories()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "generateId",
-      "file_type": "code",
-      "norm_label": "ensuredefaultcategories()",
-      "source_file": "src/db/repositories.ts",
-      "source_location": "L488"
-    },
-    {
-      "id": "src_db_repositories_ensureme",
-      "label": "ensureMe()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "generateId",
-      "file_type": "code",
-      "norm_label": "ensureme()",
-      "source_file": "src/db/repositories.ts",
-      "source_location": "L362"
-    },
-    {
-      "id": "src_db_repositories_resetdatabase",
-      "label": "resetDatabase()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "generateId",
-      "file_type": "code",
-      "norm_label": "resetdatabase()",
-      "source_file": "src/db/repositories.ts",
-      "source_location": "L663"
-    },
-    {
-      "id": "src_db_repositories_seedsampledata",
-      "label": "seedSampleData()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "generateId",
-      "file_type": "code",
-      "norm_label": "seedsampledata()",
-      "source_file": "src/db/repositories.ts",
-      "source_location": "L506"
-    },
-    {
-      "id": "src_hooks_usedbinit_usedbinit",
-      "label": "useDBInit()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "generateId",
-      "file_type": "code",
-      "norm_label": "usedbinit()",
-      "source_file": "src/hooks/useDBInit.ts",
-      "source_location": "L5"
-    },
-    {
-      "id": "src_hooks_usedbinit_usedbinit_init",
-      "label": "init()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "generateId",
-      "file_type": "code",
-      "norm_label": "init()",
-      "source_file": "src/hooks/useDBInit.ts",
-      "source_location": "L10"
-    },
-    {
-      "id": "src_lib_utils_generateid",
-      "label": "generateId()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "generateId",
-      "file_type": "code",
-      "norm_label": "generateid()",
-      "source_file": "src/lib/utils.ts",
-      "source_location": "L3"
-    },
-    {
-      "id": "test_ensureme_run",
-      "label": "run()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "generateId",
-      "file_type": "code",
-      "norm_label": "run()",
-      "source_file": "test_ensureme.ts",
-      "source_location": "L6"
-    },
-    {
       "id": "vite_config_manualchunks",
       "label": "manualChunks()",
       "_callable": true,
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "code",
       "norm_label": "manualchunks()",
       "source_file": "vite.config.ts",
@@ -3160,28 +3160,6 @@
       "source_location": "L1"
     },
     {
-      "id": "src_components_ui_textarea",
-      "label": "textarea.tsx",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "SettleUp.tsx",
-      "file_type": "code",
-      "norm_label": "textarea.tsx",
-      "source_file": "src/components/ui/textarea.tsx",
-      "source_location": "L1"
-    },
-    {
-      "id": "src_db_repositories_default_categories",
-      "label": "DEFAULT_CATEGORIES",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "SettleUp.tsx",
-      "file_type": "code",
-      "norm_label": "default_categories",
-      "source_file": "src/db/repositories.ts",
-      "source_location": "L477"
-    },
-    {
       "id": "src_db_tests_repositories_test",
       "label": "repositories.test.ts",
       "_origin": "ast",
@@ -3193,14 +3171,14 @@
       "source_location": "L1"
     },
     {
-      "id": "src_hooks_usepersondetaildata",
-      "label": "usePersonDetailData.ts",
+      "id": "src_lib_money",
+      "label": "money.ts",
       "_origin": "ast",
       "community": 0,
       "community_name": "SettleUp.tsx",
       "file_type": "code",
-      "norm_label": "usepersondetaildata.ts",
-      "source_file": "src/hooks/usePersonDetailData.ts",
+      "norm_label": "money.ts",
+      "source_file": "src/lib/money.ts",
       "source_location": "L1"
     },
     {
@@ -3389,6 +3367,17 @@
       "norm_label": "repositories.ts",
       "source_file": "src/db/repositories.ts",
       "source_location": "L1"
+    },
+    {
+      "id": "src_db_repositories_default_categories",
+      "label": "DEFAULT_CATEGORIES",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "repositories.ts",
+      "file_type": "code",
+      "norm_label": "default_categories",
+      "source_file": "src/db/repositories.ts",
+      "source_location": "L477"
     },
     {
       "id": "src_db_tests_backup_test",
@@ -3589,14 +3578,25 @@
       "source_location": "L1"
     },
     {
-      "id": "src_lib_money",
-      "label": "money.ts",
+      "id": "src_hooks_usedbinit",
+      "label": "useDBInit.ts",
       "_origin": "ast",
       "community": 1,
       "community_name": "repositories.ts",
       "file_type": "code",
-      "norm_label": "money.ts",
-      "source_file": "src/lib/money.ts",
+      "norm_label": "usedbinit.ts",
+      "source_file": "src/hooks/useDBInit.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_hooks_usepersondetaildata",
+      "label": "usePersonDetailData.ts",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "repositories.ts",
+      "file_type": "code",
+      "norm_label": "usepersondetaildata.ts",
+      "source_file": "src/hooks/usePersonDetailData.ts",
       "source_location": "L1"
     },
     {
@@ -3677,17 +3677,6 @@
       "source_location": "L1"
     },
     {
-      "id": "src_tests_no_stubs_test",
-      "label": "no-stubs.test.ts",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "repositories.ts",
-      "file_type": "code",
-      "norm_label": "no-stubs.test.ts",
-      "source_file": "src/__tests__/no-stubs.test.ts",
-      "source_location": "L1"
-    },
-    {
       "id": "test_ensureme",
       "label": "test_ensureme.ts",
       "_origin": "ast",
@@ -3764,6 +3753,30 @@
       "norm_label": "change verification summary",
       "source_file": "AUDIT_REPORT.md",
       "source_location": "L201"
+    },
+    {
+      "id": "audit_report_f_01_critical_createrefundforexpense_allocation_breakdown_zod_invariant_failure",
+      "label": "[F-01] Critical: `createRefundForExpense` Allocation Breakdown & Zod Invariant Failure",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "repositories.ts",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "[f-01] critical: `createrefundforexpense` allocation breakdown & zod invariant failure",
+      "source_file": "AUDIT_REPORT.md",
+      "source_location": "L42"
+    },
+    {
+      "id": "audit_report_f_02_critical_multiple_partial_refunds_can_exceed_original_expense_amount",
+      "label": "[F-02] Critical: Multiple Partial Refunds Can Exceed Original Expense Amount",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "repositories.ts",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "[f-02] critical: multiple partial refunds can exceed original expense amount",
+      "source_file": "AUDIT_REPORT.md",
+      "source_location": "L52"
     },
     {
       "id": "audit_report_f_05_high_backup_schema_incompatibility_between_db_ts_and_ui",
@@ -4295,6 +4308,17 @@
       "source_location": "L1"
     },
     {
+      "id": "src_tests_no_stubs_test",
+      "label": "no-stubs.test.ts",
+      "_origin": "ast",
+      "community": 15,
+      "community_name": "no-stubs.test.ts",
+      "file_type": "code",
+      "norm_label": "no-stubs.test.ts",
+      "source_file": "src/__tests__/no-stubs.test.ts",
+      "source_location": "L1"
+    },
+    {
       "id": "src_components_ui_navigation_menu",
       "label": "navigation-menu.tsx",
       "_origin": "ast",
@@ -4722,6 +4746,17 @@
       "norm_label": "tabslistvariants",
       "source_file": "src/components/ui/tabs.tsx",
       "source_location": "L23"
+    },
+    {
+      "id": "src_components_ui_textarea",
+      "label": "textarea.tsx",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Button",
+      "file_type": "code",
+      "norm_label": "textarea.tsx",
+      "source_file": "src/components/ui/textarea.tsx",
+      "source_location": "L1"
     },
     {
       "id": "src_components_welcomemodal",
@@ -5262,22 +5297,11 @@
       "source_location": "L20"
     },
     {
-      "id": "src_hooks_usedbinit",
-      "label": "useDBInit.ts",
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "generateId",
-      "file_type": "code",
-      "norm_label": "usedbinit.ts",
-      "source_file": "src/hooks/useDBInit.ts",
-      "source_location": "L1"
-    },
-    {
       "id": "audit_report",
       "label": "AUDIT_REPORT.md",
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "document",
       "node_kind": "page",
       "norm_label": "audit_report.md",
@@ -5289,7 +5313,7 @@
       "label": "Detailed Re-Audit Findings",
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "detailed re-audit findings",
@@ -5297,35 +5321,11 @@
       "source_location": "L40"
     },
     {
-      "id": "audit_report_f_01_critical_createrefundforexpense_allocation_breakdown_zod_invariant_failure",
-      "label": "[F-01] Critical: `createRefundForExpense` Allocation Breakdown & Zod Invariant Failure",
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "generateId",
-      "file_type": "document",
-      "node_kind": "heading",
-      "norm_label": "[f-01] critical: `createrefundforexpense` allocation breakdown & zod invariant failure",
-      "source_file": "AUDIT_REPORT.md",
-      "source_location": "L42"
-    },
-    {
-      "id": "audit_report_f_02_critical_multiple_partial_refunds_can_exceed_original_expense_amount",
-      "label": "[F-02] Critical: Multiple Partial Refunds Can Exceed Original Expense Amount",
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "generateId",
-      "file_type": "document",
-      "node_kind": "heading",
-      "norm_label": "[f-02] critical: multiple partial refunds can exceed original expense amount",
-      "source_file": "AUDIT_REPORT.md",
-      "source_location": "L52"
-    },
-    {
       "id": "audit_report_f_03_high_date_format_incompatibility_in_computeanalyze_and_analyze_tsx",
       "label": "[F-03] High: Date Format Incompatibility in `computeAnalyze` and `Analyze.tsx`",
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "[f-03] high: date format incompatibility in `computeanalyze` and `analyze.tsx`",
@@ -5337,7 +5337,7 @@
       "label": "[F-04] High: Unique Index Collision & Unhandled Crash on Backup Merge",
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "[f-04] high: unique index collision & unhandled crash on backup merge",
@@ -5349,7 +5349,7 @@
       "label": "[F-06] Medium: Recharts & `dangerouslySetInnerHTML` Still Present in Project",
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "[f-06] medium: recharts & `dangerouslysetinnerhtml` still present in project",
@@ -5361,7 +5361,7 @@
       "label": "[F-07] Medium: Unhandled `NaN` in Settle Up Form Submission",
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "[f-07] medium: unhandled `nan` in settle up form submission",
@@ -5373,7 +5373,7 @@
       "label": "[F-08] Medium: Multi-Currency Debts Silently Hidden on Dashboard & Friends",
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "[f-08] medium: multi-currency debts silently hidden on dashboard & friends",
@@ -5385,7 +5385,7 @@
       "label": "[F-09] Medium: Indian Numbering System (`en-IN`) Hardcoded for Non-INR Currencies",
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "[f-09] medium: indian numbering system (`en-in`) hardcoded for non-inr currencies",
@@ -5397,7 +5397,7 @@
       "label": "[F-10] Medium: False Positive Prototype Pollution Rejection in Backup Import",
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "[f-10] medium: false positive prototype pollution rejection in backup import",
@@ -5409,7 +5409,7 @@
       "label": "[F-11] Medium: Missing Currency and Country Code Controls in Settings UI",
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "[f-11] medium: missing currency and country code controls in settings ui",
@@ -5421,7 +5421,7 @@
       "label": "[F-12] Low: Timezone Boundary Date Discrepancy in `DatePicker.tsx`",
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "[f-12] low: timezone boundary date discrepancy in `datepicker.tsx`",
@@ -5433,7 +5433,7 @@
       "label": "[F-13] Low: Dead Callback in `sendWhatsAppReminder`",
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "[f-13] low: dead callback in `sendwhatsappreminder`",
@@ -5445,7 +5445,7 @@
       "label": "[F-14] Low: React 19 State Cascading & ESLint Errors",
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "[f-14] low: react 19 state cascading & eslint errors",
@@ -5457,7 +5457,7 @@
       "label": "[F-15] Low: Bundle Size & Production Dependencies",
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "[f-15] low: bundle size & production dependencies",
@@ -5469,7 +5469,7 @@
       "label": "Final Audit & Reaudit Verdict",
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "final audit & reaudit verdict",
@@ -5481,7 +5481,7 @@
       "label": "New Findings (Third Reaudit)",
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "new findings (third reaudit)",
@@ -5493,7 +5493,7 @@
       "label": "Post-Fix Re-Audit Summary Table (New Findings)",
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "post-fix re-audit summary table (new findings)",
@@ -5505,7 +5505,7 @@
       "label": "[RF-01] Medium: Missing Dexie Index on `refundOfId` \u2014 Full Table Scans on Refund Operations",
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "[rf-01] medium: missing dexie index on `refundofid` \u2014 full table scans on refund operations",
@@ -5517,7 +5517,7 @@
       "label": "[RF-02] Medium: Hardcoded `\u20b9` Currency Symbol in Settle Up \"Settled Up\" State",
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "[rf-02] medium: hardcoded `\u20b9` currency symbol in settle up \"settled up\" state",
@@ -5529,7 +5529,7 @@
       "label": "[RF-03] Low: Timezone Boundary in Backup Export Filename",
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "[rf-03] low: timezone boundary in backup export filename",
@@ -5541,7 +5541,7 @@
       "label": "[RF-04] Low: Residual `any` Types in `Dashboard.tsx` and `Activity.tsx`",
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "[rf-04] low: residual `any` types in `dashboard.tsx` and `activity.tsx`",
@@ -5553,7 +5553,7 @@
       "label": "[RF-05] Low: Refund Filter Queries Use `.filter()` (Full Table Scan) Instead of `.where()` Index",
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "[rf-05] low: refund filter queries use `.filter()` (full table scan) instead of `.where()` index",
@@ -5565,7 +5565,7 @@
       "label": "SplitLocal Pre-release Audit Report",
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "splitlocal pre-release audit report",
@@ -5577,7 +5577,7 @@
       "label": "Summary Table: Initial Audit Findings",
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "summary table: initial audit findings",
@@ -5589,7 +5589,7 @@
       "label": "Third Reaudit \u2014 Change Verification & New Findings",
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "third reaudit \u2014 change verification & new findings",
@@ -5601,7 +5601,7 @@
       "label": "Verdict",
       "_origin": "ast",
       "community": 3,
-      "community_name": "generateId",
+      "community_name": "Detailed Re-Audit Findings",
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "verdict",
@@ -8024,8 +8024,8 @@
     {
       "id": "ref_fs",
       "label": "ref_fs",
-      "community": 1,
-      "community_name": "repositories.ts",
+      "community": 15,
+      "community_name": "no-stubs.test.ts",
       "external": true,
       "file_type": "concept",
       "norm_label": "ref_fs",
@@ -8035,8 +8035,8 @@
     {
       "id": "ref_glob",
       "label": "ref_glob",
-      "community": 1,
-      "community_name": "repositories.ts",
+      "community": 15,
+      "community_name": "no-stubs.test.ts",
       "external": true,
       "file_type": "concept",
       "norm_label": "ref_glob",
@@ -13830,6 +13830,18 @@
     },
     {
       "source": "src_components_importbackupmodal",
+      "target": "src_components_ui_confirmdialog_confirmdialog",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/components/ImportBackupModal.tsx",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "src_components_importbackupmodal",
       "target": "src_components_ui_dialog_dialog",
       "relation": "imports",
       "_origin": "ast",
@@ -14102,6 +14114,18 @@
       "context": "import",
       "source_file": "src/components/person/PersonActivityFeed.tsx",
       "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "src_components_person_personactivityfeed",
+      "target": "src_components_ui_currencyicon_currencyicon",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/components/person/PersonActivityFeed.tsx",
+      "source_location": "L9",
       "weight": 1.0
     },
     {
@@ -15918,6 +15942,18 @@
     },
     {
       "source": "src_pages_activity",
+      "target": "src_components_ui_currencyicon_currencyicon",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/pages/Activity.tsx",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "src_pages_activity",
       "target": "src_components_ui_button_button",
       "relation": "imports",
       "_origin": "ast",
@@ -16262,6 +16298,18 @@
       "context": "import",
       "source_file": "src/pages/Dashboard.tsx",
       "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "src_pages_dashboard",
+      "target": "src_components_ui_currencyicon_currencyicon",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/pages/Dashboard.tsx",
+      "source_location": "L13",
       "weight": 1.0
     },
     {
@@ -16730,6 +16778,30 @@
       "context": "import",
       "source_file": "src/pages/Settings.tsx",
       "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "src_pages_settings",
+      "target": "src_components_categoriesmanager_categoriesmanager",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/pages/Settings.tsx",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "src_pages_settings",
+      "target": "src_components_ui_confirmdialog_confirmdialog",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/pages/Settings.tsx",
+      "source_location": "L15",
       "weight": 1.0
     },
     {
@@ -28400,5 +28472,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "4bfb840ea867c976be40090768f0dd4a76aeaf90"
+  "built_at_commit": "a6802c92691fb684ad42dbfaae250dbb2b04b017"
 }
