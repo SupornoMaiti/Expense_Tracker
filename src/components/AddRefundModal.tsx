@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Expense } from '../domain/types';
 import { parseDecimalToMinor, formatMoney } from '../lib/money';
 import { createRefundForExpense } from '../db/repositories';
 import { DatePicker } from './ui/DatePicker';
-import { formatDisplayDate } from '../lib/date';
+import { formatDisplayDate, getTodayISODate } from '../lib/date';
+import { db } from '../db/db';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,14 +18,32 @@ interface Props {
 }
 
 export default function AddRefundModal({ expense, onClose, onSuccess }: Props) {
-  const defaultAmountMajor = (expense.amountMinor / 100).toString();
-  const [amount, setAmount] = useState(defaultAmountMajor);
-  const [date, setDate] = useState(() => {
-    const d = new Date();
-    return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
-  });
+  const [maxRefundable, setMaxRefundable] = useState<number>(expense.amountMinor);
+  const [amount, setAmount] = useState((expense.amountMinor / 100).toString());
+  const [date, setDate] = useState(() => getTodayISODate());
   const [notes, setNotes] = useState(`Refund for "${expense.description}"`);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadExistingRefunds() {
+      const existingRefunds = await db.expenses
+        .where('refundOfId')
+        .equals(expense.id)
+        .filter(e => !e.deletedAt)
+        .toArray();
+      const alreadyRefunded = existingRefunds.reduce((sum, r) => sum + r.amountMinor, 0);
+      const remaining = Math.max(0, expense.amountMinor - alreadyRefunded);
+      if (isMounted) {
+        setMaxRefundable(remaining);
+        setAmount((remaining / 100).toString());
+      }
+    }
+    loadExistingRefunds();
+    return () => {
+      isMounted = false;
+    };
+  }, [expense.id, expense.amountMinor]);
 
   const handleSave = async () => {
     const amountMinor = parseDecimalToMinor(amount);
@@ -32,8 +51,8 @@ export default function AddRefundModal({ expense, onClose, onSuccess }: Props) {
       toast.error('Please enter a valid positive refund amount');
       return;
     }
-    if (amountMinor > expense.amountMinor) {
-      toast.error(`Refund amount cannot exceed ${formatMoney(expense.amountMinor, expense.currency)}`);
+    if (amountMinor > maxRefundable) {
+      toast.error(`Refund amount cannot exceed remaining ${formatMoney(maxRefundable, expense.currency)}`);
       return;
     }
 
@@ -48,8 +67,9 @@ export default function AddRefundModal({ expense, onClose, onSuccess }: Props) {
       toast.success(`Refund of ${formatMoney(amountMinor, expense.currency)} recorded`);
       onSuccess?.();
       onClose();
-    } catch (err: any) {
-      toast.error(err?.message || 'Failed to record refund');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to record refund';
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -82,6 +102,11 @@ export default function AddRefundModal({ expense, onClose, onSuccess }: Props) {
               <p className="text-muted-foreground">
                 Total {formatMoney(expense.amountMinor, expense.currency)} • Date: {formatDisplayDate(expense.date)}
               </p>
+              {maxRefundable < expense.amountMinor && (
+                <p className="text-amber-600 dark:text-amber-400 font-medium pt-0.5">
+                  Remaining refundable: {formatMoney(maxRefundable, expense.currency)}
+                </p>
+              )}
             </div>
           </div>
 
@@ -90,10 +115,11 @@ export default function AddRefundModal({ expense, onClose, onSuccess }: Props) {
               <Label className="text-xs font-semibold">Refund Amount</Label>
               <button
                 type="button"
-                onClick={() => setAmount((expense.amountMinor / 100).toString())}
+                onClick={() => setAmount((maxRefundable / 100).toString())}
                 className="text-[11px] text-primary hover:underline font-medium"
+                disabled={maxRefundable <= 0}
               >
-                Full Refund ({formatMoney(expense.amountMinor, expense.currency)})
+                Max Refund ({formatMoney(maxRefundable, expense.currency)})
               </button>
             </div>
             <div className="relative">

@@ -33,6 +33,10 @@ describe('formatMoney', () => {
     expect(formatMoney(123456, 'USD')).toBe('$1,234.56');
   });
 
+  it('formats large non-INR currency with standard 3-digit grouping', () => {
+    expect(formatMoney(10000000, 'USD')).toBe('$100,000.00');
+  });
+
   it('WhatsApp amount string equals on-screen string', () => {
     const formatted = formatMoney(50000, 'INR');
     expect(formatted).toBe('₹500.00');

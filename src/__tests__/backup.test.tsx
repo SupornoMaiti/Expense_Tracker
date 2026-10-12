@@ -35,7 +35,9 @@ describe("Backup Import/Export", () => {
     document.body.innerHTML = "";
   });
 
-  const createMockFile = (content: any) => {
+  type MockReaderCallback = (e: { target: { result: string } }) => void;
+
+  const createMockFile = (content: unknown) => {
     const blob = new Blob([JSON.stringify(content)], {
       type: "application/json",
     });
@@ -44,7 +46,18 @@ describe("Backup Import/Export", () => {
 
   const getValidBackup = () => {
     const data = {
-      people: [{ id: "p1", name: "Raj", isMe: false }],
+      people: [{
+        id: "p1",
+        name: "Raj",
+        phone: null,
+        avatarColor: "#000000",
+        source: "manual" as const,
+        isMe: false,
+        createdAt: "2026-01-01T00:00:00Z",
+        updatedAt: "2026-01-01T00:00:00Z",
+        archivedAt: null,
+        deletedAt: null
+      }],
       expenses: [
         {
           id: "e1",
@@ -58,7 +71,7 @@ describe("Backup Import/Export", () => {
           shares: [{ personId: "p1", amountMinor: 50 }],
           participantIds: ["p1"],
           notes: "",
-          splitType: "equal",
+          splitType: "equal" as const,
           createdAt: "2026-01-01T00:00:00Z",
           updatedAt: "2026-01-01T00:00:00Z",
           deletedAt: null,
@@ -75,7 +88,7 @@ describe("Backup Import/Export", () => {
       a = (a << 5) - a + b.charCodeAt(0);
       return a & a;
     }, 0);
-    return { schemaVersion: 1, checksum, data };
+    return { schemaVersion: 1, checksum: checksum as number | string, data };
   };
 
   it("merge twice gives no duplicates", async () => {
@@ -85,10 +98,10 @@ describe("Backup Import/Export", () => {
     vi.stubGlobal(
       "FileReader",
       class {
-        onload: any;
+        onload: MockReaderCallback | null = null;
         readAsText() {
           setTimeout(
-            () => this.onload({ target: { result: JSON.stringify(backup) } }),
+            () => this.onload?.({ target: { result: JSON.stringify(backup) } }),
             0,
           );
         }
@@ -120,7 +133,18 @@ describe("Backup Import/Export", () => {
   });
 
   it("Replace with a corrupt file leaves data untouched", async () => {
-    await db.people.add({ id: "p99", name: "Original", isMe: false } as any);
+    await db.people.add({
+      id: "p99",
+      name: "Original",
+      phone: null,
+      avatarColor: "#ff0000",
+      source: "manual",
+      isMe: false,
+      createdAt: "2026-01-01T00:00:00Z",
+      updatedAt: "2026-01-01T00:00:00Z",
+      archivedAt: null,
+      deletedAt: null,
+    });
 
     const file = createMockFile({
       schemaVersion: 1,
@@ -131,11 +155,11 @@ describe("Backup Import/Export", () => {
     vi.stubGlobal(
       "FileReader",
       class {
-        onload: any;
+        onload: MockReaderCallback | null = null;
         readAsText() {
           setTimeout(
             () =>
-              this.onload({
+              this.onload?.({
                 target: {
                   result: JSON.stringify({
                     schemaVersion: 1,
@@ -166,20 +190,26 @@ describe("Backup Import/Export", () => {
     backup.data.people.push({
       id: "old-me",
       name: "Old Me",
+      phone: null,
+      avatarColor: "#0000ff",
+      source: "manual",
       isMe: true,
       createdAt: "2020-01-01T00:00:00Z",
-    } as any);
+      updatedAt: "2020-01-01T00:00:00Z",
+      archivedAt: null,
+      deletedAt: null,
+    });
 
-    backup.checksum = "TEST_BYPASS" as any;
+    backup.checksum = "TEST_BYPASS";
     const file = createMockFile(backup);
 
     vi.stubGlobal(
       "FileReader",
       class {
-        onload: any;
+        onload: MockReaderCallback | null = null;
         readAsText() {
           setTimeout(
-            () => this.onload({ target: { result: JSON.stringify(backup) } }),
+            () => this.onload?.({ target: { result: JSON.stringify(backup) } }),
             0,
           );
         }
@@ -202,11 +232,11 @@ describe("Backup Import/Export", () => {
     vi.stubGlobal(
       "FileReader",
       class {
-        onload: any;
+        onload: MockReaderCallback | null = null;
         readAsText() {
           setTimeout(
             () =>
-              this.onload({
+              this.onload?.({
                 target: {
                   result: JSON.stringify({
                     schemaVersion: 2,
@@ -228,25 +258,36 @@ describe("Backup Import/Export", () => {
   it("export then import into an empty DB gives identical balances", async () => {
     const backup = getValidBackup();
     backup.data.expenses[0].amountMinor = 1500;
-    backup.data.expenses[0].participantIds = ["p1", "p2"] as any;
+    backup.data.expenses[0].participantIds = ["p1", "p2"];
     backup.data.expenses[0].payers = [
       { personId: "p1", amountMinor: 1500 },
-    ] as any;
+    ];
     backup.data.expenses[0].shares = [
       { personId: "p1", amountMinor: 750 },
       { personId: "p2", amountMinor: 750 },
-    ] as any;
-    backup.data.people.push({ id: "p2", name: "Test", isMe: false } as any);
-    backup.checksum = "TEST_BYPASS" as any;
+    ];
+    backup.data.people.push({
+      id: "p2",
+      name: "Test",
+      phone: null,
+      avatarColor: "#00ff00",
+      source: "manual",
+      isMe: false,
+      createdAt: "2026-01-01T00:00:00Z",
+      updatedAt: "2026-01-01T00:00:00Z",
+      archivedAt: null,
+      deletedAt: null,
+    });
+    backup.checksum = "TEST_BYPASS";
 
     const file = createMockFile(backup);
     vi.stubGlobal(
       "FileReader",
       class {
-        onload: any;
+        onload: MockReaderCallback | null = null;
         readAsText() {
           setTimeout(
-            () => this.onload({ target: { result: JSON.stringify(backup) } }),
+            () => this.onload?.({ target: { result: JSON.stringify(backup) } }),
             0,
           );
         }

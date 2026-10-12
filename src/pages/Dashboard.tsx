@@ -1,6 +1,8 @@
+import { useMemo } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/db';
 import { getActiveExpenses, getActiveSettlements, getActivePeople, softDeleteExpense, softDeleteSettlement, restoreExpense, restoreSettlement } from '../db/repositories';
+import type { Expense, Settlement } from '../domain/types';
 import { computePairwiseBalance } from '../domain/ledger';
 import { formatMoney } from '../lib/money';
 import { computeAnalyze } from '../domain/analyze';
@@ -13,12 +15,16 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
 export default function Dashboard() {
-  const settingsArray = useLiveQuery(() => db.settings.toArray()) || [];
-  const currency = settingsArray[0]?.defaultCurrency || 'INR';
+  const settingsArray = useLiveQuery(() => db.settings.toArray());
+  const currency = settingsArray?.[0]?.defaultCurrency || 'INR';
 
-  const expenses = useLiveQuery(() => getActiveExpenses()) || [];
-  const settlements = useLiveQuery(() => getActiveSettlements()) || [];
-  const people = useLiveQuery(() => getActivePeople()) || [];
+  const expensesRaw = useLiveQuery(() => getActiveExpenses());
+  const settlementsRaw = useLiveQuery(() => getActiveSettlements());
+  const peopleRaw = useLiveQuery(() => getActivePeople());
+
+  const expenses = useMemo(() => expensesRaw || [], [expensesRaw]);
+  const settlements = useMemo(() => settlementsRaw || [], [settlementsRaw]);
+  const people = useMemo(() => peopleRaw || [], [peopleRaw]);
 
   const me = people.find(p => p.isMe);
   const myId = me?.id || '';
@@ -35,8 +41,32 @@ export default function Dashboard() {
     }
   }
 
+  // Detect non-default currencies with active balances
+  const otherCurrencies = useMemo(() => {
+    const set = new Set<string>();
+    for (const e of expenses) {
+      if (e.currency && e.currency !== currency) set.add(e.currency);
+    }
+    for (const s of settlements) {
+      if (s.currency && s.currency !== currency) set.add(s.currency);
+    }
+    return Array.from(set);
+  }, [expenses, settlements, currency]);
 
-
+  const otherBalances = useMemo(() => {
+    if (!myId || otherCurrencies.length === 0) return [];
+    const friends = people.filter(p => !p.isMe);
+    return otherCurrencies.map(c => {
+      let owedToMe = 0;
+      let iOwe = 0;
+      for (const friend of friends) {
+        const bal = computePairwiseBalance(expenses, settlements, myId, friend.id, c);
+        if (bal > 0) owedToMe += bal;
+        if (bal < 0) iOwe += Math.abs(bal);
+      }
+      return { currency: c, owedToMe, iOwe };
+    }).filter(b => b.owedToMe > 0 || b.iOwe > 0);
+  }, [myId, otherCurrencies, people, expenses, settlements]);
 
   // Recent activity: Combine expenses and settlements, sort by createdAt desc
   const activity = [...expenses, ...settlements].sort(
@@ -47,8 +77,7 @@ export default function Dashboard() {
   const analyzeResult = myId ? computeAnalyze(expenses, myId, currency, 'all') : null;
   const totalSpendThisMonth = analyzeResult ? analyzeResult.totalSpendMinor : 0;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleDeleteItem = async (item: any) => {
+  const handleDeleteItem = async (item: Expense | Settlement) => {
     const isExpense = 'description' in item;
     const title = isExpense ? item.description : 'Payment';
     try {
@@ -142,6 +171,19 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {otherBalances.length > 0 && (
+        <div className="p-3 bg-muted/40 rounded-xl border flex flex-wrap items-center gap-3 text-xs">
+          <span className="font-semibold text-muted-foreground">Other Currencies:</span>
+          {otherBalances.map(b => (
+            <div key={b.currency} className="flex items-center gap-2 px-2.5 py-1 bg-background rounded-lg border font-medium">
+              <span className="font-bold">{b.currency}:</span>
+              {b.owedToMe > 0 && <span className="text-emerald-600">+{formatMoney(b.owedToMe, b.currency)}</span>}
+              {b.iOwe > 0 && <span className="text-rose-600">-{formatMoney(b.iOwe, b.currency)}</span>}
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="mt-8">
         <div className="flex items-center justify-between mb-4">

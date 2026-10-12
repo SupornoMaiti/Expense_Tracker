@@ -27,13 +27,28 @@ export default function Friends() {
 
   const currency = settings?.defaultCurrency || 'INR';
 
+  // Detect non-default currencies
+  const otherCurrencies = Array.from(new Set([
+    ...expenses.filter(e => e.currency && e.currency !== currency).map(e => e.currency),
+    ...settlements.filter(s => s.currency && s.currency !== currency).map(s => s.currency)
+  ]));
+
   // Map each friend to their net balance with me
-  const friendBalances = friends.map(friend => ({
-    ...friend,
-    netBalance: computePairwiseBalance(expenses, settlements, myId, friend.id, currency)
-  }));
+  const friendBalances = friends.map(friend => {
+    const netBalance = computePairwiseBalance(expenses, settlements, myId, friend.id, currency);
+    const nonDefaultBalances = otherCurrencies
+      .map(c => ({
+        currency: c,
+        balance: computePairwiseBalance(expenses, settlements, myId, friend.id, c)
+      }))
+      .filter(b => b.balance !== 0);
 
-
+    return {
+      ...friend,
+      netBalance,
+      nonDefaultBalances
+    };
+  });
 
   return (
     <div className="space-y-6">
@@ -79,19 +94,35 @@ export default function Friends() {
                         {friend.name}
                       </Link>
                       {friend.phone && <p className="text-xs text-muted-foreground">{friend.phone}</p>}
+                      {friend.nonDefaultBalances.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mt-1">
+                          {friend.nonDefaultBalances.map(nb => (
+                            <span
+                              key={nb.currency}
+                              className={`text-[10px] px-1.5 py-0.5 rounded-sm font-semibold border ${
+                                nb.balance > 0
+                                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'
+                                  : 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border-rose-200 dark:border-rose-800'
+                              }`}
+                            >
+                              {nb.currency} {nb.balance > 0 ? `+${formatMoney(nb.balance, nb.currency)}` : `-${formatMoney(Math.abs(nb.balance), nb.currency)}`}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
                     <div className="flex flex-col items-end mr-4 shrink-0">
                       {isOwed && (
                         <>
                           <span className="text-xs text-green-600 font-medium">Owes you</span>
-                          <span className="font-bold text-green-600">{formatMoney(friend.netBalance)}</span>
+                          <span className="font-bold text-green-600">{formatMoney(friend.netBalance, currency)}</span>
                         </>
                       )}
                       {isOwing && (
                         <>
                           <span className="text-xs text-red-600 font-medium">You owe</span>
-                          <span className="font-bold text-red-600">{formatMoney(Math.abs(friend.netBalance))}</span>
+                          <span className="font-bold text-red-600">{formatMoney(Math.abs(friend.netBalance), currency)}</span>
                         </>
                       )}
                       {!isOwed && !isOwing && (

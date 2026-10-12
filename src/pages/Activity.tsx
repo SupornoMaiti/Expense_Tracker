@@ -10,7 +10,12 @@ import { useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { getActiveExpenses, getActiveSettlements, restoreExpense, softDeleteExpense, softDeleteSettlement, restoreSettlement } from '../db/repositories';
+import type { Expense, Settlement } from '../domain/types';
 import AddRefundModal from '../components/AddRefundModal';
+
+type ActivityItem =
+  | { type: 'expense'; data: Expense; time: number; dateLabel: string }
+  | { type: 'settlement'; data: Settlement; time: number; dateLabel: string };
 
 export default function Activity() {
   const expenses = useLiveQuery(() => getActiveExpenses());
@@ -22,8 +27,7 @@ export default function Activity() {
   const [filterType, setFilterType] = useState('all');
   const [filterPersonId, setFilterPersonId] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [selectedRefundExpense, setSelectedRefundExpense] = useState<any>(null);
+  const [selectedRefundExpense, setSelectedRefundExpense] = useState<Expense | null>(null);
 
   if (!expenses || !settlements || !reminders || !people || !settings) {
     return (
@@ -36,7 +40,7 @@ export default function Activity() {
     );
   }
 
-  const allItems = [
+  const allItems: ActivityItem[] = [
     ...expenses.map(e => ({ type: 'expense' as const, data: e, time: new Date(e.createdAt).getTime(), dateLabel: formatDisplayDate(e.date || e.createdAt) })),
     ...settlements.map(s => ({ type: 'settlement' as const, data: s, time: new Date(s.createdAt).getTime(), dateLabel: formatDisplayDate(s.date || s.createdAt) }))
   ].sort((a, b) => b.time - a.time);
@@ -53,16 +57,15 @@ export default function Activity() {
 
   if (filterPersonId !== 'all') {
     activityItems = activityItems.filter(a => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const d = a.data as any;
       if (a.type === 'expense') {
+        const d = a.data;
         return (
           (d.participantIds && d.participantIds.includes(filterPersonId)) ||
-          (d.payers && d.payers.some((p: any) => p.personId === filterPersonId)) ||
-          (d.shares && d.shares.some((s: any) => s.personId === filterPersonId))
+          (d.payers && d.payers.some((p: { personId: string }) => p.personId === filterPersonId)) ||
+          (d.shares && d.shares.some((s: { personId: string }) => s.personId === filterPersonId))
         );
       }
-      if (a.type === 'settlement') return d.fromId === filterPersonId || d.toId === filterPersonId;
+      if (a.type === 'settlement') return a.data.fromId === filterPersonId || a.data.toId === filterPersonId;
       return false;
     });
   }
@@ -70,13 +73,13 @@ export default function Activity() {
   if (searchQuery.trim()) {
     const q = searchQuery.toLowerCase().trim();
     activityItems = activityItems.filter(a => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const d = a.data as any;
       if (a.type === 'expense') {
+        const d = a.data;
         const pNames = (d.participantIds || []).map((id: string) => people.find(p => p.id === id)?.name || '').join(' ');
         return (d.description || '').toLowerCase().includes(q) || (d.notes || '').toLowerCase().includes(q) || pNames.toLowerCase().includes(q);
       }
       if (a.type === 'settlement') {
+        const d = a.data;
         const fromName = people.find(p => p.id === d.fromId)?.name || '';
         const toName = people.find(p => p.id === d.toId)?.name || '';
         return fromName.toLowerCase().includes(q) || toName.toLowerCase().includes(q) || (d.notes || '').toLowerCase().includes(q);
@@ -195,8 +198,7 @@ export default function Activity() {
 
 
             if (item.type === 'settlement') {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const settlement = item.data as any;
+              const settlement = item.data;
               const fromPerson = people.find(p => p.id === settlement.fromId);
               const toPerson = people.find(p => p.id === settlement.toId);
               const isDeleted = !!settlement.deletedAt;
@@ -239,8 +241,7 @@ export default function Activity() {
             }
 
             if (item.type === 'expense') {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const expense = item.data as any;
+              const expense = item.data;
               const isSoftDeleted = !!expense.deletedAt;
               const isRefundItem = !!expense.isRefund || !!expense.refundOfId;
 

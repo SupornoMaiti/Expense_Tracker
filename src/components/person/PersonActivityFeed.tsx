@@ -127,7 +127,7 @@ export function PersonActivityFeed({
               const myPayment = expense.payers?.find((p) => p.personId === myId)?.amountMinor || 0;
               const friendPayment = expense.payers?.find((p) => p.personId === friendId)?.amountMinor || 0;
 
-              let payerSummary = '';
+              let payerSummary: string;
               if (expense.payers && expense.payers.length === 1) {
                 const payerId = expense.payers[0].personId;
                 if (payerId === myId) {

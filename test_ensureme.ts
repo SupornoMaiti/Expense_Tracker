@@ -1,6 +1,7 @@
 import 'fake-indexeddb/auto';
 import { db } from './src/db/db';
 import { ensureMe } from './src/db/repositories';
+import type { Person } from './src/domain/types';
 
 async function run() {
   try {
@@ -16,7 +17,7 @@ async function run() {
       updatedAt: new Date().toISOString(),
       archivedAt: null,
       deletedAt: null
-    } as any);
+    } as Person);
     
     await ensureMe();
     

@@ -1,4 +1,5 @@
 import type { Expense } from './types';
+import { toISODate } from '../lib/date';
 
 interface CategorySpend {
   categoryId: string;
@@ -32,8 +33,9 @@ export function computeAnalyze(
     if (exp.deletedAt) continue;
     if (exp.currency !== currency) continue;
     
-    // YYYY-MM string prefix match
-    if (yearMonth !== 'all' && !exp.date.startsWith(yearMonth)) continue;
+    // Normalize date to YYYY-MM-DD for consistent filtering
+    const isoDate = toISODate(exp.date);
+    if (yearMonth !== 'all' && !isoDate.startsWith(yearMonth)) continue;
 
     const myShare = exp.shares.find((s) => s.personId === myId);
     if (!myShare || myShare.amountMinor === 0) continue;
@@ -47,8 +49,8 @@ export function computeAnalyze(
     const catId = exp.categoryId || 'Uncategorized';
     const current = catMap.get(catId) || 0;
     catMap.set(catId, current + sign * myShare.amountMinor);
-    const currentDaily = dailyMap.get(exp.date) || 0;
-    dailyMap.set(exp.date, currentDaily + sign * myShare.amountMinor);
+    const currentDaily = dailyMap.get(isoDate) || 0;
+    dailyMap.set(isoDate, currentDaily + sign * myShare.amountMinor);
   }
 
   const categories = Array.from(catMap.entries())

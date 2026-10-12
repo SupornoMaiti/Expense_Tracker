@@ -36,6 +36,12 @@ export class SplitLocalDB extends Dexie {
       reminders: '&id, personId, groupId',
       settings: '&id'
     });
+
+    // Dexie Version(2) Stores Definition - indexing refundOfId & expenseId (RF-01)
+    this.version(2).stores({
+      expenses: '&id, groupId, date, deletedAt, *participantIds, refundOfId, [groupId+date]',
+      settlements: '&id, groupId, fromId, toId, deletedAt, refundOfId, expenseId'
+    });
   }
 }
 
@@ -46,24 +52,34 @@ db.on('blocked', () => {
 });
 
 export async function exportBackup(): Promise<string> {
-  const backup: Record<string, unknown> = {};
+  const data: Record<string, unknown> = {};
   for (const table of db.tables) {
-    backup[table.name] = await table.toArray();
+    data[table.name] = await table.toArray();
   }
+  const dataStr = JSON.stringify(data);
+  const checksum = dataStr.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a; }, 0);
+  const backup = {
+    schemaVersion: 1,
+    timestamp: new Date().toISOString(),
+    data,
+    checksum,
+    ...data
+  };
   return JSON.stringify(backup);
 }
 
 export async function importBackup(jsonStr: string): Promise<void> {
   const parsed = JSON.parse(jsonStr);
+  const data = (parsed.data || parsed) as Record<string, unknown[]>;
 
   // Validate critical domain records before transaction
-  if (parsed.expenses && Array.isArray(parsed.expenses)) {
-    for (const row of parsed.expenses) {
+  if (data.expenses && Array.isArray(data.expenses)) {
+    for (const row of data.expenses) {
       ExpenseSchema.parse(row);
     }
   }
-  if (parsed.settlements && Array.isArray(parsed.settlements)) {
-    for (const row of parsed.settlements) {
+  if (data.settlements && Array.isArray(data.settlements)) {
+    for (const row of data.settlements) {
       SettlementSchema.parse(row);
     }
   }
@@ -71,8 +87,8 @@ export async function importBackup(jsonStr: string): Promise<void> {
   await db.transaction('rw', db.tables, async () => {
     for (const table of db.tables) {
       await table.clear();
-      if (parsed[table.name]) {
-        await table.bulkAdd(parsed[table.name]);
+      if (data[table.name]) {
+        await table.bulkAdd(data[table.name]);
       }
     }
   });

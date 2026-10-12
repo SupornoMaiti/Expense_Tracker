@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { parseDecimalToMinor } from '../lib/money';
 import { db } from '../db/db';
 import { createExpense } from '../db/repositories';
@@ -9,6 +9,7 @@ import { calculateShares } from '../domain/allocation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { getTodayISODate } from '../lib/date';
 
 import { toast } from 'sonner';
 import { X, Check } from 'lucide-react';
@@ -19,18 +20,17 @@ interface Props {
 }
 
 export default function AddExpenseModal({ onClose }: Props) {
-  const people = useLiveQuery(() => db.people.filter(p => !p.deletedAt && !p.archivedAt).toArray()) || [];
-  const categories = useLiveQuery(() => db.categories.filter(c => !c.deletedAt).toArray()) || [];
+  const peopleRaw = useLiveQuery(() => db.people.filter(p => !p.deletedAt && !p.archivedAt).toArray());
+  const categoriesRaw = useLiveQuery(() => db.categories.filter(c => !c.deletedAt).toArray());
+  const people = useMemo(() => peopleRaw || [], [peopleRaw]);
+  const categories = useMemo(() => categoriesRaw || [], [categoriesRaw]);
   const settings = useLiveQuery(() => db.settings.get('user_settings'));
 
   const me = people.find(p => p.isMe);
 
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState(''); // major units string
-  const [date, setDate] = useState(() => {
-    const d = new Date();
-    return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
-  });
+  const [date, setDate] = useState(() => getTodayISODate());
   const [payerId, setPayerId] = useState<string>('');
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
   const [splitType] = useState<SplitType>('equal');

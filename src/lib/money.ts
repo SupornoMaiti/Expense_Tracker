@@ -42,6 +42,27 @@ export function parseDecimalToMinor(input: string): number {
   return minor;
 }
 
+function getLocaleForCurrency(currency: string): string {
+  switch (currency.toUpperCase()) {
+    case 'INR':
+      return 'en-IN';
+    case 'USD':
+      return 'en-US';
+    case 'GBP':
+      return 'en-GB';
+    case 'EUR':
+      return 'en-IE';
+    case 'JPY':
+      return 'ja-JP';
+    case 'CAD':
+      return 'en-CA';
+    case 'AUD':
+      return 'en-AU';
+    default:
+      return 'en-US';
+  }
+}
+
 export function formatMoney(minor: number, currency: string = 'INR'): string {
   const isNegative = minor < 0;
   const absMinor = Math.abs(minor);
@@ -52,21 +73,16 @@ export function formatMoney(minor: number, currency: string = 'INR'): string {
   let decPart = (absMinor % 100).toString();
   if (decPart.length === 1) decPart = '0' + decPart;
 
-  const formatter = new Intl.NumberFormat('en-IN', {
+  const locale = getLocaleForCurrency(currency);
+  const formatter = new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: currency,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
 
-  // We format the integer part as number, then manually construct the string 
-  // or we can use Intl.NumberFormat on the float but the prompt strictly says: "no /100 float".
-  // Let's create the string ourselves to avoid float completely, then parse it?
-  // Intl.NumberFormat accepts a string/number. If we pass a string it might just format it.
-
-  // Custom grouping for en-IN manually or using Intl.NumberFormat on the integer?
-  // Intl.NumberFormat on the integer part:
-  const groupedInt = new Intl.NumberFormat('en-IN').format(intPart);
+  // Locale-aware integer grouping (e.g. 1,00,000 for INR vs 100,000 for USD)
+  const groupedInt = new Intl.NumberFormat(locale).format(intPart);
   
   // Get currency symbol
   const parts = formatter.formatToParts(0);
@@ -75,7 +91,5 @@ export function formatMoney(minor: number, currency: string = 'INR'): string {
 
   const sign = isNegative ? '-' : '';
   
-  // Determine if symbol is prefix or suffix (usually prefix for INR/USD)
-  // To be safe, just prefix it like ₹ 1,00,000.00
   return `${sign}${symbol}${groupedInt}.${decPart}`;
 }

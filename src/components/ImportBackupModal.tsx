@@ -7,11 +7,34 @@ import { ensureMe } from '../db/repositories';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import { formatDisplayDate } from '../lib/date';
 import { ExpenseSchema, SettlementSchema } from '../domain/schemas';
+import type { Person, Expense, Settlement, Receipt, Group, Category, Reminder, Settings } from '../domain/types';
+import type { Table } from 'dexie';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+
+interface BackupData {
+  people: Person[];
+  expenses: Expense[];
+  settlements: Settlement[];
+  groups?: Group[];
+  categories?: Category[];
+  reminders?: Reminder[];
+  settings?: Settings[];
+  receipts?: Receipt[];
+}
 
 interface ImportBackupModalProps {
   file: File | null;
   onClose: () => void;
+}
+
+function hasPrototypePollution(obj: unknown): boolean {
+  if (!obj || typeof obj !== 'object') return false;
+  if (Object.prototype.hasOwnProperty.call(obj, '__proto__')) return true;
+  for (const [key, val] of Object.entries(obj)) {
+    if (key === '__proto__' || key === 'prototype') return true;
+    if (val && typeof val === 'object' && hasPrototypePollution(val)) return true;
+  }
+  return false;
 }
 
 export default function ImportBackupModal({ file, onClose }: ImportBackupModalProps) {
@@ -19,7 +42,7 @@ export default function ImportBackupModal({ file, onClose }: ImportBackupModalPr
     counts: { people: number, expenses: number, settlements: number, receipts: number },
     newCounts: { people: number, expenses: number, settlements: number, receipts: number },
     dateRange: string,
-    parsedData: any
+    parsedData: BackupData
   } | null>(null);
   
   const [error, setError] = useState<string | null>(null);
@@ -35,12 +58,16 @@ export default function ImportBackupModal({ file, onClose }: ImportBackupModalPr
       try {
         const text = event.target?.result as string;
         
-        // Anti-prototype pollution
-        if (text.includes('__proto__') || text.includes('constructor')) {
+        // Anti-prototype pollution (check for dangerous key definitions)
+        if (/"(__proto__|prototype)"\s*:/i.test(text)) {
           throw new Error('Invalid file structure');
         }
 
         const parsed = JSON.parse(text);
+
+        if (hasPrototypePollution(parsed)) {
+          throw new Error('Invalid file structure');
+        }
 
         if (parsed.schemaVersion !== 1 && parsed.version !== 1) {
           throw new Error(`Unsupported schema version. Required: 1, Found: ${parsed.schemaVersion || parsed.version}`);
@@ -55,7 +82,7 @@ export default function ImportBackupModal({ file, onClose }: ImportBackupModalPr
           throw new Error('Backup file is corrupted (checksum mismatch)');
         }
 
-        const pd = parsed.data;
+        const pd: BackupData = parsed.data;
         if (!Array.isArray(pd.people) || !Array.isArray(pd.expenses) || !Array.isArray(pd.settlements)) {
           throw new Error('Missing required arrays (people, expenses, settlements)');
         }
@@ -69,15 +96,26 @@ export default function ImportBackupModal({ file, onClose }: ImportBackupModalPr
         }
 
         // Deduplicate logic for summary
-        const existingPeople = new Set((await db.people.toArray()).map(p => p.id));
+        const existingPeopleList = await db.people.toArray();
+        const existingPeople = new Set(existingPeopleList.map(p => p.id));
+        const existingPhones = new Set(
+          existingPeopleList
+            .map(p => p.phone?.trim())
+            .filter((p): p is string => Boolean(p))
+        );
         const existingExpenses = new Set((await db.expenses.toArray()).map(e => e.id));
         const existingSettlements = new Set((await db.settlements.toArray()).map(s => s.id));
         const existingReceipts = new Set((await db.receipts.toArray()).map(r => r.expenseId));
 
-        const newPeople = pd.people.filter((p: any) => !existingPeople.has(p.id)).length;
-        const newExpenses = pd.expenses.filter((e: any) => !existingExpenses.has(e.id)).length;
-        const newSettlements = pd.settlements.filter((s: any) => !existingSettlements.has(s.id)).length;
-        const newReceipts = (pd.receipts || []).filter((r: any) => !existingReceipts.has(r.expenseId)).length;
+        const newPeople = pd.people.filter(p => {
+          if (existingPeople.has(p.id)) return false;
+          const phone = p.phone?.trim();
+          if (phone && existingPhones.has(phone)) return false;
+          return true;
+        }).length;
+        const newExpenses = pd.expenses.filter(e => !existingExpenses.has(e.id)).length;
+        const newSettlements = pd.settlements.filter(s => !existingSettlements.has(s.id)).length;
+        const newReceipts = (pd.receipts || []).filter(r => !existingReceipts.has(r.expenseId)).length;
 
         let oldest = Infinity;
         let newest = -Infinity;
@@ -99,8 +137,9 @@ export default function ImportBackupModal({ file, onClose }: ImportBackupModalPr
           dateRange,
           parsedData: pd
         });
-      } catch (err: any) {
-        setError(err.message || 'Validation failed');
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Validation failed';
+        setError(message);
       } finally {
         setHasValidated(true);
       }
@@ -114,11 +153,47 @@ export default function ImportBackupModal({ file, onClose }: ImportBackupModalPr
     try {
       const pd = summary.parsedData;
       await db.transaction('rw', [db.people, db.groups, db.categories, db.expenses, db.settlements, db.reminders, db.settings, db.receipts], async () => {
-        // Merge: Add records whose IDs don't exist
-        const addMissing = async (table: any, items: any[]) => {
+        // Merge: Add records whose IDs and unique fields don't exist
+        const addMissing = async <T, K>(table: Table<T, K>, items?: T[]) => {
           if (!items || !items.length) return;
-          const key = table.name === 'receipts' ? 'expenseId' : 'id';
-          const existing = new Set((await table.toArray()).map((i: any) => i[key]));
+
+          if (table.name === 'people') {
+            const existingPeople = await db.people.toArray();
+            const existingIds = new Set(existingPeople.map(p => p.id));
+            const existingPhones = new Set(
+              existingPeople
+                .map(p => p.phone?.trim())
+                .filter((phone): phone is string => Boolean(phone))
+            );
+
+            const missing = (items as unknown as Person[]).filter(p => {
+              if (existingIds.has(p.id)) return false;
+              const phone = p.phone?.trim();
+              if (phone && existingPhones.has(phone)) return false;
+              return true;
+            });
+
+            // Prevent duplicate phones within the imported list itself
+            const seenPhones = new Set<string>();
+            const deduplicated: Person[] = [];
+            for (const p of missing) {
+              const phone = p.phone?.trim();
+              if (phone) {
+                if (seenPhones.has(phone)) continue;
+                seenPhones.add(phone);
+              }
+              deduplicated.push(p);
+            }
+
+            if (deduplicated.length > 0) {
+              await db.people.bulkAdd(deduplicated);
+            }
+            return;
+          }
+
+          const key = (table.name === 'receipts' ? 'expenseId' : 'id') as keyof T;
+          const existingRecords = await table.toArray();
+          const existing = new Set(existingRecords.map((i) => i[key]));
           const missing = items.filter(i => !existing.has(i[key]));
           if (missing.length > 0) await table.bulkAdd(missing);
         };
@@ -134,8 +209,9 @@ export default function ImportBackupModal({ file, onClose }: ImportBackupModalPr
       await ensureMe();
       toast.success(`Imported ${summary.newCounts.people} people and ${summary.newCounts.expenses} expenses successfully!`);
       onClose();
-    } catch (err: any) {
-      toast.error(`Merge failed: ${err.message}`);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      toast.error(`Merge failed: ${message}`);
     } finally {
       setIsProcessing(false);
     }
@@ -174,8 +250,9 @@ export default function ImportBackupModal({ file, onClose }: ImportBackupModalPr
       await ensureMe();
       toast.success('Backup replaced successfully');
       setTimeout(() => window.location.reload(), 500);
-    } catch (err: any) {
-      toast.error(`Replace failed: ${err.message}`);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      toast.error(`Replace failed: ${message}`);
     } finally {
       setIsProcessing(false);
     }

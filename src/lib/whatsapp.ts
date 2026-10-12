@@ -142,7 +142,7 @@ export function buildReminderMessage(
   }
   breakdown += blocks.join('\n').trim();
 
-  let totalSummary = '';
+  let totalSummary: string;
   if (finalOwed > 0) {
     totalSummary = `You owe me ${formatMoney(finalOwed, currency)}`;
   } else if (finalOwed < 0) {
@@ -194,6 +194,9 @@ export async function sendWhatsAppReminder(
   if (!waLink) return false;
 
   deps.openLink(waLink);
+
+  const confirmed = await deps.askSent();
+  if (!confirmed) return false;
 
   await deps.logReminder({
     id: generateId(),

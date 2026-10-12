@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { generateId } from '../lib/utils';
@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { formatMoney, parseDecimalToMinor } from '../lib/money';
+import { getTodayISODate } from '../lib/date';
 import { toast } from 'sonner';
 
 export default function SettleUp() {
@@ -27,13 +28,6 @@ export default function SettleUp() {
   const settlements = useLiveQuery(() => getActiveSettlements());
   const settingsArray = useLiveQuery(() => db.settings.toArray());
 
-  const [method, setMethod] = useState<'cash' | 'upi' | 'bank' | 'other'>('upi');
-  const [payerType, setPayerType] = useState<'friend' | 'me'>('friend');
-  const [amountStr, setAmountStr] = useState<string>('');
-  const [dateStr, setDateStr] = useState<string>(new Date().toISOString().split('T')[0]);
-  const [notes, setNotes] = useState<string>('');
-  const [hasInitializedAmount, setHasInitializedAmount] = useState(false);
-
   const settings = settingsArray?.[0];
   const currency = settings?.defaultCurrency || 'INR';
 
@@ -42,24 +36,14 @@ export default function SettleUp() {
     ? computePairwiseBalance(expenses, settlements, me.id, person.id, currency)
     : 0;
 
-  // Initialize payer direction and amount once loaded
-  useEffect(() => {
-    if (person && me && expenses && settlements && !hasInitializedAmount) {
-      if (netBalance > 0) {
-        // Friend owes me -> Friend pays Me
-        setPayerType('friend');
-        setAmountStr((netBalance / 100).toFixed(2));
-      } else if (netBalance < 0) {
-        // I owe friend -> I pay Friend
-        setPayerType('me');
-        setAmountStr((Math.abs(netBalance) / 100).toFixed(2));
-      } else {
-        setPayerType('friend');
-        setAmountStr('');
-      }
-      setHasInitializedAmount(true);
-    }
-  }, [person, me, expenses, settlements, netBalance, hasInitializedAmount]);
+  const [method, setMethod] = useState<'cash' | 'upi' | 'bank' | 'other'>('upi');
+  const [userPayerType, setUserPayerType] = useState<'friend' | 'me' | null>(null);
+  const [userAmountStr, setUserAmountStr] = useState<string | null>(null);
+  const [dateStr, setDateStr] = useState<string>(() => getTodayISODate());
+  const [notes, setNotes] = useState<string>('');
+
+  const payerType = userPayerType ?? (netBalance < 0 ? 'me' : 'friend');
+  const amountStr = userAmountStr ?? (netBalance !== 0 ? (Math.abs(netBalance) / 100).toFixed(2) : '');
 
   if (person === undefined || me === undefined || expenses === undefined || settlements === undefined || settingsArray === undefined) {
     return (
@@ -92,15 +76,9 @@ export default function SettleUp() {
   const recipientName = payerType === 'friend' ? 'You' : person.name;
 
   const handleSettle = async () => {
-    let minor = 0;
-    try {
-      minor = parseDecimalToMinor(amountStr);
-    } catch {
-      toast.error('Please enter a valid amount');
-      return;
-    }
+    const minor = parseDecimalToMinor(amountStr);
 
-    if (minor <= 0) {
+    if (isNaN(minor) || minor <= 0) {
       toast.error('Settlement amount must be greater than zero');
       return;
     }
@@ -114,7 +92,7 @@ export default function SettleUp() {
         toId,
         amountMinor: minor,
         currency,
-        date: dateStr || new Date().toISOString().split('T')[0],
+        date: dateStr || getTodayISODate(),
         method,
         notes: notes.trim()
       });
@@ -156,7 +134,7 @@ export default function SettleUp() {
             )}
             {!isOwed && !isOwing && (
               <p className="text-lg font-bold text-muted-foreground flex items-center gap-1.5">
-                <CheckCircle2 className="h-4 w-4 text-green-600" /> All settled up (₹0.00)
+                <CheckCircle2 className="h-4 w-4 text-green-600" /> All settled up ({formatMoney(0, currency)})
               </p>
             )}
           </div>
@@ -165,9 +143,9 @@ export default function SettleUp() {
               variant="outline"
               size="sm"
               onClick={() => {
-                if (isOwed) setPayerType('friend');
-                if (isOwing) setPayerType('me');
-                setAmountStr((fullOutstandingMinor / 100).toFixed(2));
+                if (isOwed) setUserPayerType('friend');
+                if (isOwing) setUserPayerType('me');
+                setUserAmountStr((fullOutstandingMinor / 100).toFixed(2));
               }}
               className="text-xs h-7"
             >
@@ -184,7 +162,7 @@ export default function SettleUp() {
           <div className="grid grid-cols-2 gap-2 p-1 bg-muted/50 rounded-lg border">
             <button
               type="button"
-              onClick={() => setPayerType('friend')}
+              onClick={() => setUserPayerType('friend')}
               className={`py-2 px-3 text-sm font-medium rounded-md transition-all flex items-center justify-center gap-2 ${
                 payerType === 'friend'
                   ? 'bg-background text-foreground shadow-xs'
@@ -201,7 +179,7 @@ export default function SettleUp() {
             </button>
             <button
               type="button"
-              onClick={() => setPayerType('me')}
+              onClick={() => setUserPayerType('me')}
               className={`py-2 px-3 text-sm font-medium rounded-md transition-all flex items-center justify-center gap-2 ${
                 payerType === 'me'
                   ? 'bg-background text-foreground shadow-xs'
@@ -246,9 +224,6 @@ export default function SettleUp() {
         <div className="space-y-2">
           <Label htmlFor="settle-amount" className="text-sm font-medium">Amount ({currency})</Label>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-semibold">
-              ₹
-            </span>
             <Input
               id="settle-amount"
               type="number"
@@ -256,8 +231,8 @@ export default function SettleUp() {
               min="0"
               placeholder="0.00"
               value={amountStr}
-              onChange={e => setAmountStr(e.target.value)}
-              className="pl-8 text-lg font-bold h-12"
+              onChange={e => setUserAmountStr(e.target.value)}
+              className="text-lg font-bold h-12"
             />
           </div>
         </div>

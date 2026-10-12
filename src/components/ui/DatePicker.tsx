@@ -2,7 +2,7 @@ import { useState, useId } from 'react';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
 import { Button } from './button';
-import { formatDisplayDate, toISODate, MONTH_NAMES } from '../../lib/date';
+import { formatDisplayDate, toISODate, getTodayISODate, MONTH_NAMES } from '../../lib/date';
 import { cn } from '../../lib/utils';
 
 interface DatePickerProps {
@@ -19,12 +19,13 @@ export function DatePicker({ value, onChange, className, id, disabled = false }:
   const [open, setOpen] = useState(false);
 
   // Normalize current selected date into year, month, day numbers
-  const isoValue = toISODate(value) || new Date().toISOString().split('T')[0];
+  const isoValue = toISODate(value) || getTodayISODate();
   const [selectedY, selectedM, selectedD] = isoValue.split('-').map(Number);
 
   // View state for navigating months inside the calendar picker
-  const [viewYear, setViewYear] = useState<number>(selectedY || new Date().getFullYear());
-  const [viewMonth, setViewMonth] = useState<number>((selectedM ? selectedM - 1 : new Date().getMonth()));
+  const today = new Date();
+  const [viewYear, setViewYear] = useState<number>(selectedY || today.getFullYear());
+  const [viewMonth, setViewMonth] = useState<number>((selectedM ? selectedM - 1 : today.getMonth()));
 
   // Synchronize view when opening
   const handleOpenChange = (isOpen: boolean) => {
@@ -97,7 +98,6 @@ export function DatePicker({ value, onChange, className, id, disabled = false }:
   const currentMonthDays = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
   // Today's details for highlighting
-  const today = new Date();
   const isCurrentViewTodayMonth = today.getFullYear() === viewYear && today.getMonth() === viewMonth;
   const todayDate = today.getDate();
 

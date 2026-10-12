@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { formatDisplayDate } from '../lib/date';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { formatDisplayDate, getTodayISODate } from '../lib/date';
 import { toast } from 'sonner';
 import { Save, Download, Upload, HardDrive, MessageCircle, Trash2, RefreshCw } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -17,6 +18,8 @@ export default function SettingsPage() {
   const settings = useLiveQuery(() => db.settings.get('user_settings'));
   const [storageInfo, setStorageInfo] = useState<{ quota: number; usage: number; persisted: boolean } | null>(null);
   const [localWhatsappTemplate, setLocalWhatsappTemplate] = useState<string | null>(null);
+  const [localCurrency, setLocalCurrency] = useState<string | null>(null);
+  const [localCountryCode, setLocalCountryCode] = useState<string | null>(null);
   const [importFile, setImportFile] = useState<File | null>(null);
   const [isResetting, setIsResetting] = useState(false);
   const [showConfirmFresh, setShowConfirmFresh] = useState(false);
@@ -26,9 +29,21 @@ export default function SettingsPage() {
     ? localWhatsappTemplate 
     : (settings?.whatsappTemplate || 'Hi {name}, here is our balance breakdown:\n\n{breakdown}\n\nTotal: {amount}');
 
+  const displayCurrency = localCurrency !== null
+    ? localCurrency
+    : (settings?.defaultCurrency || 'INR');
+
+  const displayCountryCode = localCountryCode !== null
+    ? localCountryCode
+    : (settings?.defaultCountryCode || '+91');
+
   const savePreferences = async () => {
     if (!settings) return;
-    await db.settings.update('user_settings', { whatsappTemplate: displayTemplate });
+    await db.settings.update('user_settings', {
+      whatsappTemplate: displayTemplate,
+      defaultCurrency: displayCurrency,
+      defaultCountryCode: displayCountryCode.trim() || '+91'
+    });
     toast.success('Preferences saved');
   };
 
@@ -86,7 +101,7 @@ export default function SettingsPage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `splitlocal-backup-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `splitlocal-backup-${getTodayISODate()}.json`;
       a.click();
       URL.revokeObjectURL(url);
 
@@ -186,6 +201,37 @@ export default function SettingsPage() {
           <CardDescription>Customize your app experience</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Default Currency</label>
+              <Select value={displayCurrency} onValueChange={(val) => val && setLocalCurrency(val)}>
+                <SelectTrigger className="h-10">
+                  <SelectValue placeholder="Select currency" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="INR">INR (₹) - Indian Rupee</SelectItem>
+                  <SelectItem value="USD">USD ($) - US Dollar</SelectItem>
+                  <SelectItem value="EUR">EUR (€) - Euro</SelectItem>
+                  <SelectItem value="GBP">GBP (£) - British Pound</SelectItem>
+                  <SelectItem value="JPY">JPY (¥) - Japanese Yen</SelectItem>
+                  <SelectItem value="CAD">CAD ($) - Canadian Dollar</SelectItem>
+                  <SelectItem value="AUD">AUD ($) - Australian Dollar</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Default Phone Country Code</label>
+              <Input
+                type="text"
+                value={displayCountryCode}
+                onChange={e => setLocalCountryCode(e.target.value)}
+                placeholder="+91"
+                className="h-10"
+              />
+            </div>
+          </div>
+
           <div className="space-y-2">
             <label className="text-sm font-medium">WhatsApp Reminder Template</label>
             <p className="text-xs text-muted-foreground">Available variables: {'{name}, {amount}, {breakdown}'}</p>

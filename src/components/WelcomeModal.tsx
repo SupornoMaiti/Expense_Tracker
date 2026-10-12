@@ -11,25 +11,28 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export default function WelcomeModal() {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    if (import.meta.env?.MODE === 'test') return false;
+    return !localStorage.getItem(STORAGE_KEY);
+  });
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [isStandalone, setIsStandalone] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as unknown as { standalone?: boolean }).standalone === true;
+  });
 
   useEffect(() => {
     if (import.meta.env?.MODE === 'test') {
       return;
     }
 
-    // Check if user has already dismissed welcome popup
-    const dismissed = localStorage.getItem(STORAGE_KEY);
-    if (!dismissed) {
-      setOpen(true);
-    }
-
-    // Detect if already running as installed PWA
-    const standalone = window.matchMedia('(display-mode: standalone)').matches ||
-      (window.navigator as unknown as { standalone?: boolean }).standalone === true;
-    setIsStandalone(standalone);
+    const mq = window.matchMedia('(display-mode: standalone)');
+    const handleModeChange = (e: MediaQueryListEvent) => {
+      setIsStandalone(e.matches);
+    };
+    mq.addEventListener('change', handleModeChange);
 
     // Capture install prompt if available
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -39,6 +42,7 @@ export default function WelcomeModal() {
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     return () => {
+      mq.removeEventListener('change', handleModeChange);
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
   }, []);
@@ -50,7 +54,7 @@ export default function WelcomeModal() {
 
   const handleInstall = async () => {
     if (installPrompt) {
-      await (installPrompt as any)['prompt']();
+      await installPrompt['prompt']();
       const choice = await installPrompt.userChoice;
       if (choice.outcome === 'accepted') {
         setInstallPrompt(null);

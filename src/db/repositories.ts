@@ -2,6 +2,7 @@ import { db } from './db';
 import type { Expense, Settlement, Person, Reminder } from '../domain/types';
 import { ExpenseSchema, SettlementSchema } from '../domain/schemas';
 import { generateId } from '../lib/utils';
+import { allocateLargestRemainder } from '../domain/allocation';
 
 // --- EXPENSE REPOSITORY ---
 export async function createExpense(data: Omit<Expense, 'createdAt' | 'updatedAt' | 'deletedAt'>): Promise<string> {
@@ -62,7 +63,9 @@ export async function softDeleteExpense(id: string): Promise<{ deletedExpenseId:
 
     // 1. Cascade soft-delete child refund expenses
     const refundExpenses = await db.expenses
-      .filter(e => !e.deletedAt && e.refundOfId === id)
+      .where('refundOfId')
+      .equals(id)
+      .filter(e => !e.deletedAt)
       .toArray();
 
     for (const re of refundExpenses) {
@@ -72,10 +75,17 @@ export async function softDeleteExpense(id: string): Promise<{ deletedExpenseId:
 
     // 2. Cascade soft-delete child refund settlements
     const refundSettlements = await db.settlements
-      .filter(s => !s.deletedAt && (s.expenseId === id || s.refundOfId === id))
+      .where('refundOfId')
+      .equals(id)
+      .filter(s => !s.deletedAt)
+      .toArray();
+    const linkedSettlements = await db.settlements
+      .where('expenseId')
+      .equals(id)
+      .filter(s => !s.deletedAt && s.refundOfId !== id)
       .toArray();
 
-    for (const rs of refundSettlements) {
+    for (const rs of [...refundSettlements, ...linkedSettlements]) {
       await db.settlements.update(rs.id, { deletedAt: now, updatedAt: now });
       deletedRefundCount++;
     }
@@ -102,7 +112,8 @@ export async function restoreExpense(id: string): Promise<void> {
 
     // Also restore linked refund expenses
     const refundExpenses = await db.expenses
-      .filter(e => e.refundOfId === id)
+      .where('refundOfId')
+      .equals(id)
       .toArray();
 
     for (const re of refundExpenses) {
@@ -111,10 +122,16 @@ export async function restoreExpense(id: string): Promise<void> {
 
     // Also restore linked refund settlements
     const refundSettlements = await db.settlements
-      .filter(s => s.expenseId === id || s.refundOfId === id)
+      .where('refundOfId')
+      .equals(id)
+      .toArray();
+    const linkedSettlements = await db.settlements
+      .where('expenseId')
+      .equals(id)
+      .filter(s => s.refundOfId !== id)
       .toArray();
 
-    for (const rs of refundSettlements) {
+    for (const rs of [...refundSettlements, ...linkedSettlements]) {
       await db.settlements.update(rs.id, { deletedAt: null, updatedAt: now });
     }
   });
@@ -130,39 +147,43 @@ export async function createRefundForExpense(params: {
   if (!original) throw new Error('Original expense not found');
 
   if (params.amountMinor <= 0) throw new Error('Refund amount must be positive');
-  if (params.amountMinor > original.amountMinor) {
-    throw new Error('Refund amount cannot exceed the original expense amount');
+
+  // Verify total existing active refunds for this expense
+  const existingRefunds = await db.expenses
+    .where('refundOfId')
+    .equals(original.id)
+    .filter(e => !e.deletedAt)
+    .toArray();
+  const alreadyRefunded = existingRefunds.reduce((sum, r) => sum + r.amountMinor, 0);
+
+  if (alreadyRefunded + params.amountMinor > original.amountMinor) {
+    const remainingRefundable = Math.max(0, original.amountMinor - alreadyRefunded);
+    throw new Error(`Refund amount cannot exceed remaining refundable amount (${remainingRefundable})`);
   }
 
-  const refundRatio = params.amountMinor / original.amountMinor;
-  let remainingShare = params.amountMinor;
+  // Allocate refund shares using Largest Remainder Method
+  const allocatedShares = allocateLargestRemainder(
+    params.amountMinor,
+    original.shares.map(s => ({ personId: s.personId, rawValue: s.rawValue })),
+    original.shares.map(s => s.amountMinor)
+  );
+  const shareMap = new Map(allocatedShares.map(s => [s.personId, s.amountMinor]));
+  const refundShares = original.shares.map(s => ({
+    personId: s.personId,
+    amountMinor: shareMap.get(s.personId) ?? 0
+  }));
 
-  const refundShares = original.shares.map((s, idx) => {
-    let shareAmount = Math.round(s.amountMinor * refundRatio);
-    if (idx === original.shares.length - 1) {
-      shareAmount = remainingShare;
-    } else {
-      remainingShare -= shareAmount;
-    }
-    return {
-      personId: s.personId,
-      amountMinor: Math.max(0, shareAmount)
-    };
-  });
-
-  let remainingPayer = params.amountMinor;
-  const refundPayers = original.payers.map((p, idx) => {
-    let payerAmount = Math.round(p.amountMinor * refundRatio);
-    if (idx === original.payers.length - 1) {
-      payerAmount = remainingPayer;
-    } else {
-      remainingPayer -= payerAmount;
-    }
-    return {
-      personId: p.personId,
-      amountMinor: Math.max(0, payerAmount)
-    };
-  });
+  // Allocate refund payers using Largest Remainder Method
+  const allocatedPayers = allocateLargestRemainder(
+    params.amountMinor,
+    original.payers.map(p => ({ personId: p.personId })),
+    original.payers.map(p => p.amountMinor)
+  );
+  const payerMap = new Map(allocatedPayers.map(p => [p.personId, p.amountMinor]));
+  const refundPayers = original.payers.map(p => ({
+    personId: p.personId,
+    amountMinor: payerMap.get(p.personId) ?? 0
+  }));
 
   const now = new Date().toISOString();
   const date = params.date || original.date;
@@ -224,6 +245,15 @@ export async function createRefundForSettlement(params: {
   const original = await db.settlements.get(params.originalSettlementId);
   if (!original) throw new Error('Original settlement not found');
 
+  const existingRefunds = await db.settlements
+    .where('refundOfId')
+    .equals(original.id)
+    .filter(s => !s.deletedAt)
+    .toArray();
+  if (existingRefunds.length > 0) {
+    throw new Error('Settlement has already been refunded');
+  }
+
   const now = new Date().toISOString();
   const date = params.date || original.date;
 
@@ -256,7 +286,9 @@ export async function softDeleteSettlement(id: string): Promise<{ deletedSettlem
     await db.settlements.update(id, { deletedAt: now, updatedAt: now });
 
     const childSettlements = await db.settlements
-      .filter(s => !s.deletedAt && s.refundOfId === id)
+      .where('refundOfId')
+      .equals(id)
+      .filter(s => !s.deletedAt)
       .toArray();
 
     for (const cs of childSettlements) {
@@ -265,7 +297,9 @@ export async function softDeleteSettlement(id: string): Promise<{ deletedSettlem
     }
 
     const childExpenses = await db.expenses
-      .filter(e => !e.deletedAt && e.refundOfId === id)
+      .where('refundOfId')
+      .equals(id)
+      .filter(e => !e.deletedAt)
       .toArray();
 
     for (const ce of childExpenses) {
@@ -283,7 +317,8 @@ export async function restoreSettlement(id: string): Promise<void> {
     await db.settlements.update(id, { deletedAt: null, updatedAt: now });
 
     const childSettlements = await db.settlements
-      .filter(s => s.refundOfId === id)
+      .where('refundOfId')
+      .equals(id)
       .toArray();
 
     for (const cs of childSettlements) {
@@ -291,7 +326,8 @@ export async function restoreSettlement(id: string): Promise<void> {
     }
 
     const childExpenses = await db.expenses
-      .filter(e => e.refundOfId === id)
+      .where('refundOfId')
+      .equals(id)
       .toArray();
 
     for (const ce of childExpenses) {

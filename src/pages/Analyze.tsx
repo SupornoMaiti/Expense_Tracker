@@ -4,6 +4,7 @@ import { db } from '../db/db';
 import { getActiveExpenses, getActivePeople } from '../db/repositories';
 import { computeAnalyze } from '../domain/analyze';
 import { formatMoney } from '../lib/money';
+import { toISODate } from '../lib/date';
 import { PieChart, AlertCircle, ChevronLeft, ChevronRight, TrendingUp, Receipt } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -35,7 +36,8 @@ export default function Analyze() {
       if (exp.deletedAt) continue;
       curSet.add(exp.currency);
       if (exp.date) {
-        moSet.add(exp.date.substring(0, 7)); // YYYY-MM
+        const iso = toISODate(exp.date);
+        moSet.add(iso.substring(0, 7)); // YYYY-MM
       }
     }
     return {
