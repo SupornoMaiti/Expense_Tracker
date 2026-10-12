@@ -54,8 +54,8 @@
     "semantic_hash": "ed13f841df4634c46863eb088ca85fdd"
   },
   "src/App.tsx": {
-    "mtime": 1791782236.9663298,
-    "seen": 1791782411.4925373,
+    "mtime": 1791782652.7676275,
+    "seen": 1791782655.8174965,
     "ast_hash": "e1e4ae56d567e1d7a6c4af78ba2f2d29",
     "semantic_hash": ""
   },
@@ -806,18 +806,18 @@
   "supabase-schema.sql": {
     "mtime": 1791179243.6589963,
     "seen": 1791782569.1142972,
-    "ast_hash": "f6b175c38afd3096c3f4c20cc99bd49b",
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "public/SplitLocal Brush Logo Light.png": {
-    "mtime": 1791782212.7276304,
-    "seen": 1791782411.4991086,
+    "mtime": 1791782652.7406292,
+    "seen": 1791782655.8239717,
     "ast_hash": "08ed292ffd76c1bd18a879cf78f476e7",
     "semantic_hash": ""
   },
   "public/SplitLocal Brush Logo.png": {
-    "mtime": 1791781429.8294575,
-    "seen": 1791782411.4991117,
+    "mtime": 1791782652.7676275,
+    "seen": 1791782655.8239737,
     "ast_hash": "96bae255304eba6ad209411937576ad5",
     "semantic_hash": ""
   }

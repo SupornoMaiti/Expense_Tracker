@@ -13,7 +13,7 @@
   "11": "compilerOptions",
   "12": "drawer.tsx",
   "13": "chart.tsx",
-  "14": "PersonHeader.tsx",
+  "14": "PersonDetail.tsx",
   "15": "AddExpenseModal.tsx",
   "16": "navigation-menu.tsx",
   "17": "notifications.test.mjs",
@@ -50,6 +50,5 @@
   "48": "responsive-Responsive-over-bf02e-route-settings-for-overlaps-chromium/error-context.md",
   "49": "responsive-Responsive-over-d1af3-route-settings-for-overlaps-chromium/error-context.md",
   "50": "responsive-Responsive-over-dcb70--route-friends-for-overlaps-chromium/error-context.md",
-  "51": "responsive-Responsive-over-eebee-route-insights-for-overlaps-chromium/error-context.md",
-  "52": "1. Problem Analysis"
+  "51": "responsive-Responsive-over-eebee-route-insights-for-overlaps-chromium/error-context.md"
 }
