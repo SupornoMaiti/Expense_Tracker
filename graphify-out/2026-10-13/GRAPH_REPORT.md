@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `d198407b`
+- Built from commit: `d0b88e74`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -71,26 +71,26 @@
 ## God Nodes (most connected - your core abstractions)
 1. `Button()` - 51 edges
 2. `react` - 37 edges
-3. `lucide-react` - 29 edges
-4. `db` - 29 edges
+3. `db` - 29 edges
+4. `lucide-react` - 29 edges
 5. `Expense` - 27 edges
 6. `cn` - 24 edges
 7. `vitest` - 23 edges
-8. `formatMoney()` - 22 edges
-9. `Analyze()` - 22 edges
-10. `SettingsPage()` - 22 edges
+8. `Analyze()` - 22 edges
+9. `SettingsPage()` - 22 edges
+10. `SettleUp()` - 22 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `[NF-01] Medium: Linear search over people array in SelectValue` --references--> `SelectValue()`  [INFERRED]
-  AUDIT_REPORT.md → src/components/ui/select.tsx
 - `[RF-01] Medium: Missing Dexie Index on `refundOfId` — Full Table Scans on Refund Operations` --references--> `SplitLocalDB`  [INFERRED]
   AUDIT_REPORT.md → src/db/db.ts
-- `[F5-02] Medium: IndexedDB Unique Constraint Collision on `importBackup()`` --references--> `importBackup()`  [INFERRED]
-  AUDIT_REPORT.md → src/db/db.ts
-- `[F-03] High: Date Format Incompatibility in `computeAnalyze` and `Analyze.tsx`` --references--> `computeAnalyze()`  [INFERRED]
-  AUDIT_REPORT.md → src/domain/analyze.ts
 - `[F-11] Medium: Missing Currency and Country Code Controls in Settings UI` --references--> `Settings`  [INFERRED]
   AUDIT_REPORT.md → src/domain/types.ts
+- `[NF-01] Medium: Linear search over people array in SelectValue` --references--> `SelectValue()`  [INFERRED]
+  AUDIT_REPORT.md → src/components/ui/select.tsx
+- `[F-03] High: Date Format Incompatibility in `computeAnalyze` and `Analyze.tsx`` --references--> `computeAnalyze()`  [INFERRED]
+  AUDIT_REPORT.md → src/domain/analyze.ts
+- `[F-12] Low: Timezone Boundary Date Discrepancy in `DatePicker.tsx`` --references--> `getTodayISODate()`  [INFERRED]
+  AUDIT_REPORT.md → src/lib/date.ts
 
 ## Import Cycles
 - None detected.
@@ -282,7 +282,7 @@ Cohesion: 0.25
 Nodes (7): Bug Auditor, Final output, Project context (do not violate), Rules of evidence, Stage 1: FIND, Stage 2: REPORT, Stage 3: FIX
 
 ## Knowledge Gaps
-- **19 isolated node(s):** `@hookform/resolvers`, `date-fns`, `framer-motion`, `react-hook-form`, `tailwindcss-animate` (+14 more)
+- **19 isolated node(s):** `RFC-4122`, `autoprefixer`, `clsx`, `date-fns`, `framer-motion` (+14 more)
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 374 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **9 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -291,7 +291,7 @@ _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `react` connect `SettleUp.tsx` to `table.tsx`, `package.json`, `App.tsx`, `drawer.tsx`, `chart.tsx`, `PersonHeader.tsx`, `repositories.ts`, `avatar.tsx`, `Button`?**
   _High betweenness centrality (0.102) - this node is a cross-community bridge._
-- **What connects `@hookform/resolvers`, `date-fns`, `framer-motion` to the rest of the system?**
+- **What connects `RFC-4122`, `autoprefixer`, `clsx` to the rest of the system?**
   _19 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `SettleUp.tsx` be split into smaller, more focused modules?**
   _Cohesion score 0.07031463748290014 - nodes in this community are weakly interconnected._
