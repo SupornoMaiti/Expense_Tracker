@@ -14,6 +14,16 @@ import ImportBackupModal from '@/components/ImportBackupModal';
 import CategoriesManager from '@/components/CategoriesManager';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
+const CURRENCY_LABELS: Record<string, string> = {
+  INR: 'INR (₹) - Indian Rupee',
+  USD: 'USD ($) - US Dollar',
+  EUR: 'EUR (€) - Euro',
+  GBP: 'GBP (£) - British Pound',
+  JPY: 'JPY (¥) - Japanese Yen',
+  CAD: 'CAD ($) - Canadian Dollar',
+  AUD: 'AUD ($) - Australian Dollar',
+};
+
 export default function SettingsPage() {
   const settings = useLiveQuery(() => db.settings.get('user_settings'));
   const [storageInfo, setStorageInfo] = useState<{ quota: number; usage: number; persisted: boolean } | null>(null);
@@ -204,9 +214,15 @@ export default function SettingsPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Default Currency</label>
-              <Select value={displayCurrency} onValueChange={(val) => val && setLocalCurrency(val)}>
+              <Select
+                value={displayCurrency}
+                onValueChange={(val) => val && setLocalCurrency(val)}
+                items={CURRENCY_LABELS}
+              >
                 <SelectTrigger className="h-10">
-                  <SelectValue placeholder="Select currency" />
+                  <SelectValue placeholder="Select currency">
+                    {(val) => (val ? CURRENCY_LABELS[val] || val : 'Select currency')}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="INR">INR (₹) - Indian Rupee</SelectItem>

@@ -6,7 +6,7 @@ import { Clock, Users, Undo2, Search, Trash2, RotateCcw } from 'lucide-react';
 import CurrencyIcon from '@/components/ui/CurrencyIcon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { getActiveExpenses, getActiveSettlements, restoreExpense, softDeleteExpense, softDeleteSettlement, restoreSettlement } from '../db/repositories';
@@ -136,6 +136,16 @@ export default function Activity() {
     }
   };
 
+  const personItems = useMemo(() => {
+    const map: Record<string, string> = { all: 'All people' };
+    for (const p of people) {
+      if (!p.isMe) {
+        map[p.id] = p.name;
+      }
+    }
+    return map;
+  }, [people]);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col space-y-2 mb-6">
@@ -174,9 +184,18 @@ export default function Activity() {
           />
         </div>
 
-        <Select value={filterPersonId} onValueChange={(v) => v && setFilterPersonId(v)}>
+        <Select
+          value={filterPersonId}
+          onValueChange={(v) => v && setFilterPersonId(v)}
+          items={personItems}
+        >
           <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="All people" />
+            <SelectValue placeholder="All people">
+              {(val) => {
+                if (!val || val === 'all') return 'All people';
+                return people.find((p) => p.id === val)?.name || val;
+              }}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All people</SelectItem>

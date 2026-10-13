@@ -16,6 +16,13 @@ import { formatMoney, parseDecimalToMinor } from '../lib/money';
 import { getTodayISODate } from '../lib/date';
 import { toast } from 'sonner';
 
+const METHOD_LABELS: Record<'cash' | 'upi' | 'bank' | 'other', string> = {
+  upi: 'UPI (Google Pay / PhonePe / Paytm)',
+  cash: 'Cash',
+  bank: 'Bank Transfer / IMPS',
+  other: 'Other',
+};
+
 export default function SettleUp() {
   const [searchParams] = useSearchParams();
   const friendId = searchParams.get('friendId');
@@ -240,9 +247,15 @@ export default function SettleUp() {
         {/* Payment Method */}
         <div className="space-y-2">
           <Label className="text-sm font-medium">Payment Method</Label>
-          <Select value={method} onValueChange={(v) => v && setMethod(v as 'cash' | 'upi' | 'bank' | 'other')}>
+          <Select
+            value={method}
+            onValueChange={(v) => v && setMethod(v as 'cash' | 'upi' | 'bank' | 'other')}
+            items={METHOD_LABELS}
+          >
             <SelectTrigger className="h-10">
-              <SelectValue placeholder="Select method" />
+              <SelectValue placeholder="Select method">
+                {(v) => METHOD_LABELS[v as keyof typeof METHOD_LABELS] || v}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="upi">UPI (Google Pay / PhonePe / Paytm)</SelectItem>
