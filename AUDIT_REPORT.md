@@ -5,7 +5,7 @@
 | ID | Severity | Area | file:line | Status |
 |---|---|---|---|---|
 | AUDIT-01 | Medium | Money input validation | src/lib/money.ts:27-29 | Fixed (commit: `8fd33f2`, test: `parseDecimalToMinor rejects inputs with more than two decimal places`) |
-| AUDIT-02 | High | Dependency security | package-lock.json (npm audit --omit=dev) | Open |
+| AUDIT-02 | High | Dependency security | package.json, package-lock.json | Fixed (validated by `npm audit --omit=dev` = 0 vulnerabilities) |
 
 ## Bugs
 
@@ -22,6 +22,10 @@
 - Reproduction: Run `npm audit --omit=dev`.
 - Root cause: Transitive dependency versions include vulnerable ranges.
 - Impact: Security risk remains in shipped dependency graph.
+- Fix:
+  - Applied `npm audit fix` to update vulnerable transitive dependencies in lockfile.
+  - Moved `tailwindcss-animate` from `dependencies` to `devDependencies` in `package.json` so build-time Tailwind tooling is excluded from production dependency scope.
+- Verification: `npm audit --omit=dev` now reports `found 0 vulnerabilities`.
 
 ## Checks run
 \n### Command: npx tsc -b --noEmit\n
@@ -740,3 +744,266 @@ To address all issues (including breaking changes), run:
 
 ## Verdict
 Not ready.
+
+## Dependency remediation rerun checks
+\n### Command: npx tsc -b --noEmit\n
+\n### Command: npx eslint .\n
+\n### Command: npx knip; echo "knip exit: 0"\n
+npm warn exec The following package was not found and will be installed: knip@6.41.0
+Unused files (10)
+seed-measure.ts                      
+src/components/ui/avatar.tsx         
+src/components/ui/badge.tsx          
+src/components/ui/drawer.tsx         
+src/components/ui/navigation-menu.tsx
+src/components/ui/scroll-area.tsx    
+src/components/ui/sheet.tsx          
+src/components/ui/skeleton.tsx       
+src/components/ui/table.tsx          
+test_ensureme.ts                     
+Unused dependencies (3)
+@hookform/resolvers  package.json:17:6
+framer-motion        package.json:23:6
+react-hook-form      package.json:28:6
+Unused devDependencies (4)
+clsx            package.json:45:6
+shadcn          package.json:54:6
+sharp           package.json:55:6
+tailwind-merge  package.json:56:6
+Unlisted dependencies (1)
+glob  src/__tests__/no-stubs.test.ts:4:26
+Unresolved imports (1)
+../src/lib/notifications.ts  tests/notifications.test.mjs:4:35
+Unused exports (48)
+ErrorBoundary                  class     src/components/ErrorBoundary.tsx:15:14              
+PersonActivityFeed             function  src/components/person/PersonActivityFeed.tsx:22:17  
+PersonBalanceSummary           function  src/components/person/PersonBalanceSummary.tsx:31:17
+PersonHeader                   function  src/components/person/PersonHeader.tsx:21:17        
+AlertAction                              src/components/ui/alert.tsx:75:47                   
+buttonVariants                           src/components/ui/button.tsx:57:18                  
+CardFooter                               src/components/ui/card.tsx:97:3                     
+CardAction                               src/components/ui/card.tsx:99:3                     
+ChartLegend                              src/components/ui/chart.tsx:368:3                   
+ChartLegendContent                       src/components/ui/chart.tsx:369:3                   
+ChartStyle                               src/components/ui/chart.tsx:370:3                   
+ConfirmDialog                  function  src/components/ui/ConfirmDialog.tsx:23:17           
+CurrencyIcon                   function  src/components/ui/CurrencyIcon.tsx:7:17             
+DialogClose                              src/components/ui/dialog.tsx:149:3                  
+DialogOverlay                            src/components/ui/dialog.tsx:154:3                  
+DialogPortal                             src/components/ui/dialog.tsx:155:3                  
+DialogTrigger                            src/components/ui/dialog.tsx:157:3                  
+DropdownMenuPortal                       src/components/ui/dropdown-menu.tsx:253:3           
+DropdownMenuGroup                        src/components/ui/dropdown-menu.tsx:256:3           
+DropdownMenuLabel                        src/components/ui/dropdown-menu.tsx:257:3           
+DropdownMenuCheckboxItem                 src/components/ui/dropdown-menu.tsx:259:3           
+DropdownMenuRadioGroup                   src/components/ui/dropdown-menu.tsx:260:3           
+DropdownMenuRadioItem                    src/components/ui/dropdown-menu.tsx:261:3           
+DropdownMenuSeparator                    src/components/ui/dropdown-menu.tsx:262:3           
+DropdownMenuShortcut                     src/components/ui/dropdown-menu.tsx:263:3           
+DropdownMenuSub                          src/components/ui/dropdown-menu.tsx:264:3           
+DropdownMenuSubTrigger                   src/components/ui/dropdown-menu.tsx:265:3           
+DropdownMenuSubContent                   src/components/ui/dropdown-menu.tsx:266:3           
+PopoverDescription                       src/components/ui/popover.tsx:83:3                  
+PopoverHeader                            src/components/ui/popover.tsx:84:3                  
+PopoverTitle                             src/components/ui/popover.tsx:85:3                  
+SelectGroup                              src/components/ui/select.tsx:190:3                  
+SelectLabel                              src/components/ui/select.tsx:192:3                  
+SelectScrollDownButton                   src/components/ui/select.tsx:193:3                  
+SelectScrollUpButton                     src/components/ui/select.tsx:194:3                  
+SelectSeparator                          src/components/ui/select.tsx:195:3                  
+tabsListVariants                         src/components/ui/tabs.tsx:79:52                    
+Tooltip                                  src/components/ui/tooltip.tsx:63:10                 
+TooltipTrigger                           src/components/ui/tooltip.tsx:63:19                 
+TooltipContent                           src/components/ui/tooltip.tsx:63:35                 
+SplitLocalDB                   class     src/db/db.ts:15:14                                  
+updateExpense                  function  src/db/repositories.ts:32:23                        
+getActiveExpensesByGroupId     function  src/db/repositories.ts:220:23                       
+getActiveSettlementsByGroupId  function  src/db/repositories.ts:343:23                       
+getPersonByPhone               function  src/db/repositories.ts:354:23                       
+seedSampleData                 function  src/db/repositories.ts:506:23                       
+MONTH_SHORT                              src/lib/date.ts:104:23                              
+formatWhatsAppDate             function  src/lib/whatsapp.ts:6:17                            
+Unused exported types (1)
+ConfirmDialogProps  interface  src/components/ui/ConfirmDialog.tsx:11:18
+Duplicate exports (6)
+ErrorBoundary|default         src/components/ErrorBoundary.tsx              
+PersonActivityFeed|default    src/components/person/PersonActivityFeed.tsx  
+PersonBalanceSummary|default  src/components/person/PersonBalanceSummary.tsx
+PersonHeader|default          src/components/person/PersonHeader.tsx        
+ConfirmDialog|default         src/components/ui/ConfirmDialog.tsx           
+CurrencyIcon|default          src/components/ui/CurrencyIcon.tsx            
+knip exit: 1
+\n### Command: npx vitest run --reporter=verbose\n
+[33m(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - `__dirname` (vitest.config.ts:14:25). Use `import.meta.dirname` instead
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.[39m
+
+ RUN  v5.0.3 /home/runner/work/Expense_Tracker/Expense_Tracker
+
+ ✓ src/__tests__/backup.test.tsx > Backup Import/Export > merge twice gives no duplicates 421ms
+ ✓ src/__tests__/backup.test.tsx > Backup Import/Export > Replace with a corrupt file leaves data untouched 100ms
+ ✓ src/__tests__/backup.test.tsx > Backup Import/Export > a backup containing a Me, merged into a DB that has its own Me, results in exactly one Me 279ms
+ ✓ src/__tests__/backup.test.tsx > Backup Import/Export > a newer schemaVersion is rejected with a clear message 58ms
+ ✓ src/__tests__/backup.test.tsx > Backup Import/Export > export then import into an empty DB gives identical balances 382ms
+ ✓ src/__tests__/activityAndSettlementReset.test.tsx > Activity Share View and Friend Settlement Reset > Feature 1: Activity Tab (My Share & User Transactions) > shows user share by default and filters to transactions involving user 368ms
+ ✓ src/__tests__/activityAndSettlementReset.test.tsx > Activity Share View and Friend Settlement Reset > Feature 2: Friend Section (Amount to be Settled & Reset after Settlement) > shows Amount to be Settled and resets subcards after settlement 99ms
+ ✓ src/__tests__/layout.test.tsx > App Layout Navigation > renders all nav items and settings at both widths 421ms
+ ✓ src/__tests__/ensureMe.test.tsx > ensureMe logic > an existing DB with only "Raj" gets a Me after startup 23ms
+ ✓ src/__tests__/ensureMe.test.tsx > ensureMe logic > two concurrent startups create exactly one Me 5ms
+ ✓ src/__tests__/ensureMe.test.tsx > ensureMe logic > duplicate Me rows are merged with their data repointed 8ms
+ ✓ src/__tests__/ensureMe.test.tsx > ensureMe logic > the Add Expense form renders Me checked and selected on open 236ms
+ ✓ src/__tests__/ensureMe.test.tsx > ensureMe logic > "Biryani 100, Me paid, split Me and Raj" gives Raj a balance of 50 owed to me 37ms
+ ✓ src/__tests__/dashboardCurrency.test.tsx > Dashboard Currency (H1) > renders configured USD currency symbol instead of hardcoded INR 171ms
+ ✓ src/db/__tests__/repositories.test.ts > repositories > creates and retrieves an expense 12ms
+ ✓ src/db/__tests__/repositories.test.ts > repositories > fails to create an expense if invariants are violated 3ms
+ ✓ src/db/__tests__/repositories.test.ts > repositories > soft deletes an expense 7ms
+ ✓ src/db/__tests__/repositories.test.ts > repositories > cascades soft-delete to linked refund expenses and restores both on undo 19ms
+ ✓ src/db/__tests__/repositories.test.ts > repositories > cascades soft-delete to linked refund settlements when parent expense is deleted 10ms
+ ✓ src/db/__tests__/repositories.test.ts > repositories > cascades soft-delete to refund settlements when parent settlement is deleted 13ms
+ ✓ src/db/__tests__/repositories.test.ts > repositories > resets database to clean slate or sample data 11ms
+ ✓ src/db/__tests__/repositories.test.ts > repositories > createRefundForExpense correctly assigns payers and shares summing to amountMinor (C1) 4ms
+ ✓ src/db/__tests__/repositories.test.ts > repositories > getActiveExpenses excludes soft-deleted items (H3) 7ms
+ ✓ src/db/__tests__/repositories.test.ts > repositories > restoreExpense throws when trying to restore child refund whose parent is deleted (M4) 6ms
+ ✓ src/__tests__/errorBoundary.test.tsx > ErrorBoundary > renders children when no error occurs 26ms
+ ✓ src/__tests__/errorBoundary.test.tsx > ErrorBoundary > catches render error and displays fallback UI 39ms
+ ✓ src/__tests__/errorBoundary.test.tsx > ErrorBoundary > renders custom fallback if provided 5ms
+ ✓ src/db/__tests__/backup.test.ts > Backup and restore logic > exports, wipes, and imports with identical data 30ms
+ ✓ src/db/__tests__/backup.test.ts > Backup and restore logic > JSON backup round trip preserves descriptions starting with = + - @ 3ms
+ ✓ src/db/__tests__/backup.test.ts > Backup and restore logic > deduplicates duplicate phone numbers in people to avoid ConstraintError 4ms
+ ✓ src/lib/__tests__/whatsapp.test.ts > whatsapp url building > buildReminderMessage - Two dates with two entries and one entry, exact expected string 19ms
+ ✓ src/lib/__tests__/whatsapp.test.ts > whatsapp url building > Date conversion: 2026-01-05 becomes 5 Jan 26, with no off-by-one in UTC-8 or UTC+14 1ms
+ ✓ src/lib/__tests__/whatsapp.test.ts > whatsapp url building > Entries before a zero balance point are excluded 1ms
+ ✓ src/lib/__tests__/whatsapp.test.ts > whatsapp url building > A payment appears as a negative line, and the total matches the screen balance 1ms
+ ✓ src/lib/__tests__/whatsapp.test.ts > whatsapp url building > When a transaction ties the balance to zero, that tying transaction is included in the message 1ms
+ ✓ src/lib/__tests__/whatsapp.test.ts > whatsapp url building > Zero and negative balance builds correctly 1ms
+ ✓ src/lib/__tests__/whatsapp.test.ts > whatsapp url building > Long list truncates, keeps the newest dates, and the total still covers everything 5ms
+ ✓ src/lib/__tests__/whatsapp.test.ts > whatsapp url building > Unknown template variables do not leak raw placeholders 1ms
+ ✓ src/lib/__tests__/whatsapp.test.ts > whatsapp url building > Formats 11 Oct 26 date, +/- amounts with [what for], and directional totals 1ms
+ ✓ src/lib/__tests__/whatsapp.test.ts > whatsapp url building > Emoji, "&", "#" and newlines in descriptions survive URL encoding in buildWhatsAppUrl 0ms
+ ✓ src/lib/__tests__/whatsapp.test.ts > whatsapp url building > sendWhatsAppReminder logic > logs exactly one reminder immediately 5ms
+ ✓ src/domain/__tests__/ledger.test.ts > ledger > computes correct balances for a simple equal split expense 2ms
+ ✓ src/domain/__tests__/ledger.test.ts > ledger > computes correct balances with multi-payer 0ms
+ ✓ src/domain/__tests__/ledger.test.ts > ledger > computes correctly after a partial settlement 0ms
+ ✓ src/domain/__tests__/ledger.test.ts > ledger > ignores deleted expenses and settlements 1ms
+ ✓ src/domain/__tests__/ledger.test.ts > ledger > simplifyDebts > simplifies debts efficiently 1ms
+ ✓ src/domain/__tests__/ledger.test.ts > ledger > simplifyDebts > handles multiple currencies separately 0ms
+ ✓ src/domain/__tests__/ledger.test.ts > ledger > property test: 1,000 randomized ledgers > always maintains zero sum invariant 16ms
+ ✓ src/domain/__tests__/ledger.test.ts > ledger > computePairwiseBalance > computes correct balance when A pays for B 1ms
+ ✓ src/domain/__tests__/ledger.test.ts > ledger > computePairwiseBalance > settlement settles the pairwise balance 0ms
+ ✓ src/domain/__tests__/ledger.test.ts > ledger > computePairwiseBalance > does not get affected by unrelated third-party expenses 1ms
+ ✓ src/domain/__tests__/ledger.test.ts > ledger > computePairwiseBalance > computeBalances does not throw on imbalanced data and logs a warning (C2) 3ms
+ ✓ src/domain/__tests__/ledger.test.ts > ledger > computePairwiseBalance > getExpensePairwiseImpact distributes shares without rounding artifacts using largest remainder (L1) 0ms
+ ✓ src/__tests__/no-stubs.test.ts > Stub-proofing > scans all src files for stubs and alerts 24ms
+ ✓ src/lib/__tests__/money.test.ts > formatMoney > formats exactly 0 16ms
+ ✓ src/lib/__tests__/money.test.ts > formatMoney > parseDecimalToMinor > rejects inputs with more than two decimal places 1ms
+ ✓ src/lib/__tests__/money.test.ts > formatMoney > formats 1 minor unit 0ms
+ ✓ src/lib/__tests__/money.test.ts > formatMoney > formats 99 minor units 0ms
+ ✓ src/lib/__tests__/money.test.ts > formatMoney > formats 100 minor units 0ms
+ ✓ src/lib/__tests__/money.test.ts > formatMoney > formats 10000000 minor units as 1,00,000.00 0ms
+ ✓ src/lib/__tests__/money.test.ts > formatMoney > formats negative amounts 0ms
+ ✓ src/lib/__tests__/money.test.ts > formatMoney > formats non-INR currency 0ms
+ ✓ src/lib/__tests__/money.test.ts > formatMoney > formats large non-INR currency with standard 3-digit grouping 0ms
+ ✓ src/lib/__tests__/money.test.ts > formatMoney > WhatsApp amount string equals on-screen string 1ms
+ ✓ src/db/__tests__/transactions.test.ts > Dexie Database tests > rolls back a multi-record transaction completely if an error is thrown 22ms
+ ✓ src/domain/__tests__/property.test.ts > property test: 1,000 randomized ledgers (fixed seed) > always maintains zero sum invariant 20ms
+ ✓ src/domain/__tests__/allocation.test.ts > calculateShares > splits exactly among 3 equal parts (100 -> 34, 33, 33) 10ms
+ ✓ src/domain/__tests__/allocation.test.ts > calculateShares > splits 1 paisa among 3 people 0ms
+ ✓ src/domain/__tests__/allocation.test.ts > calculateShares > calculates percentage accurately and assigns remainders 1ms
+ ✓ src/domain/__tests__/allocation.test.ts > calculateShares > throws on exact split if total does not match 1ms
+ ✓ src/domain/__tests__/allocation.test.ts > calculateShares > accepts exact splits that match exactly 0ms
+ ✓ src/domain/__tests__/allocation.test.ts > calculateShares > splits using shares accurately 0ms
+ ✓ src/domain/__tests__/analyze.test.ts > analyze domain logic > equal split spend equals my share 3ms
+ ✓ src/domain/__tests__/analyze.test.ts > analyze domain logic > I paid but am not a participant is excluded 0ms
+ ✓ src/domain/__tests__/analyze.test.ts > analyze domain logic > deleted and settlements excluded 0ms
+ ✓ src/domain/__tests__/analyze.test.ts > analyze domain logic > two currencies separate 0ms
+ ✓ src/domain/__tests__/analyze.test.ts > analyze domain logic > 2026-01-31 vs 2026-02-01 land in different months 0ms
+ ✓ src/domain/__tests__/analyze.test.ts > analyze domain logic > category totals sum exactly to the period total 7ms
+ ✓ src/domain/__tests__/analyze.test.ts > analyze domain logic > empty period has no NaN 0ms
+ ✓ src/lib/__tests__/utils.test.ts > generateId > generates a valid UUID v4 using native crypto.randomUUID 5ms
+ ✓ src/lib/__tests__/utils.test.ts > generateId > generates unique IDs across successive calls 1ms
+ ✓ src/lib/__tests__/utils.test.ts > generateId > falls back to crypto.getRandomValues when crypto.randomUUID is not a function (e.g. non-secure HTTP / LAN) 1ms
+ ✓ src/lib/__tests__/utils.test.ts > generateId > falls back to RFC4122 v4 generator when crypto is completely undefined 0ms
+ ✓ src/domain/__tests__/date.test.ts > UTC date handling & DD-MM-YYYY formatting > does not have off-by-one errors across timezones 2ms
+ ✓ src/domain/__tests__/date.test.ts > UTC date handling & DD-MM-YYYY formatting > formats YYYY-MM-DD to unambiguous DD-MM-YYYY 1ms
+ ✓ src/domain/__tests__/date.test.ts > UTC date handling & DD-MM-YYYY formatting > preserves existing DD-MM-YYYY 0ms
+ ✓ src/domain/__tests__/date.test.ts > UTC date handling & DD-MM-YYYY formatting > formats ISO timestamps to DD-MM-YYYY 0ms
+ ✓ src/domain/__tests__/date.test.ts > UTC date handling & DD-MM-YYYY formatting > normalizes DD-MM-YYYY to ISO YYYY-MM-DD for DB storage 0ms
+ ✓ src/lib/__tests__/import.test.ts > CSV and parsing logic > parses CSV with commas and quotes inside fields 2ms
+ ✓ src/lib/__tests__/import.test.ts > CSV and parsing logic > protects against formula injection in exports and is idempotent 1ms
+ ✓ src/db/__tests__/migration.test.ts > Database Migration and Upgrade Events > handles blocked upgrades when another tab is open 3ms
+ ✓ src/lib/__tests__/phone.test.ts > phone normalization > normalizes +91 numbers correctly 2ms
+ ✓ src/lib/__tests__/phone.test.ts > phone normalization > rejects invalid numbers 0ms
+
+ Test Files  21 passed (21)
+      Tests  93 passed (93)
+   Start at  14:15:59
+   Duration  14.97s (environment 33%, import 29%, tests 25%, transform 8%, setup 5%, worker 1%)
+
+     Import  97 modules were evaluated 219 times · 3.58s total, 29% of tracked time
+             ~2.00s faster with isolate: false — shared modules are evaluated once per worker instead of once per file
+             learn more: https://vitest.dev/guide/improving-performance#test-isolation
+
+\n### Command: npm run build; ls -la dist\n
+
+> splitlocal@0.0.0 build
+> tsc -b && vite build
+
+[33m(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - `__dirname` (vite.config.ts:74:25). Use `import.meta.dirname` instead
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.[39m
+[36mvite v8.3.4 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 3007 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/registerSW.js                          0.13 kB
+dist/manifest.webmanifest                   0.56 kB
+dist/index.html                             1.30 kB │ gzip:   0.58 kB
+dist/assets/index-f3H0ZoJ0.css             74.79 kB │ gzip:  13.81 kB
+dist/assets/rolldown-runtime-hePW80VL.js    0.71 kB │ gzip:   0.42 kB
+dist/assets/db-CPEqVTd7.js                 96.50 kB │ gzip:  31.76 kB
+dist/assets/vendor-B10xaJoN.js            218.48 kB │ gzip:  70.26 kB
+dist/assets/charts-DhEYLbmZ.js            397.80 kB │ gzip: 113.88 kB
+dist/assets/index-Xbrpi0Uk.js             605.16 kB │ gzip: 174.45 kB
+
+[33m[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[32m✓ built in 2.15s[39m
+
+[36mPWA v1.3.0[39m
+mode      [35mgenerateSW[39m
+precache  [32m20 entries[39m [2m(2913.42 KiB)[22m
+files generated
+  [2mdist/sw.js[22m
+  [2mdist/workbox-9c191d2f.js[22m
+total 1316
+drwxrwxr-x  4 runner runner   4096 Oct 13 14:16 .
+drwxr-xr-x 12 runner runner   4096 Oct 13 14:15 ..
+-rw-rw-r--  1 runner runner 515002 Oct 13 14:16 SplitLocal Brush Logo Light.png
+-rw-rw-r--  1 runner runner 762857 Oct 13 14:16 SplitLocal Brush Logo.png
+-rw-rw-r--  1 runner runner     19 Oct 13 14:16 _redirects
+drwxrwxr-x  2 runner runner   4096 Oct 13 14:16 assets
+-rw-rw-r--  1 runner runner   3243 Oct 13 14:16 favicon.png
+drwxrwxr-x  2 runner runner   4096 Oct 13 14:16 icons
+-rw-rw-r--  1 runner runner   5031 Oct 13 14:16 icons.svg
+-rw-rw-r--  1 runner runner   1308 Oct 13 14:16 index.html
+-rw-rw-r--  1 runner runner    561 Oct 13 14:16 manifest.webmanifest
+-rw-rw-r--  1 runner runner    134 Oct 13 14:16 registerSW.js
+-rw-rw-r--  1 runner runner   2112 Oct 13 14:16 sw.js
+-rw-rw-r--  1 runner runner  15112 Oct 13 14:16 workbox-9c191d2f.js
+\n### Command: grep -rnEi "TODO|FIXME|coming soon|not implemented|alert\(|confirm\(|prompt\(" src\n
+src/components/ui/alert.tsx:21:function Alert({
+src/components/ui/ConfirmDialog.tsx:54:              await onConfirm();
+src/components/WelcomeModal.tsx:40:      setInstallPrompt(e as BeforeInstallPromptEvent);
+src/components/WelcomeModal.tsx:60:        setInstallPrompt(null);
+src/__tests__/no-stubs.test.ts:16:      if (/TODO|FIXME|coming soon|not implemented/i.test(line)) return true;
+\n### Command: grep -rnE "as any|@ts-ignore|dangerouslySetInnerHTML|parseFloat|toFixed|fetch\(|XMLHttpRequest|WebSocket|supabase|axios|console\.log" src\n
+src/lib/__tests__/utils.test.ts:26:      getRandomValues: (arr: Uint8Array) => originalCrypto.getRandomValues(arr as any),
+src/pages/SettleUp.tsx:53:  const amountStr = userAmountStr ?? (netBalance !== 0 ? (Math.abs(netBalance) / 100).toFixed(2) : '');
+src/pages/SettleUp.tsx:155:                setUserAmountStr((fullOutstandingMinor / 100).toFixed(2));
+src/pages/Settings.tsx:166:    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+\n### Command: npm audit --omit=dev\n
+found 0 vulnerabilities
