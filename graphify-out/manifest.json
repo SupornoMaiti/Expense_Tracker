@@ -84,8 +84,8 @@
     "semantic_hash": "611cf140b1fd3fa0201457f4ca91f5b1"
   },
   "src/components/AddExpenseModal.tsx": {
-    "mtime": 1791886573.4937077,
-    "seen": 1791887149.4711127,
+    "mtime": 1791887370.851933,
+    "seen": 1791888893.1633205,
     "ast_hash": "40187a5be7f13620b615eb7ed1080e43",
     "semantic_hash": ""
   },
@@ -282,8 +282,8 @@
     "semantic_hash": "2acb5ba5599eb382480e1c6e1a091380"
   },
   "src/db/__tests__/backup.test.ts": {
-    "mtime": 1791887129.0071065,
-    "seen": 1791887149.472932,
+    "mtime": 1791887370.851933,
+    "seen": 1791888893.1656454,
     "ast_hash": "9440962914dd1e0bf0d2f35044f2df9a",
     "semantic_hash": ""
   },
@@ -306,8 +306,8 @@
     "semantic_hash": "c55f3da8c2b351916ca0f6a726f341c4"
   },
   "src/db/db.ts": {
-    "mtime": 1791887039.5285957,
-    "seen": 1791887149.4730752,
+    "mtime": 1791887370.851933,
+    "seen": 1791888893.1658182,
     "ast_hash": "b084ebf8e9714304c816a2b28fe38059",
     "semantic_hash": ""
   },
@@ -438,9 +438,9 @@
     "semantic_hash": "787e5a07efeb2bf6209d5937195f2f68"
   },
   "src/pages/Activity.tsx": {
-    "mtime": 1791887076.3741937,
-    "seen": 1791887149.4743407,
-    "ast_hash": "eeff17091c78ceaff24806d62b76837a",
+    "mtime": 1791888463.9785156,
+    "seen": 1791888893.166939,
+    "ast_hash": "5b06a2bc982e4d17d36d6d6c2a67363c",
     "semantic_hash": ""
   },
   "src/pages/Analyze.tsx": {
@@ -450,8 +450,8 @@
     "semantic_hash": ""
   },
   "src/pages/Dashboard.tsx": {
-    "mtime": 1791887058.8239043,
-    "seen": 1791887149.474387,
+    "mtime": 1791887370.851933,
+    "seen": 1791888893.1669862,
     "ast_hash": "65355b68b6dac0b90b016c76b8c6ce77",
     "semantic_hash": ""
   },
@@ -462,9 +462,9 @@
     "semantic_hash": ""
   },
   "src/pages/PersonDetail.tsx": {
-    "mtime": 1791749703.105384,
-    "seen": 1791782411.4957466,
-    "ast_hash": "408e967a86fe59208729021da197e18c",
+    "mtime": 1791888123.90378,
+    "seen": 1791888893.1670322,
+    "ast_hash": "5dda8d4d1a941cf981fdf809e5bf2754",
     "semantic_hash": ""
   },
   "src/pages/Settings.tsx": {
@@ -582,15 +582,15 @@
     "semantic_hash": ""
   },
   "src/components/person/PersonBalanceSummary.tsx": {
-    "mtime": 1791749703.1038177,
-    "seen": 1791782411.493317,
-    "ast_hash": "070965a32745cd68da0c639a0f125e96",
+    "mtime": 1791888207.1052535,
+    "seen": 1791888893.1637213,
+    "ast_hash": "354d82490d2d9716db1d517ff984b4f2",
     "semantic_hash": ""
   },
   "src/components/person/PersonHeader.tsx": {
-    "mtime": 1791749703.1038177,
-    "seen": 1791782411.493321,
-    "ast_hash": "b1d1e4468bdce0ff62ad078f73db5652",
+    "mtime": 1791888780.7004545,
+    "seen": 1791888893.1637228,
+    "ast_hash": "021f0afe6b7b50f06f55eeaedf45af3f",
     "semantic_hash": ""
   },
   "src/components/ui/ConfirmDialog.tsx": {
@@ -606,14 +606,14 @@
     "semantic_hash": ""
   },
   "src/hooks/usePersonDetailData.ts": {
-    "mtime": 1791749703.105384,
-    "seen": 1791782411.4951282,
-    "ast_hash": "da0a78785fea4138ed98bdc9c4290aea",
+    "mtime": 1791888092.3606594,
+    "seen": 1791888893.1663969,
+    "ast_hash": "0c4e72fcefc5bbae606fb65dded0dd50",
     "semantic_hash": ""
   },
   "AUDIT_REPORT.md": {
-    "mtime": 1791887191.4462628,
-    "seen": 1791887206.9199164,
+    "mtime": 1791887370.8412757,
+    "seen": 1791888893.1676466,
     "ast_hash": "a595cd4c018b0fbd332fa1ef87a879a1",
     "semantic_hash": ""
   },
@@ -805,7 +805,7 @@
   },
   "supabase-schema.sql": {
     "mtime": 1791179243.6589963,
-    "seen": 1791887206.919871,
+    "seen": 1791888928.3742566,
     "ast_hash": "f6b175c38afd3096c3f4c20cc99bd49b",
     "semantic_hash": ""
   },
@@ -825,6 +825,18 @@
     "mtime": 1791885946.682954,
     "seen": 1791886279.1380723,
     "ast_hash": "e97bf160c81a664d059f18b9440b725f",
+    "semantic_hash": ""
+  },
+  "src/__tests__/activityAndSettlementReset.test.tsx": {
+    "mtime": 1791888747.8960056,
+    "seen": 1791888893.163051,
+    "ast_hash": "3b00e39fbe8c5f5b7c12c3ad642a43df",
+    "semantic_hash": ""
+  },
+  ".github/agents/my-agent.agent.md": {
+    "mtime": 1791887370.8405185,
+    "seen": 1791888893.167645,
+    "ast_hash": "96ac65d8ac6ea8539fd4a8e6b6b92e9d",
     "semantic_hash": ""
   }
 }

@@ -61,10 +61,8 @@ export function PersonHeader({ person, onEdit }: PersonHeaderProps) {
 
         {!person.isMe && (
           <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Button variant="ghost" size="icon">
-                <MoreVertical className="h-5 w-5" />
-              </Button>
+            <DropdownMenuTrigger className="inline-flex items-center justify-center rounded-lg size-8 hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer transition-colors">
+              <MoreVertical className="h-5 w-5" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={onEdit}>

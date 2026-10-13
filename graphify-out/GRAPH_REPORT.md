@@ -1,28 +1,28 @@
 # Graph Report - Finance Tracker  (2026-10-13)
 
 ## Corpus Check
-- 129 files · ~118,097 words
+- 131 files · ~120,374 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 6 file(s) not represented in the graph (top: (none) 4, .example 1, .css 1)
 
 ## Summary
-- 710 nodes · 1753 edges · 55 communities (46 shown, 9 thin omitted)
+- 719 nodes · 1770 edges · 53 communities (46 shown, 7 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 31 edges (avg confidence: 0.95)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `623c6598`
+- Built from commit: `902b7387`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- App.tsx
+- SettleUp.tsx
 - db.ts
 - navigation-menu.tsx
 - Detailed Re-Audit Findings
 - package.json
 - devDependencies
-- theme-provider.tsx
+- App.tsx
 - components.json
 - dependencies
 - compilerOptions
@@ -30,7 +30,7 @@
 - drawer.tsx
 - chart.tsx
 - PersonHeader.tsx
-- sheet.tsx
+- schemas.ts
 - repositories.ts
 - notifications.test.mjs
 - scripts
@@ -66,44 +66,44 @@
 - responsive-Responsive-over-dcb70--route-friends-for-overlaps-chromium/error-context.md
 - responsive-Responsive-over-eebee-route-insights-for-overlaps-chromium/error-context.md
 - 1. Problem Analysis
-- ErrorBoundary.tsx
+- Bug Auditor
 
 ## God Nodes (most connected - your core abstractions)
 1. `Button()` - 51 edges
 2. `react` - 37 edges
-3. `lucide-react` - 29 edges
-4. `db` - 28 edges
+3. `db` - 29 edges
+4. `lucide-react` - 29 edges
 5. `Expense` - 27 edges
 6. `cn` - 24 edges
-7. `Analyze()` - 22 edges
-8. `SettingsPage()` - 22 edges
-9. `SettleUp()` - 22 edges
-10. `formatMoney()` - 22 edges
+7. `vitest` - 23 edges
+8. `Analyze()` - 22 edges
+9. `SettingsPage()` - 22 edges
+10. `SettleUp()` - 22 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `[F-07] Medium: Unhandled `NaN` in Settle Up Form Submission` --references--> `parseDecimalToMinor()`  [INFERRED]
-  AUDIT_REPORT.md → src/lib/money.ts
-- `[F-09] Medium: Indian Numbering System (`en-IN`) Hardcoded for Non-INR Currencies` --references--> `formatMoney()`  [INFERRED]
-  AUDIT_REPORT.md → src/lib/money.ts
+- `[RF-01] Medium: Missing Dexie Index on `refundOfId` — Full Table Scans on Refund Operations` --references--> `SplitLocalDB`  [INFERRED]
+  AUDIT_REPORT.md → src/db/db.ts
 - `[F-11] Medium: Missing Currency and Country Code Controls in Settings UI` --references--> `Settings`  [INFERRED]
   AUDIT_REPORT.md → src/domain/types.ts
+- `[NF-01] Medium: Linear search over people array in SelectValue` --references--> `SelectValue()`  [INFERRED]
+  AUDIT_REPORT.md → src/components/ui/select.tsx
+- `[F-03] High: Date Format Incompatibility in `computeAnalyze` and `Analyze.tsx`` --references--> `computeAnalyze()`  [INFERRED]
+  AUDIT_REPORT.md → src/domain/analyze.ts
 - `[F-12] Low: Timezone Boundary Date Discrepancy in `DatePicker.tsx`` --references--> `getTodayISODate()`  [INFERRED]
   AUDIT_REPORT.md → src/lib/date.ts
-- `[F-13] Low: Dead Callback in `sendWhatsAppReminder`` --references--> `sendWhatsAppReminder()`  [INFERRED]
-  AUDIT_REPORT.md → src/lib/whatsapp.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (55 total, 9 thin omitted)
+## Communities (53 total, 7 thin omitted)
 
-### Community 0 - "App.tsx"
-Cohesion: 0.10
-Nodes (53): [NF-02] Medium: Double iteration over people array for filtering and mapping, dexie-react-hooks, lucide-react, next-themes, react, react-router-dom, sonner, AppShell() (+45 more)
+### Community 0 - "SettleUp.tsx"
+Cohesion: 0.06
+Nodes (52): [NF-02] Medium: Double iteration over people array for filtering and mapping, RFC-4122, cn, react, AddExpenseModal(), Props, CategoriesManager(), COLOR_PRESETS (+44 more)
 
 ### Community 1 - "db.ts"
 Cohesion: 0.08
-Nodes (44): Change Verification Summary, [F-05] High: Backup Schema Incompatibility Between `db.ts` and UI, bench(), dexie, fake-indexeddb, @testing-library/react, vitest, seedAndMeasure() (+36 more)
+Nodes (38): Change Verification Summary, [F-05] High: Backup Schema Incompatibility Between `db.ts` and UI, bench(), fake-indexeddb, react-router-dom, @testing-library/react, vitest, seedAndMeasure() (+30 more)
 
 ### Community 2 - "navigation-menu.tsx"
 Cohesion: 0.24
@@ -111,19 +111,19 @@ Nodes (4): NavigationMenu(), NavigationMenuPositioner(), NavigationMenuTrigger()
 
 ### Community 3 - "Detailed Re-Audit Findings"
 Cohesion: 0.05
-Nodes (40): Detailed Re-Audit Findings, [F5-01] Medium: React 19 State Cascade in AddExpenseModal Hydration, [F5-02] Medium: IndexedDB Unique Constraint Collision on `importBackup()`, [F5-03] Low: Variable Naming Discrepancy on Dashboard Spend Card, [F5-04] Low: Search Filter Linear Scan in Activity Feed, [F-03] High: Date Format Incompatibility in `computeAnalyze` and `Analyze.tsx`, [F-04] High: Unique Index Collision & Unhandled Crash on Backup Merge, [F-06] Medium: Recharts & `dangerouslySetInnerHTML` Still Present in Project (+32 more)
+Nodes (37): Detailed Re-Audit Findings, [F5-01] Medium: React 19 State Cascade in AddExpenseModal Hydration, [F5-02] Medium: IndexedDB Unique Constraint Collision on `importBackup()`, [F5-03] Low: Variable Naming Discrepancy on Dashboard Spend Card, [F5-04] Low: Search Filter Linear Scan in Activity Feed, [F-01] Critical: `createRefundForExpense` Allocation Breakdown & Zod Invariant Failure, [F-03] High: Date Format Incompatibility in `computeAnalyze` and `Analyze.tsx`, [F-04] High: Unique Index Collision & Unhandled Crash on Backup Merge (+29 more)
 
 ### Community 5 - "package.json"
-Cohesion: 0.08
-Nodes (23): name, private, type, version, autoprefixer, clsx, date-fns, framer-motion (+15 more)
+Cohesion: 0.07
+Nodes (26): name, private, type, version, autoprefixer, clsx, date-fns, dexie (+18 more)
 
 ### Community 6 - "devDependencies"
 Cohesion: 0.07
 Nodes (27): devDependencies, autoprefixer, clsx, eslint, @eslint/js, eslint-plugin-react-hooks, eslint-plugin-react-refresh, fake-indexeddb (+19 more)
 
-### Community 7 - "theme-provider.tsx"
-Cohesion: 0.12
-Nodes (11): react-dom, App(), initialState, Theme, ThemeProvider(), ThemeProviderContext, ThemeProviderProps, ThemeProviderState (+3 more)
+### Community 7 - "App.tsx"
+Cohesion: 0.08
+Nodes (25): lucide-react, App(), AppShell(), NAV_ITEMS, ScrollToTop(), ErrorBoundary, Props, State (+17 more)
 
 ### Community 8 - "components.json"
 Cohesion: 0.09
@@ -153,13 +153,13 @@ Nodes (13): recharts, ChartConfig, ChartContainer(), ChartContext, ChartContextP
 Cohesion: 0.16
 Nodes (7): PersonHeader(), PersonHeaderProps, DropdownMenu(), DropdownMenuContent(), DropdownMenuItem(), DropdownMenuSubContent(), DropdownMenuTrigger()
 
-### Community 15 - "sheet.tsx"
+### Community 15 - "schemas.ts"
 Cohesion: 0.22
-Nodes (3): SheetContent(), SheetOverlay(), SheetPortal()
+Nodes (8): zod, AmountMinorSchema, CurrencySchema, DateSchema, ExpensePayerSchema, ExpenseSchema, ExpenseShareSchema, SettlementSchema
 
 ### Community 16 - "repositories.ts"
-Cohesion: 0.11
-Nodes (22): [F-01] Critical: `createRefundForExpense` Allocation Breakdown & Zod Invariant Failure, [F-02] Critical: Multiple Partial Refunds Can Exceed Original Expense Amount, RFC-4122, createRefundForExpense(), createRefundForSettlement(), DEFAULT_CATEGORIES, ensureDefaultCategories(), ensureMe() (+14 more)
+Cohesion: 0.18
+Nodes (26): [F-02] Critical: Multiple Partial Refunds Can Exceed Original Expense Amount, dexie-react-hooks, sonner, AddRefundModal(), Props, PersonActivityFeed(), CurrencyIcon(), CurrencyIconProps (+18 more)
 
 ### Community 18 - "scripts"
 Cohesion: 0.25
@@ -187,7 +187,7 @@ Nodes (6): 1. Build, 2. Hosting, 3. WARNING: Domain Changes and IndexedDB, 4. Se
 
 ### Community 30 - "Button"
 Cohesion: 0.08
-Nodes (49): @base-ui/react, class-variance-authority, cn, libphonenumber-js, AddExpenseModal(), Props, AddFriendModal(), COLORS (+41 more)
+Nodes (36): @base-ui/react, class-variance-authority, AddFriendModal(), COLORS, EditFriendModal(), hasPrototypePollution(), ImportBackupModal(), ImportBackupModalProps (+28 more)
 
 ### Community 31 - "SplitLocal"
 Cohesion: 0.33
@@ -277,29 +277,29 @@ Nodes (3): Error details, Instructions, Test info
 Cohesion: 0.33
 Nodes (5): 1. Problem Analysis, 2. Solution Plan, A. Settle Logic Issues, B. Notification / Alert Placement, Settle Logic & Notification Positioning Investigation & Fix Plan
 
-### Community 53 - "ErrorBoundary.tsx"
-Cohesion: 0.24
-Nodes (3): ErrorBoundary, Props, State
+### Community 53 - "Bug Auditor"
+Cohesion: 0.25
+Nodes (7): Bug Auditor, Final output, Project context (do not violate), Rules of evidence, Stage 1: FIND, Stage 2: REPORT, Stage 3: FIX
 
 ## Knowledge Gaps
 - **19 isolated node(s):** `RFC-4122`, `autoprefixer`, `clsx`, `date-fns`, `framer-motion` (+14 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 367 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **9 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 374 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **7 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `react` connect `App.tsx` to `db.ts`, `table.tsx`, `package.json`, `theme-provider.tsx`, `drawer.tsx`, `chart.tsx`, `PersonHeader.tsx`, `sheet.tsx`, `repositories.ts`, `ErrorBoundary.tsx`, `avatar.tsx`, `Button`?**
-  _High betweenness centrality (0.104) - this node is a cross-community bridge._
+- **Why does `react` connect `SettleUp.tsx` to `package.json`, `App.tsx`, `drawer.tsx`, `chart.tsx`, `PersonHeader.tsx`, `repositories.ts`, `Button`?**
+  _High betweenness centrality (0.102) - this node is a cross-community bridge._
 - **What connects `RFC-4122`, `autoprefixer`, `clsx` to the rest of the system?**
   _19 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `App.tsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.10348101265822784 - nodes in this community are weakly interconnected._
+- **Should `SettleUp.tsx` be split into smaller, more focused modules?**
+  _Cohesion score 0.05979843225083987 - nodes in this community are weakly interconnected._
 - **Why does `devDependencies` connect `devDependencies` to `package.json`?**
-  _High betweenness centrality (0.053) - this node is a cross-community bridge._
+  _High betweenness centrality (0.052) - this node is a cross-community bridge._
 - **Should `db.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.07784810126582278 - nodes in this community are weakly interconnected._
-- **Why does `lucide-react` connect `App.tsx` to `db.ts`, `navigation-menu.tsx`, `package.json`, `theme-provider.tsx`, `PersonHeader.tsx`, `sheet.tsx`, `ErrorBoundary.tsx`, `Button`?**
-  _High betweenness centrality (0.051) - this node is a cross-community bridge._
+  _Cohesion score 0.0848982785602504 - nodes in this community are weakly interconnected._
+- **Why does `lucide-react` connect `App.tsx` to `SettleUp.tsx`, `db.ts`, `navigation-menu.tsx`, `package.json`, `PersonHeader.tsx`, `repositories.ts`, `Button`?**
+  _High betweenness centrality (0.050) - this node is a cross-community bridge._
 - **Should `Detailed Re-Audit Findings` be split into smaller, more focused modules?**
-  _Cohesion score 0.04878048780487805 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.05405405405405406 - nodes in this community are weakly interconnected._

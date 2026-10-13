@@ -24,16 +24,20 @@ export default function Activity() {
   const people = useLiveQuery(() => db.people.toArray());
   const settings = useLiveQuery(() => db.settings.get('user_settings'));
 
+  const [viewScope, setViewScope] = useState<'mine' | 'all'>('mine');
   const [filterType, setFilterType] = useState('all');
   const [filterPersonId, setFilterPersonId] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRefundExpense, setSelectedRefundExpense] = useState<Expense | null>(null);
 
+  const me = useMemo(() => people?.find(p => p.isMe), [people]);
+  const myId = me?.id;
+
   const personItems = useMemo(() => {
     const map: Record<string, string> = { all: 'All people' };
     if (people) {
       for (const p of people) {
-        map[p.id] = p.name;
+        map[p.id] = p.isMe ? `${p.name} (You)` : p.name;
       }
     }
     return map;
@@ -60,11 +64,28 @@ export default function Activity() {
     ...settlements.map(s => ({ type: 'settlement' as const, data: s, time: new Date(s.createdAt).getTime(), dateLabel: formatDisplayDate(s.date || s.createdAt) }))
   ].sort((a, b) => b.time - a.time);
 
-  const expenseCount = expenses.length;
-  const settlementCount = settlements.length;
-  const totalCount = allItems.length;
+  const isItemInvolvingMe = (item: ActivityItem): boolean => {
+    if (!myId) return true;
+    if (item.type === 'settlement') {
+      return item.data.fromId === myId || item.data.toId === myId;
+    }
+    const d = item.data;
+    return (
+      (d.participantIds && d.participantIds.includes(myId)) ||
+      (d.payers && d.payers.some((p: { personId: string }) => p.personId === myId)) ||
+      (d.shares && d.shares.some((s: { personId: string }) => s.personId === myId))
+    );
+  };
 
-  let activityItems = allItems;
+  const scopedItems = viewScope === 'mine' && myId
+    ? allItems.filter(isItemInvolvingMe)
+    : allItems;
+
+  const expenseCount = scopedItems.filter(i => i.type === 'expense').length;
+  const settlementCount = scopedItems.filter(i => i.type === 'settlement').length;
+  const totalCount = scopedItems.length;
+
+  let activityItems = scopedItems;
 
   if (filterType !== 'all') {
     activityItems = activityItems.filter(a => a.type === filterType);
@@ -151,6 +172,29 @@ export default function Activity() {
     }
   };
 
+  const getPayerSummary = (expense: Expense) => {
+    if (!expense.payers || expense.payers.length === 0) {
+      return `Total ${formatMoney(expense.amountMinor, expense.currency)}`;
+    }
+    if (expense.payers.length === 1) {
+      const payer = expense.payers[0];
+      if (payer.personId === myId) {
+        return `You paid ${formatMoney(expense.amountMinor, expense.currency)}`;
+      }
+      const payerPerson = people.find(p => p.id === payer.personId);
+      return `${payerPerson?.name || 'Someone'} paid ${formatMoney(expense.amountMinor, expense.currency)}`;
+    }
+    const myPayer = expense.payers.find(p => p.personId === myId);
+    if (myPayer && myPayer.amountMinor > 0) {
+      return `You paid ${formatMoney(myPayer.amountMinor, expense.currency)} of ${formatMoney(expense.amountMinor, expense.currency)}`;
+    }
+    const payerNames = expense.payers
+      .map(p => people.find(per => per.id === p.personId)?.name || 'Someone')
+      .slice(0, 2)
+      .join(' & ');
+    return `${payerNames}${expense.payers.length > 2 ? ` +${expense.payers.length - 2}` : ''} paid`;
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col space-y-2 mb-6">
@@ -158,23 +202,51 @@ export default function Activity() {
         <p className="text-muted-foreground">Chronological feed of everything that happened</p>
       </div>
 
-      {/* Type quick-filter pills */}
-      <div className="flex flex-wrap gap-2">
-        {[
-          { id: 'all', label: 'All Types', count: totalCount },
-          { id: 'expense', label: 'Expenses', count: expenseCount },
-          { id: 'settlement', label: 'Settlements', count: settlementCount }
-        ].map(t => (
-          <Button
-            key={t.id}
-            variant={filterType === t.id ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setFilterType(t.id)}
-            className="rounded-full text-xs font-medium"
+      {/* Type quick-filter pills & Scope toggle */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex flex-wrap gap-2">
+          {[
+            { id: 'all', label: 'All Types', count: totalCount },
+            { id: 'expense', label: 'Expenses', count: expenseCount },
+            { id: 'settlement', label: 'Settlements', count: settlementCount }
+          ].map(t => (
+            <Button
+              key={t.id}
+              variant={filterType === t.id ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setFilterType(t.id)}
+              className="rounded-full text-xs font-medium"
+            >
+              {t.label} <span className="ml-1.5 opacity-70 text-[11px] font-semibold">({t.count})</span>
+            </Button>
+          ))}
+        </div>
+
+        {/* View Mode Toggle: My Share vs Total Expense */}
+        <div className="inline-flex items-center rounded-lg bg-muted/60 p-1 border self-start sm:self-auto">
+          <button
+            type="button"
+            onClick={() => setViewScope('mine')}
+            className={`px-3 py-1 rounded-md text-xs font-medium transition-all cursor-pointer ${
+              viewScope === 'mine'
+                ? 'bg-background text-foreground shadow-xs font-semibold'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
           >
-            {t.label} <span className="ml-1.5 opacity-70 text-[11px] font-semibold">({t.count})</span>
-          </Button>
-        ))}
+            My Share
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewScope('all')}
+            className={`px-3 py-1 rounded-md text-xs font-medium transition-all cursor-pointer ${
+              viewScope === 'all'
+                ? 'bg-background text-foreground shadow-xs font-semibold'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Total Expense
+          </button>
+        </div>
       </div>
 
       {/* Search and Person filter toolbar */}
@@ -216,30 +288,66 @@ export default function Activity() {
           </div>
         ) : (
           activityItems.map((item) => {
-
-
             if (item.type === 'settlement') {
               const settlement = item.data;
               const fromPerson = people.find(p => p.id === settlement.fromId);
               const toPerson = people.find(p => p.id === settlement.toId);
               const isDeleted = !!settlement.deletedAt;
+              const isMeRecipient = settlement.toId === myId;
+              const isMeSender = settlement.fromId === myId;
+
+              const title = isMeSender
+                ? `You paid ${toPerson?.name || 'Unknown'}`
+                : isMeRecipient
+                ? `${fromPerson?.name || 'Unknown'} paid you`
+                : `${fromPerson?.name || 'Unknown'} paid ${toPerson?.name || 'Unknown'}`;
 
               return (
-                <div key={settlement.id} className={`flex items-center justify-between p-4 bg-card rounded-lg border shadow-sm ${isDeleted ? 'opacity-50' : ''}`}>
+                <div key={settlement.id} className={`flex items-center justify-between p-4 bg-card rounded-lg border shadow-xs hover:border-border/80 transition-colors ${isDeleted ? 'opacity-50' : ''}`}>
                   <div className="flex items-center gap-4 min-w-0 flex-1 mr-3">
-                    <div className="p-2 rounded-full bg-green-100 text-green-600 dark:bg-green-900/30 shrink-0">
+                    <div className={`p-2 rounded-full shrink-0 ${
+                      isMeRecipient
+                        ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40'
+                        : isMeSender
+                        ? 'bg-blue-100 text-blue-600 dark:bg-blue-950/40'
+                        : 'bg-green-100 text-green-600 dark:bg-green-900/30'
+                    }`}>
                       <CurrencyIcon currency={settlement.currency || settings?.defaultCurrency} className="h-4 w-4" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className={`font-medium truncate ${isDeleted ? 'line-through text-muted-foreground' : ''}`}>
-                        {fromPerson?.name || 'Unknown'} paid {toPerson?.name || 'Unknown'}
+                        {title}
                       </p>
                       <p className="text-xs text-muted-foreground">{item.dateLabel} {isDeleted ? '(Deleted)' : ''}</p>
+                      {settlement.notes && (
+                        <p className="text-[11px] text-muted-foreground/80 italic mt-0.5 truncate">{settlement.notes}</p>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
-                    <div className="font-semibold text-right">
-                      {formatMoney(settlement.amountMinor, settlement.currency)}
+                    <div className="text-right">
+                      {viewScope === 'mine' && isMeRecipient ? (
+                        <>
+                          <div className="font-bold text-base text-emerald-600 dark:text-emerald-400">
+                            +{formatMoney(settlement.amountMinor, settlement.currency)}
+                          </div>
+                          <p className="text-[11px] text-emerald-600/80 dark:text-emerald-400/80 font-medium">Received</p>
+                        </>
+                      ) : viewScope === 'mine' && isMeSender ? (
+                        <>
+                          <div className="font-bold text-base text-rose-600 dark:text-rose-400">
+                            -{formatMoney(settlement.amountMinor, settlement.currency)}
+                          </div>
+                          <p className="text-[11px] text-rose-600/80 dark:text-rose-400/80 font-medium">You sent</p>
+                        </>
+                      ) : (
+                        <>
+                          <div className="font-semibold text-base text-right">
+                            {formatMoney(settlement.amountMinor, settlement.currency)}
+                          </div>
+                          <p className="text-[11px] text-muted-foreground">Payment</p>
+                        </>
+                      )}
                     </div>
                     {isDeleted ? (
                       <Button variant="outline" size="sm" onClick={() => handleRestoreSettlement(settlement.id)} className="h-8 text-xs">
@@ -265,16 +373,24 @@ export default function Activity() {
               const expense = item.data;
               const isSoftDeleted = !!expense.deletedAt;
               const isRefundItem = !!expense.isRefund || !!expense.refundOfId;
+              const payerSummary = getPayerSummary(expense);
+
+              const myShareObj = expense.shares?.find(s => s.personId === myId);
+              const myShare = myShareObj
+                ? myShareObj.amountMinor
+                : (expense.participantIds?.includes(myId || '') && expense.participantIds.length > 0
+                    ? Math.round(expense.amountMinor / expense.participantIds.length)
+                    : 0);
 
               return (
-                <div key={expense.id} className={`flex items-center justify-between p-4 bg-card rounded-lg border shadow-sm ${isSoftDeleted ? 'opacity-50' : ''}`}>
+                <div key={expense.id} className={`flex items-center justify-between p-4 bg-card rounded-lg border shadow-xs hover:border-border/80 transition-colors ${isSoftDeleted ? 'opacity-50' : ''}`}>
                   <div className="flex items-center gap-4 min-w-0 flex-1 mr-3">
                     <div className={`p-2 rounded-full shrink-0 ${isRefundItem ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30' : 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30'}`}>
                       {isRefundItem ? <RotateCcw className="h-4 w-4" /> : <Users className="h-4 w-4" />}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <p className={`font-medium truncate ${isSoftDeleted ? 'line-through text-muted-foreground' : ''}`}>
+                        <p className={`font-semibold text-sm truncate ${isSoftDeleted ? 'line-through text-muted-foreground' : ''}`}>
                           {expense.description}
                         </p>
                         {isRefundItem && (
@@ -283,12 +399,48 @@ export default function Activity() {
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-muted-foreground">{item.dateLabel} {isSoftDeleted ? '(Deleted)' : ''}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {payerSummary} • {item.dateLabel} {isSoftDeleted ? '(Deleted)' : ''}
+                      </p>
+                      {expense.notes && (
+                        <p className="text-[11px] text-muted-foreground/80 italic mt-0.5 truncate">{expense.notes}</p>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
-                    <div className="font-semibold text-right">
-                      {formatMoney(expense.amountMinor, expense.currency)}
+                    <div className="text-right">
+                      {viewScope === 'mine' ? (
+                        isRefundItem ? (
+                          <>
+                            <div className="font-bold text-base text-blue-600 dark:text-blue-400">
+                              -{formatMoney(myShare, expense.currency)}
+                            </div>
+                            <p className="text-[11px] text-muted-foreground">
+                              Refund of {formatMoney(expense.amountMinor, expense.currency)}
+                            </p>
+                          </>
+                        ) : (
+                          <>
+                            <div className="font-bold text-base text-foreground">
+                              {formatMoney(myShare, expense.currency)}
+                            </div>
+                            <p className="text-[11px] text-muted-foreground">
+                              {myShare === expense.amountMinor
+                                ? 'Full expense'
+                                : `Your share of ${formatMoney(expense.amountMinor, expense.currency)}`}
+                            </p>
+                          </>
+                        )
+                      ) : (
+                        <>
+                          <div className="font-semibold text-base text-right">
+                            {formatMoney(expense.amountMinor, expense.currency)}
+                          </div>
+                          <p className="text-[11px] text-muted-foreground">
+                            Total expense
+                          </p>
+                        </>
+                      )}
                     </div>
                     {isSoftDeleted ? (
                       <Button variant="outline" size="sm" onClick={() => handleUndo(expense.id)} className="h-8 text-xs">

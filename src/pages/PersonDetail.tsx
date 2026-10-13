@@ -59,6 +59,8 @@ export default function PersonDetail() {
         totalTheyOweMeFromExpenses={data.totalTheyOweMeFromExpenses}
         totalIOweThemFromExpenses={data.totalIOweThemFromExpenses}
         totalSettledAmount={data.totalSettledAmount}
+        amountToBeSettled={data.amountToBeSettled}
+        activeSettlementsCount={data.activeSettlementsCount}
         sharedExpenses={data.sharedExpenses}
         sharedSettlements={data.sharedSettlements}
         settings={data.settings}

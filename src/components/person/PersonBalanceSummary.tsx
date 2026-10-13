@@ -20,7 +20,9 @@ interface PersonBalanceSummaryProps {
   isOwing: boolean;
   totalTheyOweMeFromExpenses: number;
   totalIOweThemFromExpenses: number;
-  totalSettledAmount: number;
+  totalSettledAmount?: number;
+  amountToBeSettled?: number;
+  activeSettlementsCount?: number;
   sharedExpenses: Expense[];
   sharedSettlements: Settlement[];
   settings?: Settings;
@@ -35,7 +37,8 @@ export function PersonBalanceSummary({
   isOwing,
   totalTheyOweMeFromExpenses,
   totalIOweThemFromExpenses,
-  totalSettledAmount,
+  amountToBeSettled = Math.abs(netBalance),
+  activeSettlementsCount = 0,
   sharedExpenses,
   sharedSettlements,
   settings,
@@ -121,7 +124,7 @@ export function PersonBalanceSummary({
         </div>
       </div>
 
-      {/* Breakdown Subcards: What they owe you vs What you owe them vs Settled */}
+      {/* Breakdown Subcards: What they owe you vs What you owe them vs Amount to be Settled */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t">
         {/* They owe you */}
         <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-between">
@@ -132,7 +135,9 @@ export function PersonBalanceSummary({
             <p className="text-lg font-bold text-emerald-700 dark:text-emerald-300">
               {formatMoney(totalTheyOweMeFromExpenses, currency)}
             </p>
-            <p className="text-[10px] text-muted-foreground">From shared expenses</p>
+            <p className="text-[10px] text-muted-foreground">
+              {activeSettlementsCount > 0 ? 'Since last settlement' : 'From shared expenses'}
+            </p>
           </div>
           <div className="p-2 rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
             <ArrowDownLeft className="h-4 w-4" />
@@ -148,24 +153,30 @@ export function PersonBalanceSummary({
             <p className="text-lg font-bold text-rose-700 dark:text-rose-300">
               {formatMoney(totalIOweThemFromExpenses, currency)}
             </p>
-            <p className="text-[10px] text-muted-foreground">From shared expenses</p>
+            <p className="text-[10px] text-muted-foreground">
+              {activeSettlementsCount > 0 ? 'Since last settlement' : 'From shared expenses'}
+            </p>
           </div>
           <div className="p-2 rounded-lg bg-rose-500/15 text-rose-600 dark:text-rose-400">
             <ArrowUpRight className="h-4 w-4" />
           </div>
         </div>
 
-        {/* Total Settled */}
+        {/* Amount to be Settled */}
         <div className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-between">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-wider text-blue-800 dark:text-blue-300">
-              Total Settled
+              Amount to be Settled
             </p>
             <p className="text-lg font-bold text-blue-700 dark:text-blue-300">
-              {formatMoney(totalSettledAmount, currency)}
+              {formatMoney(amountToBeSettled, currency)}
             </p>
             <p className="text-[10px] text-muted-foreground">
-              {sharedSettlements.length} settlement{sharedSettlements.length === 1 ? '' : 's'}
+              {netBalance > 0
+                ? `${person.name} owes you`
+                : netBalance < 0
+                ? `You owe ${person.name}`
+                : 'All settled up'}
             </p>
           </div>
           <div className="p-2 rounded-lg bg-blue-500/15 text-blue-600 dark:text-blue-400">
