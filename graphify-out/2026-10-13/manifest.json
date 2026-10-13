@@ -438,9 +438,9 @@
     "semantic_hash": "787e5a07efeb2bf6209d5937195f2f68"
   },
   "src/pages/Activity.tsx": {
-    "mtime": 1791883739.4018908,
-    "seen": 1791884168.4859006,
-    "ast_hash": "df6c0372d0562ec4e8a0fd94fbcbb6f6",
+    "mtime": 1791885333.7968314,
+    "seen": 1791885393.398456,
+    "ast_hash": "df67e6bb79f5cf185e5ca0c54addf278",
     "semantic_hash": ""
   },
   "src/pages/Analyze.tsx": {
@@ -612,9 +612,9 @@
     "semantic_hash": ""
   },
   "AUDIT_REPORT.md": {
-    "mtime": 1791790576.9476275,
-    "seen": 1791790581.3798609,
-    "ast_hash": "f241f6980093a1b5534ceb021973c2b2",
+    "mtime": 1791885059.4323792,
+    "seen": 1791885393.3992796,
+    "ast_hash": "098798031be52f251934a6f7dcb6c348",
     "semantic_hash": ""
   },
   "DEPLOY.md": {
@@ -805,7 +805,7 @@
   },
   "supabase-schema.sql": {
     "mtime": 1791179243.6589963,
-    "seen": 1791880605.7450159,
+    "seen": 1791884192.6385202,
     "ast_hash": "",
     "semantic_hash": ""
   },

@@ -41,6 +41,11 @@ export default function Activity() {
     return map;
   }, [people]);
 
+  const filteredPeople = useMemo(() => {
+    if (!people) return [];
+    return people.filter(p => !p.isMe);
+  }, [people]);
+
   if (!expenses || !settlements || !reminders || !people || !settings) {
     return (
       <div className="flex h-full items-center justify-center p-8 animate-pulse">
@@ -193,15 +198,12 @@ export default function Activity() {
         >
           <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue placeholder="All people">
-              {(val) => {
-                if (!val || val === 'all') return 'All people';
-                return people.find((p) => p.id === val)?.name || val;
-              }}
+              {(val) => personItems[val] ?? val}
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All people</SelectItem>
-            {people.filter(p => !p.isMe).map(p => (
+            {filteredPeople.map(p => (
               <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
             ))}
           </SelectContent>
