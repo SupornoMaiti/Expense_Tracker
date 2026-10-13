@@ -296,3 +296,26 @@
 - **ESLint:** Clean lint with zero warnings (`eslint .`).
 - **Production Build:** Succeeded cleanly with PWA service worker generation.
 
+
+
+## Fourth Reaudit — New Findings
+
+| ID | Severity | Area | File:Line | Status |
+|---|---|---|---|---|
+| NF-01 | Medium | Performance (linear search in SelectValue) | src/pages/Activity.tsx:198 | Fixed |
+| NF-02 | Medium | Performance (double iteration in SelectItem) | src/pages/Activity.tsx:204 | Fixed |
+
+### [NF-01] Medium: Linear search over people array in SelectValue
+- **File & Line:** `src/pages/Activity.tsx:198`
+- **Description:** The `SelectValue` component uses `people.find((p) => p.id === val)` to look up a person's name by ID, which performs a linear scan over the people array on each render. As the number of people grows, this can cause UI lag.
+- **Impact:** O(n) lookup per render; with hundreds of people, may cause noticeable delays.
+- **Remediation:** Use a memoized map from person ID to name (already computed as `personItems`) for O(1) lookup.
+- **Resolution:** Fixed. Replaced linear search with `personItems[val] ?? val`.
+
+### [NF-02] Medium: Double iteration over people array for filtering and mapping
+- **File & Line:** `src/pages/Activity.tsx:204`
+- **Description:** The `SelectContent` renders items by first filtering `people` to exclude the current user, then mapping over the filtered array to generate `SelectItem` components. This results in two passes over the array.
+- **Impact:** Extra CPU work, especially with large people arrays.
+- **Remediation:** Memoize the filtered array (`filteredPeople`) and map over it.
+- **Resolution:** Fixed. Added `const filteredPeople = useMemo(() => people.filter(p => !p.isMe), [people]);` and used it in the mapping.
+

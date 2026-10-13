@@ -6,7 +6,7 @@ import { Clock, Users, Undo2, Search, Trash2, RotateCcw } from 'lucide-react';
 import CurrencyIcon from '@/components/ui/CurrencyIcon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { getActiveExpenses, getActiveSettlements, restoreExpense, softDeleteExpense, softDeleteSettlement, restoreSettlement } from '../db/repositories';
@@ -28,6 +28,21 @@ export default function Activity() {
   const [filterPersonId, setFilterPersonId] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRefundExpense, setSelectedRefundExpense] = useState<Expense | null>(null);
+
+  const personItems = useMemo(() => {
+    const map: Record<string, string> = { all: 'All people' };
+    if (people) {
+      for (const p of people) {
+        map[p.id] = p.name;
+      }
+    }
+    return map;
+  }, [people]);
+
+  const filteredPeople = useMemo(() => {
+    if (!people) return [];
+    return people.filter(p => !p.isMe && !p.deletedAt && !p.archivedAt);
+  }, [people]);
 
   if (!expenses || !settlements || !reminders || !people || !settings) {
     return (
@@ -174,13 +189,19 @@ export default function Activity() {
           />
         </div>
 
-        <Select value={filterPersonId} onValueChange={(v) => v && setFilterPersonId(v)}>
+        <Select
+          value={filterPersonId}
+          onValueChange={(v) => v && setFilterPersonId(v)}
+          items={personItems}
+        >
           <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="All people" />
+            <SelectValue placeholder="All people">
+              {(val) => personItems[val] ?? val}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All people</SelectItem>
-            {people.filter(p => !p.isMe).map(p => (
+            {filteredPeople.map(p => (
               <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
             ))}
           </SelectContent>

@@ -1,24 +1,24 @@
 # Graph Report - Finance Tracker  (2026-10-13)
 
 ## Corpus Check
-- 129 files · ~116,947 words
+- 129 files · ~117,389 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 6 file(s) not represented in the graph (top: (none) 4, .example 1, .css 1)
 
 ## Summary
-- 698 nodes · 1740 edges · 54 communities (45 shown, 9 thin omitted)
-- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 27 edges (avg confidence: 0.95)
+- 703 nodes · 1748 edges · 52 communities (44 shown, 8 thin omitted)
+- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 30 edges (avg confidence: 0.95)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `51126f10`
+- Built from commit: `ca863ee3`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- SettleUp.tsx
-- db.ts
 - Button
+- repositories.ts
+- AddFriendModal.tsx
 - Detailed Re-Audit Findings
 - package.json
 - devDependencies
@@ -30,8 +30,6 @@
 - drawer.tsx
 - chart.tsx
 - PersonHeader.tsx
-- repositories.ts
-- navigation-menu.tsx
 - notifications.test.mjs
 - scripts
 - eslint.config.js
@@ -43,7 +41,7 @@
 - vercel.json
 - SplitLocal Release Checklist
 - Deployment Guide
-- AddExpenseModal.tsx
+- Dashboard.tsx
 - SplitLocal
 - 13192bc19f0d056b2e66bfc262a518f3f6faf52d.md
 - 1ed0fe24fa9a77afb5e6456b91c8fb749cd3bd8c.md
@@ -66,6 +64,7 @@
 - responsive-Responsive-over-dcb70--route-friends-for-overlaps-chromium/error-context.md
 - responsive-Responsive-over-eebee-route-insights-for-overlaps-chromium/error-context.md
 - 1. Problem Analysis
+- sheet.tsx
 
 ## God Nodes (most connected - your core abstractions)
 1. `Button()` - 51 edges
@@ -80,10 +79,10 @@
 10. `SettingsPage()` - 22 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `[NF-01] Medium: Linear search over people array in SelectValue` --references--> `SelectValue()`  [INFERRED]
+  AUDIT_REPORT.md → src/components/ui/select.tsx
 - `[RF-01] Medium: Missing Dexie Index on `refundOfId` — Full Table Scans on Refund Operations` --references--> `SplitLocalDB`  [INFERRED]
   AUDIT_REPORT.md → src/db/db.ts
-- `[F-03] High: Date Format Incompatibility in `computeAnalyze` and `Analyze.tsx`` --references--> `computeAnalyze()`  [INFERRED]
-  AUDIT_REPORT.md → src/domain/analyze.ts
 - `[F-11] Medium: Missing Currency and Country Code Controls in Settings UI` --references--> `Settings`  [INFERRED]
   AUDIT_REPORT.md → src/domain/types.ts
 - `[F-12] Low: Timezone Boundary Date Discrepancy in `DatePicker.tsx`` --references--> `getTodayISODate()`  [INFERRED]
@@ -94,35 +93,35 @@
 ## Import Cycles
 - None detected.
 
-## Communities (54 total, 9 thin omitted)
+## Communities (52 total, 8 thin omitted)
 
-### Community 0 - "SettleUp.tsx"
-Cohesion: 0.12
-Nodes (49): dexie-react-hooks, lucide-react, react, sonner, CategoriesManager(), COLOR_PRESETS, EMOJI_PRESETS, PersonActivityFeed() (+41 more)
-
-### Community 1 - "db.ts"
+### Community 0 - "Button"
 Cohesion: 0.09
-Nodes (38): Change Verification Summary, [F-05] High: Backup Schema Incompatibility Between `db.ts` and UI, bench(), fake-indexeddb, @testing-library/react, vitest, seedAndMeasure(), BackupData (+30 more)
+Nodes (49): [NF-02] Medium: Double iteration over people array for filtering and mapping, cn, dexie-react-hooks, react, CategoriesManager(), COLOR_PRESETS, EMOJI_PRESETS, EditFriendModal() (+41 more)
 
-### Community 2 - "Button"
-Cohesion: 0.09
-Nodes (40): @base-ui/react, class-variance-authority, cn, AddFriendModal(), COLORS, AddRefundModal(), Props, EditFriendModal() (+32 more)
+### Community 1 - "repositories.ts"
+Cohesion: 0.06
+Nodes (57): Change Verification Summary, [F-05] High: Backup Schema Incompatibility Between `db.ts` and UI, bench(), RFC-4122, dexie, fake-indexeddb, vitest, seedAndMeasure() (+49 more)
+
+### Community 2 - "AddFriendModal.tsx"
+Cohesion: 0.08
+Nodes (19): @base-ui/react, class-variance-authority, AddFriendModal(), COLORS, Badge(), badgeVariants, Checkbox(), NavigationMenu() (+11 more)
 
 ### Community 3 - "Detailed Re-Audit Findings"
 Cohesion: 0.07
-Nodes (27): Detailed Re-Audit Findings, [F-03] High: Date Format Incompatibility in `computeAnalyze` and `Analyze.tsx`, [F-04] High: Unique Index Collision & Unhandled Crash on Backup Merge, [F-06] Medium: Recharts & `dangerouslySetInnerHTML` Still Present in Project, [F-07] Medium: Unhandled `NaN` in Settle Up Form Submission, [F-08] Medium: Multi-Currency Debts Silently Hidden on Dashboard & Friends, [F-09] Medium: Indian Numbering System (`en-IN`) Hardcoded for Non-INR Currencies, [F-10] Medium: False Positive Prototype Pollution Rejection in Backup Import (+19 more)
+Nodes (29): Detailed Re-Audit Findings, [F-01] Critical: `createRefundForExpense` Allocation Breakdown & Zod Invariant Failure, [F-04] High: Unique Index Collision & Unhandled Crash on Backup Merge, [F-06] Medium: Recharts & `dangerouslySetInnerHTML` Still Present in Project, [F-07] Medium: Unhandled `NaN` in Settle Up Form Submission, [F-08] Medium: Multi-Currency Debts Silently Hidden on Dashboard & Friends, [F-09] Medium: Indian Numbering System (`en-IN`) Hardcoded for Non-INR Currencies, [F-10] Medium: False Positive Prototype Pollution Rejection in Backup Import (+21 more)
 
 ### Community 5 - "package.json"
 Cohesion: 0.08
-Nodes (25): name, private, type, version, autoprefixer, clsx, date-fns, dexie (+17 more)
+Nodes (25): name, private, type, version, autoprefixer, clsx, date-fns, framer-motion (+17 more)
 
 ### Community 6 - "devDependencies"
 Cohesion: 0.07
 Nodes (27): devDependencies, autoprefixer, clsx, eslint, @eslint/js, eslint-plugin-react-hooks, eslint-plugin-react-refresh, fake-indexeddb (+19 more)
 
 ### Community 7 - "App.tsx"
-Cohesion: 0.09
-Nodes (18): react-dom, App(), AppShell(), NAV_ITEMS, ScrollToTop(), ErrorBoundary, Props, State (+10 more)
+Cohesion: 0.08
+Nodes (19): react-dom, @testing-library/react, App(), AppShell(), NAV_ITEMS, ScrollToTop(), ErrorBoundary, Props (+11 more)
 
 ### Community 8 - "components.json"
 Cohesion: 0.09
@@ -149,16 +148,8 @@ Cohesion: 0.20
 Nodes (13): recharts, ChartConfig, ChartContainer(), ChartContext, ChartContextProps, ChartLegendContent(), ChartStyle(), ChartTooltipContent() (+5 more)
 
 ### Community 14 - "PersonHeader.tsx"
-Cohesion: 0.15
-Nodes (8): react-router-dom, PersonHeader(), PersonHeaderProps, DropdownMenu(), DropdownMenuContent(), DropdownMenuItem(), DropdownMenuSubContent(), DropdownMenuTrigger()
-
-### Community 15 - "repositories.ts"
-Cohesion: 0.11
-Nodes (22): [F-01] Critical: `createRefundForExpense` Allocation Breakdown & Zod Invariant Failure, [F-02] Critical: Multiple Partial Refunds Can Exceed Original Expense Amount, RFC-4122, zod, createRefundForExpense(), createRefundForSettlement(), DEFAULT_CATEGORIES, ensureDefaultCategories() (+14 more)
-
-### Community 16 - "navigation-menu.tsx"
-Cohesion: 0.24
-Nodes (4): NavigationMenu(), NavigationMenuPositioner(), NavigationMenuTrigger(), navigationMenuTriggerStyle
+Cohesion: 0.16
+Nodes (7): PersonHeader(), PersonHeaderProps, DropdownMenu(), DropdownMenuContent(), DropdownMenuItem(), DropdownMenuSubContent(), DropdownMenuTrigger()
 
 ### Community 18 - "scripts"
 Cohesion: 0.25
@@ -184,9 +175,9 @@ Nodes (8): 1. Installation & PWA Manifest Check, 2. Airplane Mode (Offline) Test
 Cohesion: 0.29
 Nodes (6): 1. Build, 2. Hosting, 3. WARNING: Domain Changes and IndexedDB, 4. Service Worker Updates, Deployment Guide, HTTP Rules (Required)
 
-### Community 30 - "AddExpenseModal.tsx"
-Cohesion: 0.14
-Nodes (16): AddExpenseModal(), Props, DatePicker(), DatePickerProps, Popover(), PopoverContent(), PopoverTrigger(), createExpense() (+8 more)
+### Community 30 - "Dashboard.tsx"
+Cohesion: 0.10
+Nodes (44): [F-02] Critical: Multiple Partial Refunds Can Exceed Original Expense Amount, [F-03] High: Date Format Incompatibility in `computeAnalyze` and `Analyze.tsx`, lucide-react, react-router-dom, sonner, AddExpenseModal(), Props, AddRefundModal() (+36 more)
 
 ### Community 31 - "SplitLocal"
 Cohesion: 0.33
@@ -276,25 +267,29 @@ Nodes (3): Error details, Instructions, Test info
 Cohesion: 0.33
 Nodes (5): 1. Problem Analysis, 2. Solution Plan, A. Settle Logic Issues, B. Notification / Alert Placement, Settle Logic & Notification Positioning Investigation & Fix Plan
 
+### Community 54 - "sheet.tsx"
+Cohesion: 0.22
+Nodes (3): SheetContent(), SheetOverlay(), SheetPortal()
+
 ## Knowledge Gaps
 - **19 isolated node(s):** `@hookform/resolvers`, `date-fns`, `framer-motion`, `react-hook-form`, `tailwindcss-animate` (+14 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 360 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **9 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 362 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **8 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `react` connect `SettleUp.tsx` to `Button`, `table.tsx`, `package.json`, `App.tsx`, `drawer.tsx`, `chart.tsx`, `PersonHeader.tsx`, `repositories.ts`, `avatar.tsx`, `AddExpenseModal.tsx`?**
+- **Why does `react` connect `Button` to `repositories.ts`, `AddFriendModal.tsx`, `table.tsx`, `package.json`, `App.tsx`, `drawer.tsx`, `chart.tsx`, `PersonHeader.tsx`, `sheet.tsx`, `Dashboard.tsx`?**
   _High betweenness centrality (0.105) - this node is a cross-community bridge._
 - **What connects `@hookform/resolvers`, `date-fns`, `framer-motion` to the rest of the system?**
   _19 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `SettleUp.tsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.11531531531531532 - nodes in this community are weakly interconnected._
-- **Why does `devDependencies` connect `devDependencies` to `package.json`?**
-  _High betweenness centrality (0.054) - this node is a cross-community bridge._
-- **Should `db.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.08646322378716745 - nodes in this community are weakly interconnected._
-- **Why does `lucide-react` connect `SettleUp.tsx` to `db.ts`, `Button`, `package.json`, `App.tsx`, `PersonHeader.tsx`, `navigation-menu.tsx`, `AddExpenseModal.tsx`?**
-  _High betweenness centrality (0.052) - this node is a cross-community bridge._
 - **Should `Button` be split into smaller, more focused modules?**
-  _Cohesion score 0.08531468531468532 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.0939060939060939 - nodes in this community are weakly interconnected._
+- **Why does `devDependencies` connect `devDependencies` to `package.json`?**
+  _High betweenness centrality (0.053) - this node is a cross-community bridge._
+- **Should `repositories.ts` be split into smaller, more focused modules?**
+  _Cohesion score 0.06101834673263245 - nodes in this community are weakly interconnected._
+- **Why does `lucide-react` connect `Dashboard.tsx` to `Button`, `repositories.ts`, `AddFriendModal.tsx`, `package.json`, `App.tsx`, `PersonHeader.tsx`, `sheet.tsx`?**
+  _High betweenness centrality (0.052) - this node is a cross-community bridge._
+- **Should `AddFriendModal.tsx` be split into smaller, more focused modules?**
+  _Cohesion score 0.08258258258258258 - nodes in this community are weakly interconnected._

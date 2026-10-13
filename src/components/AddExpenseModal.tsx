@@ -50,7 +50,10 @@ export default function AddExpenseModal({ onClose }: Props) {
     if (me && !payerId) {
       setTimeout(() => setPayerId(me.id), 0);
     }
-  }, [me, payerId]);
+    if (me && selectedParticipants.size === 0) {
+      setSelectedParticipants(new Set([me.id]));
+    }
+  }, [me, payerId, selectedParticipants.size]);
 
   useEffect(() => {
     if (categories.length > 0 && !selectedCategoryId) {

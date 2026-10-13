@@ -224,7 +224,17 @@ export default function ImportBackupModal({ file, onClose }: ImportBackupModalPr
       const pd = summary.parsedData;
       await db.transaction('rw', [db.people, db.groups, db.categories, db.expenses, db.settlements, db.reminders, db.settings, db.receipts], async () => {
         await db.people.clear();
-        await db.people.bulkAdd(pd.people);
+        const seenPhones = new Set<string>();
+        const deduplicatedPeople: Person[] = [];
+        for (const p of pd.people) {
+          const phone = p.phone?.trim();
+          if (phone) {
+            if (seenPhones.has(phone)) continue;
+            seenPhones.add(phone);
+          }
+          deduplicatedPeople.push(p);
+        }
+        await db.people.bulkAdd(deduplicatedPeople);
         
         await db.groups.clear();
         if (pd.groups) await db.groups.bulkAdd(pd.groups);
