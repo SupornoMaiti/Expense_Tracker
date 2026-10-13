@@ -29,6 +29,18 @@ export default function Activity() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRefundExpense, setSelectedRefundExpense] = useState<Expense | null>(null);
 
+  const personItems = useMemo(() => {
+    const map: Record<string, string> = { all: 'All people' };
+    if (people) {
+      for (const p of people) {
+        if (!p.isMe) {
+          map[p.id] = p.name;
+        }
+      }
+    }
+    return map;
+  }, [people]);
+
   if (!expenses || !settlements || !reminders || !people || !settings) {
     return (
       <div className="flex h-full items-center justify-center p-8 animate-pulse">
@@ -135,16 +147,6 @@ export default function Activity() {
       toast.error('Failed to delete transaction');
     }
   };
-
-  const personItems = useMemo(() => {
-    const map: Record<string, string> = { all: 'All people' };
-    for (const p of people) {
-      if (!p.isMe) {
-        map[p.id] = p.name;
-      }
-    }
-    return map;
-  }, [people]);
 
   return (
     <div className="space-y-6">

@@ -1,17 +1,17 @@
 # Graph Report - Finance Tracker  (2026-10-13)
 
 ## Corpus Check
-- 129 files · ~117,106 words
+- 129 files · ~117,113 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 6 file(s) not represented in the graph (top: (none) 4, .example 1, .css 1)
 
 ## Summary
-- 700 nodes · 1737 edges · 56 communities (46 shown, 10 thin omitted)
+- 700 nodes · 1740 edges · 56 communities (46 shown, 10 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 27 edges (avg confidence: 0.95)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `401c4fc4`
+- Built from commit: `711644ad`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -75,10 +75,10 @@
 4. `db` - 28 edges
 5. `Expense` - 27 edges
 6. `cn` - 24 edges
-7. `SettingsPage()` - 22 edges
-8. `SettleUp()` - 22 edges
-9. `formatMoney()` - 22 edges
-10. `Analyze()` - 22 edges
+7. `formatMoney()` - 22 edges
+8. `Analyze()` - 22 edges
+9. `SettingsPage()` - 22 edges
+10. `SettleUp()` - 22 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `[RF-01] Medium: Missing Dexie Index on `refundOfId` — Full Table Scans on Refund Operations` --references--> `SplitLocalDB`  [INFERRED]
@@ -294,7 +294,7 @@ _Questions this graph is uniquely positioned to answer:_
 - **What connects `RFC-4122`, `autoprefixer`, `clsx` to the rest of the system?**
   _19 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `SettleUp.tsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.10423786739576213 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.10457963089542037 - nodes in this community are weakly interconnected._
 - **Why does `devDependencies` connect `devDependencies` to `package.json`?**
   _High betweenness centrality (0.054) - this node is a cross-community bridge._
 - **Should `repositories.ts` be split into smaller, more focused modules?**

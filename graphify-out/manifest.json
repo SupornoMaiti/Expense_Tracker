@@ -438,9 +438,9 @@
     "semantic_hash": "787e5a07efeb2bf6209d5937195f2f68"
   },
   "src/pages/Activity.tsx": {
-    "mtime": 1791880424.699989,
-    "seen": 1791880584.44434,
-    "ast_hash": "1453f911946d83b67f5f554372edffdc",
+    "mtime": 1791883739.4018908,
+    "seen": 1791884168.4859006,
+    "ast_hash": "df6c0372d0562ec4e8a0fd94fbcbb6f6",
     "semantic_hash": ""
   },
   "src/pages/Analyze.tsx": {
@@ -468,14 +468,14 @@
     "semantic_hash": ""
   },
   "src/pages/Settings.tsx": {
-    "mtime": 1791880497.3843603,
-    "seen": 1791880584.4446976,
+    "mtime": 1791883626.3419812,
+    "seen": 1791883629.1412344,
     "ast_hash": "cadab10c811f8571dcd8caf9f2eb42e1",
     "semantic_hash": ""
   },
   "src/pages/SettleUp.tsx": {
-    "mtime": 1791880550.076909,
-    "seen": 1791880584.444701,
+    "mtime": 1791883626.3421888,
+    "seen": 1791883629.1412358,
     "ast_hash": "2c1e41f268884d308c6ba3fabc734353",
     "semantic_hash": ""
   },
@@ -805,7 +805,7 @@
   },
   "supabase-schema.sql": {
     "mtime": 1791179243.6589963,
-    "seen": 1791880605.7450159,
+    "seen": 1791884192.6385202,
     "ast_hash": "f6b175c38afd3096c3f4c20cc99bd49b",
     "semantic_hash": ""
   },
@@ -822,9 +822,9 @@
     "semantic_hash": ""
   },
   "src/lib/__tests__/utils.test.ts": {
-    "mtime": 1791880015.5302258,
-    "seen": 1791880584.440589,
-    "ast_hash": "773442ab1130ce004a1c914cac8d3a87",
+    "mtime": 1791884128.5023468,
+    "seen": 1791884168.48552,
+    "ast_hash": "e97bf160c81a664d059f18b9440b725f",
     "semantic_hash": ""
   }
 }

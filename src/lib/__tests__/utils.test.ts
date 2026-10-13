@@ -22,6 +22,7 @@ describe('generateId', () => {
   it('falls back to crypto.getRandomValues when crypto.randomUUID is not a function (e.g. non-secure HTTP / LAN)', () => {
     const originalCrypto = globalThis.crypto;
     vi.stubGlobal('crypto', {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       getRandomValues: (arr: Uint8Array) => originalCrypto.getRandomValues(arr as any),
       randomUUID: undefined,
     });
