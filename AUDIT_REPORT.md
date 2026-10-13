@@ -4,7 +4,7 @@
 
 | ID | Severity | Area | file:line | Status |
 |---|---|---|---|---|
-| AUDIT-01 | Medium | Money input validation | src/lib/money.ts:27-29 | Open |
+| AUDIT-01 | Medium | Money input validation | src/lib/money.ts:27-29 | Fixed (commit: pending, test: `parseDecimalToMinor rejects inputs with more than two decimal places`) |
 | AUDIT-02 | High | Dependency security | package-lock.json (npm audit --omit=dev) | Open |
 
 ## Bugs
@@ -14,6 +14,8 @@
 - Reproduction: `parseDecimalToMinor("1.999")` returns `199` instead of invalid input.
 - Root cause: `decPart` is sliced with `substring(0, 2)`.
 - Impact: User can enter amounts with more than 2 decimals and app silently changes value.
+- Fix: reject inputs where the decimal part has more than 2 digits in `parseDecimalToMinor`.
+- Regression test: `src/lib/__tests__/money.test.ts` → `parseDecimalToMinor > rejects inputs with more than two decimal places`.
 
 ### AUDIT-02: High-severity production dependency vulnerabilities
 - Description: `npm audit --omit=dev` reports high vulnerabilities in production dependency tree.

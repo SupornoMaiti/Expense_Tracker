@@ -24,8 +24,8 @@ export function parseDecimalToMinor(input: string): number {
   const intPart = match[1];
   let decPart = match[2] || '';
   
-  // Truncate or pad decimal to 2 places
-  if (decPart.length > 2) decPart = decPart.substring(0, 2);
+  // Reject precision beyond 2 decimal places for money inputs
+  if (decPart.length > 2) return NaN;
   if (decPart.length === 1) decPart += '0';
   if (decPart.length === 0) decPart = '00';
   

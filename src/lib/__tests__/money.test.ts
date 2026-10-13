@@ -1,11 +1,17 @@
 import { describe, it, expect } from 'vitest';
-import { formatMoney } from '../money';
+import { formatMoney, parseDecimalToMinor } from '../money';
 import { getWhatsAppLink } from '../whatsapp';
 import type { Person } from '../../domain/types';
 
 describe('formatMoney', () => {
   it('formats exactly 0', () => {
     expect(formatMoney(0, 'INR')).toBe('₹0.00');
+  });
+
+  describe('parseDecimalToMinor', () => {
+    it('rejects inputs with more than two decimal places', () => {
+      expect(parseDecimalToMinor('1.999')).toBeNaN();
+    });
   });
   
   it('formats 1 minor unit', () => {
