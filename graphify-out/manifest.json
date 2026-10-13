@@ -438,8 +438,8 @@
     "semantic_hash": "787e5a07efeb2bf6209d5937195f2f68"
   },
   "src/pages/Activity.tsx": {
-    "mtime": 1791888463.9785156,
-    "seen": 1791888893.166939,
+    "mtime": 1791889167.5691988,
+    "seen": 1791889699.0330534,
     "ast_hash": "5b06a2bc982e4d17d36d6d6c2a67363c",
     "semantic_hash": ""
   },
@@ -462,8 +462,8 @@
     "semantic_hash": ""
   },
   "src/pages/PersonDetail.tsx": {
-    "mtime": 1791888123.90378,
-    "seen": 1791888893.1670322,
+    "mtime": 1791889167.5691988,
+    "seen": 1791889699.0331852,
     "ast_hash": "5dda8d4d1a941cf981fdf809e5bf2754",
     "semantic_hash": ""
   },
@@ -582,14 +582,14 @@
     "semantic_hash": ""
   },
   "src/components/person/PersonBalanceSummary.tsx": {
-    "mtime": 1791888207.1052535,
-    "seen": 1791888893.1637213,
+    "mtime": 1791889167.5691988,
+    "seen": 1791889699.03027,
     "ast_hash": "354d82490d2d9716db1d517ff984b4f2",
     "semantic_hash": ""
   },
   "src/components/person/PersonHeader.tsx": {
-    "mtime": 1791888780.7004545,
-    "seen": 1791888893.1637228,
+    "mtime": 1791889167.5691988,
+    "seen": 1791889699.030272,
     "ast_hash": "021f0afe6b7b50f06f55eeaedf45af3f",
     "semantic_hash": ""
   },
@@ -606,8 +606,8 @@
     "semantic_hash": ""
   },
   "src/hooks/usePersonDetailData.ts": {
-    "mtime": 1791888092.3606594,
-    "seen": 1791888893.1663969,
+    "mtime": 1791889167.5691988,
+    "seen": 1791889699.032548,
     "ast_hash": "0c4e72fcefc5bbae606fb65dded0dd50",
     "semantic_hash": ""
   },
@@ -805,7 +805,7 @@
   },
   "supabase-schema.sql": {
     "mtime": 1791179243.6589963,
-    "seen": 1791888928.3742566,
+    "seen": 1791889707.6094353,
     "ast_hash": "f6b175c38afd3096c3f4c20cc99bd49b",
     "semantic_hash": ""
   },
@@ -828,9 +828,9 @@
     "semantic_hash": ""
   },
   "src/__tests__/activityAndSettlementReset.test.tsx": {
-    "mtime": 1791888747.8960056,
-    "seen": 1791888893.163051,
-    "ast_hash": "3b00e39fbe8c5f5b7c12c3ad642a43df",
+    "mtime": 1791889658.7381296,
+    "seen": 1791889699.0290396,
+    "ast_hash": "60bae33d8f0f98ba0879bec7b9aadc0b",
     "semantic_hash": ""
   },
   ".github/agents/my-agent.agent.md": {

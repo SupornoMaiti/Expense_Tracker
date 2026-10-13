@@ -1,17 +1,17 @@
 # Graph Report - Finance Tracker  (2026-10-13)
 
 ## Corpus Check
-- 131 files · ~120,374 words
+- 131 files · ~120,384 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 6 file(s) not represented in the graph (top: (none) 4, .example 1, .css 1)
 
 ## Summary
-- 719 nodes · 1770 edges · 53 communities (46 shown, 7 thin omitted)
+- 719 nodes · 1775 edges · 55 communities (46 shown, 9 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 31 edges (avg confidence: 0.95)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `902b7387`
+- Built from commit: `d0b88e74`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -95,10 +95,10 @@
 ## Import Cycles
 - None detected.
 
-## Communities (53 total, 7 thin omitted)
+## Communities (55 total, 9 thin omitted)
 
 ### Community 0 - "SettleUp.tsx"
-Cohesion: 0.06
+Cohesion: 0.07
 Nodes (52): [NF-02] Medium: Double iteration over people array for filtering and mapping, RFC-4122, cn, react, AddExpenseModal(), Props, CategoriesManager(), COLOR_PRESETS (+44 more)
 
 ### Community 1 - "db.ts"
@@ -186,7 +186,7 @@ Cohesion: 0.29
 Nodes (6): 1. Build, 2. Hosting, 3. WARNING: Domain Changes and IndexedDB, 4. Service Worker Updates, Deployment Guide, HTTP Rules (Required)
 
 ### Community 30 - "Button"
-Cohesion: 0.08
+Cohesion: 0.10
 Nodes (36): @base-ui/react, class-variance-authority, AddFriendModal(), COLORS, EditFriendModal(), hasPrototypePollution(), ImportBackupModal(), ImportBackupModalProps (+28 more)
 
 ### Community 31 - "SplitLocal"
@@ -284,17 +284,17 @@ Nodes (7): Bug Auditor, Final output, Project context (do not violate), Rules of
 ## Knowledge Gaps
 - **19 isolated node(s):** `RFC-4122`, `autoprefixer`, `clsx`, `date-fns`, `framer-motion` (+14 more)
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 374 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **7 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **9 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `react` connect `SettleUp.tsx` to `package.json`, `App.tsx`, `drawer.tsx`, `chart.tsx`, `PersonHeader.tsx`, `repositories.ts`, `Button`?**
+- **Why does `react` connect `SettleUp.tsx` to `table.tsx`, `package.json`, `App.tsx`, `drawer.tsx`, `chart.tsx`, `PersonHeader.tsx`, `repositories.ts`, `avatar.tsx`, `Button`?**
   _High betweenness centrality (0.102) - this node is a cross-community bridge._
 - **What connects `RFC-4122`, `autoprefixer`, `clsx` to the rest of the system?**
   _19 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `SettleUp.tsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.05979843225083987 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07031463748290014 - nodes in this community are weakly interconnected._
 - **Why does `devDependencies` connect `devDependencies` to `package.json`?**
   _High betweenness centrality (0.052) - this node is a cross-community bridge._
 - **Should `db.ts` be split into smaller, more focused modules?**
