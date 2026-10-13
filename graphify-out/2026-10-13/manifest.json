@@ -84,9 +84,9 @@
     "semantic_hash": "611cf140b1fd3fa0201457f4ca91f5b1"
   },
   "src/components/AddExpenseModal.tsx": {
-    "mtime": 1791790576.9586277,
-    "seen": 1791790581.328392,
-    "ast_hash": "bdff67907cae9a0e2bf727e9bf3a31f5",
+    "mtime": 1791886298.2118678,
+    "seen": 1791886301.8852208,
+    "ast_hash": "43bb845f77b9c48845a5c44aaea3822b",
     "semantic_hash": ""
   },
   "src/components/AddFriendModal.tsx": {
@@ -114,9 +114,9 @@
     "semantic_hash": "675abda58ec27bf2df877f9d8808fd94"
   },
   "src/components/ImportBackupModal.tsx": {
-    "mtime": 1791790576.9586277,
-    "seen": 1791790581.3286965,
-    "ast_hash": "63fe75f495f8938981fdd18f3bb16b0e",
+    "mtime": 1791886298.2128677,
+    "seen": 1791886301.8857293,
+    "ast_hash": "95482bdaee0c33fbbf35646d074a65d4",
     "semantic_hash": ""
   },
   "src/components/ThemeToggle.tsx": {
@@ -438,9 +438,9 @@
     "semantic_hash": "787e5a07efeb2bf6209d5937195f2f68"
   },
   "src/pages/Activity.tsx": {
-    "mtime": 1791885333.7968314,
-    "seen": 1791885393.398456,
-    "ast_hash": "df67e6bb79f5cf185e5ca0c54addf278",
+    "mtime": 1791886298.2128677,
+    "seen": 1791886301.8895233,
+    "ast_hash": "213bbb5e14048b9466097545d9328416",
     "semantic_hash": ""
   },
   "src/pages/Analyze.tsx": {
@@ -468,14 +468,14 @@
     "semantic_hash": ""
   },
   "src/pages/Settings.tsx": {
-    "mtime": 1791883626.3419812,
-    "seen": 1791883629.1412344,
+    "mtime": 1791885946.6835117,
+    "seen": 1791886279.1380873,
     "ast_hash": "cadab10c811f8571dcd8caf9f2eb42e1",
     "semantic_hash": ""
   },
   "src/pages/SettleUp.tsx": {
-    "mtime": 1791883626.3421888,
-    "seen": 1791883629.1412358,
+    "mtime": 1791885946.6837459,
+    "seen": 1791886279.1380885,
     "ast_hash": "2c1e41f268884d308c6ba3fabc734353",
     "semantic_hash": ""
   },
@@ -612,8 +612,8 @@
     "semantic_hash": ""
   },
   "AUDIT_REPORT.md": {
-    "mtime": 1791885059.4323792,
-    "seen": 1791885393.3992796,
+    "mtime": 1791885946.6722622,
+    "seen": 1791886279.1381068,
     "ast_hash": "098798031be52f251934a6f7dcb6c348",
     "semantic_hash": ""
   },
@@ -806,7 +806,7 @@
   "supabase-schema.sql": {
     "mtime": 1791179243.6589963,
     "seen": 1791885446.1500638,
-    "ast_hash": "f6b175c38afd3096c3f4c20cc99bd49b",
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "public/SplitLocal Brush Logo Light.png": {
@@ -822,8 +822,8 @@
     "semantic_hash": ""
   },
   "src/lib/__tests__/utils.test.ts": {
-    "mtime": 1791884128.5023468,
-    "seen": 1791884168.48552,
+    "mtime": 1791885946.682954,
+    "seen": 1791886279.1380723,
     "ast_hash": "e97bf160c81a664d059f18b9440b725f",
     "semantic_hash": ""
   }

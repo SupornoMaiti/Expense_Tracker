@@ -90,13 +90,13 @@ export default function Activity() {
     activityItems = activityItems.filter(a => {
       if (a.type === 'expense') {
         const d = a.data;
-        const pNames = (d.participantIds || []).map((id: string) => people.find(p => p.id === id)?.name || '').join(' ');
+        const pNames = (d.participantIds || []).map((id: string) => personItems[id] || '').join(' ');
         return (d.description || '').toLowerCase().includes(q) || (d.notes || '').toLowerCase().includes(q) || pNames.toLowerCase().includes(q);
       }
       if (a.type === 'settlement') {
         const d = a.data;
-        const fromName = people.find(p => p.id === d.fromId)?.name || '';
-        const toName = people.find(p => p.id === d.toId)?.name || '';
+        const fromName = personItems[d.fromId] || '';
+        const toName = personItems[d.toId] || '';
         return fromName.toLowerCase().includes(q) || toName.toLowerCase().includes(q) || (d.notes || '').toLowerCase().includes(q);
       }
       return false;

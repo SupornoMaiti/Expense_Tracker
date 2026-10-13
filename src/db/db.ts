@@ -88,7 +88,19 @@ export async function importBackup(jsonStr: string): Promise<void> {
     for (const table of db.tables) {
       await table.clear();
       if (data[table.name]) {
-        await table.bulkAdd(data[table.name]);
+        let items = data[table.name];
+        if (table.name === 'people' && Array.isArray(items)) {
+          const seenPhones = new Set<string>();
+          items = (items as Person[]).filter(p => {
+            const phone = p.phone?.trim();
+            if (phone) {
+              if (seenPhones.has(phone)) return false;
+              seenPhones.add(phone);
+            }
+            return true;
+          });
+        }
+        await table.bulkAdd(items);
       }
     }
   });

@@ -75,7 +75,7 @@ export default function Dashboard() {
 
 
   const analyzeResult = myId ? computeAnalyze(expenses, myId, currency, 'all') : null;
-  const totalSpendThisMonth = analyzeResult ? analyzeResult.totalSpendMinor : 0;
+  const totalSpend = analyzeResult ? analyzeResult.totalSpendMinor : 0;
 
   const handleDeleteItem = async (item: Expense | Settlement) => {
     const isExpense = 'description' in item;
@@ -123,7 +123,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent className="space-y-0.5 pt-1">
             <div className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground truncate">
-              {formatMoney(totalSpendThisMonth, currency)}
+              {formatMoney(totalSpend, currency)}
             </div>
             <p className="text-xs text-muted-foreground">
               All-time spending

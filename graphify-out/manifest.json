@@ -84,9 +84,9 @@
     "semantic_hash": "611cf140b1fd3fa0201457f4ca91f5b1"
   },
   "src/components/AddExpenseModal.tsx": {
-    "mtime": 1791886119.1791081,
-    "seen": 1791886279.1379983,
-    "ast_hash": "43bb845f77b9c48845a5c44aaea3822b",
+    "mtime": 1791886573.4937077,
+    "seen": 1791887149.4711127,
+    "ast_hash": "40187a5be7f13620b615eb7ed1080e43",
     "semantic_hash": ""
   },
   "src/components/AddFriendModal.tsx": {
@@ -114,8 +114,8 @@
     "semantic_hash": "675abda58ec27bf2df877f9d8808fd94"
   },
   "src/components/ImportBackupModal.tsx": {
-    "mtime": 1791886156.1372747,
-    "seen": 1791886279.1380053,
+    "mtime": 1791886298.2128677,
+    "seen": 1791886301.8857293,
     "ast_hash": "95482bdaee0c33fbbf35646d074a65d4",
     "semantic_hash": ""
   },
@@ -282,10 +282,10 @@
     "semantic_hash": "2acb5ba5599eb382480e1c6e1a091380"
   },
   "src/db/__tests__/backup.test.ts": {
-    "mtime": 1791660295.3151414,
-    "seen": 1791746135.5705047,
-    "ast_hash": "93ac72682926cbcf2d2829a0ea368647",
-    "semantic_hash": "93ac72682926cbcf2d2829a0ea368647"
+    "mtime": 1791887129.0071065,
+    "seen": 1791887149.472932,
+    "ast_hash": "9440962914dd1e0bf0d2f35044f2df9a",
+    "semantic_hash": ""
   },
   "src/db/__tests__/migration.test.ts": {
     "mtime": 1791660295.3152828,
@@ -306,9 +306,9 @@
     "semantic_hash": "c55f3da8c2b351916ca0f6a726f341c4"
   },
   "src/db/db.ts": {
-    "mtime": 1791790576.9596276,
-    "seen": 1791790581.3695517,
-    "ast_hash": "d7ec85a1af2b61ca48208f8d10c875ed",
+    "mtime": 1791887039.5285957,
+    "seen": 1791887149.4730752,
+    "ast_hash": "b084ebf8e9714304c816a2b28fe38059",
     "semantic_hash": ""
   },
   "src/db/repositories.ts": {
@@ -438,9 +438,9 @@
     "semantic_hash": "787e5a07efeb2bf6209d5937195f2f68"
   },
   "src/pages/Activity.tsx": {
-    "mtime": 1791886137.7183044,
-    "seen": 1791886279.1380808,
-    "ast_hash": "213bbb5e14048b9466097545d9328416",
+    "mtime": 1791887076.3741937,
+    "seen": 1791887149.4743407,
+    "ast_hash": "eeff17091c78ceaff24806d62b76837a",
     "semantic_hash": ""
   },
   "src/pages/Analyze.tsx": {
@@ -450,9 +450,9 @@
     "semantic_hash": ""
   },
   "src/pages/Dashboard.tsx": {
-    "mtime": 1791790576.9616277,
-    "seen": 1791790581.3790827,
-    "ast_hash": "1828d6b9356cad9043c1261f88349af3",
+    "mtime": 1791887058.8239043,
+    "seen": 1791887149.474387,
+    "ast_hash": "65355b68b6dac0b90b016c76b8c6ce77",
     "semantic_hash": ""
   },
   "src/pages/Friends.tsx": {
@@ -806,7 +806,7 @@
   "supabase-schema.sql": {
     "mtime": 1791179243.6589963,
     "seen": 1791885446.1500638,
-    "ast_hash": "f6b175c38afd3096c3f4c20cc99bd49b",
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "public/SplitLocal Brush Logo Light.png": {

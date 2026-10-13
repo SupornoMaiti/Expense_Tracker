@@ -95,4 +95,45 @@ describe('Backup and restore logic', () => {
     const savedExp = parsed.expenses[0] as Expense | undefined;
     expect(savedExp?.description).toBe('=Dinner + Drinks - Discount @home');
   });
+
+  it('deduplicates duplicate phone numbers in people to avoid ConstraintError', async () => {
+    const backupData = {
+      schemaVersion: 1,
+      data: {
+        people: [
+          {
+            id: 'p1',
+            name: 'Alice',
+            phone: '+919999999999',
+            avatarColor: '#10b981',
+            source: 'manual',
+            isMe: false,
+            createdAt: '2026-01-01T00:00:00Z',
+            updatedAt: '2026-01-01T00:00:00Z',
+            archivedAt: null,
+            deletedAt: null
+          },
+          {
+            id: 'p2',
+            name: 'Alice Duplicate Phone',
+            phone: '+919999999999',
+            avatarColor: '#3b82f6',
+            source: 'manual',
+            isMe: false,
+            createdAt: '2026-01-01T00:00:00Z',
+            updatedAt: '2026-01-01T00:00:00Z',
+            archivedAt: null,
+            deletedAt: null
+          }
+        ],
+        expenses: [],
+        settlements: []
+      }
+    };
+
+    await expect(importBackup(JSON.stringify(backupData))).resolves.not.toThrow();
+    const people = await db.people.toArray();
+    expect(people).toHaveLength(1);
+    expect(people[0].phone).toBe('+919999999999');
+  });
 });

@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `ca863ee3`
+- Built from commit: `be231fbb`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -30,6 +30,7 @@
 - drawer.tsx
 - chart.tsx
 - PersonHeader.tsx
+- sheet.tsx
 - notifications.test.mjs
 - scripts
 - eslint.config.js
@@ -64,7 +65,6 @@
 - responsive-Responsive-over-dcb70--route-friends-for-overlaps-chromium/error-context.md
 - responsive-Responsive-over-eebee-route-insights-for-overlaps-chromium/error-context.md
 - 1. Problem Analysis
-- sheet.tsx
 
 ## God Nodes (most connected - your core abstractions)
 1. `Button()` - 51 edges
@@ -150,6 +150,10 @@ Nodes (13): recharts, ChartConfig, ChartContainer(), ChartContext, ChartContextP
 ### Community 14 - "PersonHeader.tsx"
 Cohesion: 0.16
 Nodes (7): PersonHeader(), PersonHeaderProps, DropdownMenu(), DropdownMenuContent(), DropdownMenuItem(), DropdownMenuSubContent(), DropdownMenuTrigger()
+
+### Community 15 - "sheet.tsx"
+Cohesion: 0.22
+Nodes (3): SheetContent(), SheetOverlay(), SheetPortal()
 
 ### Community 18 - "scripts"
 Cohesion: 0.25
@@ -266,10 +270,6 @@ Nodes (3): Error details, Instructions, Test info
 ### Community 52 - "1. Problem Analysis"
 Cohesion: 0.33
 Nodes (5): 1. Problem Analysis, 2. Solution Plan, A. Settle Logic Issues, B. Notification / Alert Placement, Settle Logic & Notification Positioning Investigation & Fix Plan
-
-### Community 54 - "sheet.tsx"
-Cohesion: 0.22
-Nodes (3): SheetContent(), SheetOverlay(), SheetPortal()
 
 ## Knowledge Gaps
 - **19 isolated node(s):** `@hookform/resolvers`, `date-fns`, `framer-motion`, `react-hook-form`, `tailwindcss-animate` (+14 more)

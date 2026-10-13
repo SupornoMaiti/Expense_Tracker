@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { parseDecimalToMinor } from '../lib/money';
 import { db } from '../db/db';
 import { createExpense } from '../db/repositories';
@@ -46,20 +46,26 @@ export default function AddExpenseModal({ onClose }: Props) {
     return a.name.localeCompare(b.name);
   });
 
+  const initializedMeRef = useRef(false);
   useEffect(() => {
-    if (me && !payerId) {
-      setTimeout(() => setPayerId(me.id), 0);
+    if (me && !initializedMeRef.current) {
+      initializedMeRef.current = true;
+      setTimeout(() => {
+        setPayerId(prev => prev || me.id);
+        setSelectedParticipants(prev => (prev.size === 0 ? new Set([me.id]) : prev));
+      }, 0);
     }
-    if (me && selectedParticipants.size === 0) {
-      setSelectedParticipants(new Set([me.id]));
-    }
-  }, [me, payerId, selectedParticipants.size]);
+  }, [me]);
 
+  const initializedCategoryRef = useRef(false);
   useEffect(() => {
-    if (categories.length > 0 && !selectedCategoryId) {
-      setTimeout(() => setSelectedCategoryId(categories[0].id), 0);
+    if (categories.length > 0 && !initializedCategoryRef.current) {
+      initializedCategoryRef.current = true;
+      setTimeout(() => {
+        setSelectedCategoryId(prev => prev || categories[0].id);
+      }, 0);
     }
-  }, [categories, selectedCategoryId]);
+  }, [categories]);
 
   const toggleParticipant = (id: string) => {
     const next = new Set(selectedParticipants);
