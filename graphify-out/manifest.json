@@ -612,9 +612,9 @@
     "semantic_hash": ""
   },
   "AUDIT_REPORT.md": {
-    "mtime": 1791885946.6722622,
-    "seen": 1791886279.1381068,
-    "ast_hash": "098798031be52f251934a6f7dcb6c348",
+    "mtime": 1791887191.4462628,
+    "seen": 1791887206.9199164,
+    "ast_hash": "a595cd4c018b0fbd332fa1ef87a879a1",
     "semantic_hash": ""
   },
   "DEPLOY.md": {
@@ -805,8 +805,8 @@
   },
   "supabase-schema.sql": {
     "mtime": 1791179243.6589963,
-    "seen": 1791885446.1500638,
-    "ast_hash": "",
+    "seen": 1791887206.919871,
+    "ast_hash": "f6b175c38afd3096c3f4c20cc99bd49b",
     "semantic_hash": ""
   },
   "public/SplitLocal Brush Logo Light.png": {

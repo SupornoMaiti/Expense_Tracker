@@ -8464,7 +8464,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/components/AddExpenseModal.tsx",
-      "source_location": "L100",
+      "source_location": "L106",
       "weight": 1.0
     },
     {
@@ -8476,7 +8476,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/components/AddExpenseModal.tsx",
-      "source_location": "L140",
+      "source_location": "L146",
       "weight": 1.0
     },
     {
@@ -8488,7 +8488,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/components/AddExpenseModal.tsx",
-      "source_location": "L148",
+      "source_location": "L154",
       "weight": 1.0
     },
     {
@@ -8500,7 +8500,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/components/AddExpenseModal.tsx",
-      "source_location": "L149",
+      "source_location": "L155",
       "weight": 1.0
     },
     {
@@ -8512,7 +8512,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/components/AddExpenseModal.tsx",
-      "source_location": "L193",
+      "source_location": "L199",
       "weight": 1.0
     },
     {
@@ -8536,7 +8536,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/components/AddExpenseModal.tsx",
-      "source_location": "L76",
+      "source_location": "L82",
       "weight": 1.0
     },
     {
@@ -8548,7 +8548,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/components/AddExpenseModal.tsx",
-      "source_location": "L82",
+      "source_location": "L88",
       "weight": 1.0
     },
     {
@@ -8560,7 +8560,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/components/AddExpenseModal.tsx",
-      "source_location": "L87",
+      "source_location": "L93",
       "weight": 1.0
     },
     {

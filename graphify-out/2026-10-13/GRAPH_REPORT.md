@@ -1,7 +1,7 @@
 # Graph Report - Finance Tracker  (2026-10-13)
 
 ## Corpus Check
-- 129 files · ~117,389 words
+- 129 files · ~117,527 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 6 file(s) not represented in the graph (top: (none) 4, .example 1, .css 1)
 
