@@ -420,9 +420,9 @@
     "semantic_hash": ""
   },
   "src/lib/utils.ts": {
-    "mtime": 1791749703.105384,
-    "seen": 1791782411.495425,
-    "ast_hash": "405f76c0bdad2bb0f5b87c55186001dc",
+    "mtime": 1791879862.727938,
+    "seen": 1791879966.1854165,
+    "ast_hash": "b96f153c8e05301ed8e9825bfbf0ac8d",
     "semantic_hash": ""
   },
   "src/lib/whatsapp.ts": {
@@ -819,6 +819,12 @@
     "mtime": 1791782652.7676275,
     "seen": 1791782655.8239737,
     "ast_hash": "96bae255304eba6ad209411937576ad5",
+    "semantic_hash": ""
+  },
+  "src/lib/__tests__/utils.test.ts": {
+    "mtime": 1791879933.2600942,
+    "seen": 1791879966.1852782,
+    "ast_hash": "773442ab1130ce004a1c914cac8d3a87",
     "semantic_hash": ""
   }
 }
